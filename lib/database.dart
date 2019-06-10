@@ -14,30 +14,40 @@ class Database {
 
   Database._internal(this.name);
 
-  static Future<Database> initWithName(String _name) async {
+  /// Initializes a Couchbase Lite database with the given [dbName].
+  static Future<Database> initWithName(String dbName) async {
     await _methodChannel.invokeMethod(
-        'initDatabaseWithName', <String, dynamic>{'database': _name});
-    return Database._internal(_name);
+        'initDatabaseWithName', <String, dynamic>{'database': dbName});
+    return Database._internal(dbName);
   }
 
-  static Future<void> deleteWithName(String _name) =>
+  /// Deletes a database of the given [dbName].
+  static Future<void> deleteWithName(String dbName) =>
       _methodChannel.invokeMethod(
-          'deleteDatabaseWithName', <String, dynamic>{'database': _name});
+          'deleteDatabaseWithName', <String, dynamic>{'database': dbName});
 
-  Future<Map<dynamic, dynamic>> documentWithId(String _id) =>
-      _methodChannel.invokeMethod(
-          'getDocumentWithId', <String, dynamic>{'database': name, 'id': _id});
+  /// Gets a Document object with the given [id]
+  Future<Document> documentWithId(String id) async {
+    Map<dynamic, dynamic> _docResult = await _methodChannel.invokeMethod(
+        'getDocumentWithId', <String, dynamic>{'database': name, 'id': id});
 
-  Future<String> saveDocument(Document _doc) => _methodChannel.invokeMethod(
-      'saveDocument', <String, dynamic>{'database': name, 'map': _doc.toMap()});
+    return Document(_docResult["doc"], _docResult["id"]);
+  }
 
-  Future<String> saveDocumentWithId(String _id, Document _doc) =>
+  /// Saves [doc] to the database with the document id set by the database.
+  Future<String> saveDocument(Document doc) => _methodChannel.invokeMethod(
+      'saveDocument', <String, dynamic>{'database': name, 'map': doc.toMap()});
+
+  /// Saves [doc] to the database with the Document id set to [id].
+  Future<String> saveDocumentWithId(String id, Document doc) =>
       _methodChannel.invokeMethod('saveDocumentWithId',
-          <String, dynamic>{'database': name, 'id': _id, 'map': _doc.toMap()});
+          <String, dynamic>{'database': name, 'id': id, 'map': doc.toMap()});
 
-  Future<void> deleteDocument(String _id) => _methodChannel.invokeMethod(
-      'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': _id});
+  /// Deletes document with [id] from the database.
+  Future<void> deleteDocument(String id) => _methodChannel.invokeMethod(
+      'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': id});
 
+  /// Closes database.
   Future<void> close() => _methodChannel.invokeMethod(
       'closeDatabaseWithName', <String, dynamic>{'database': name});
 

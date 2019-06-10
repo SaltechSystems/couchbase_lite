@@ -56,7 +56,10 @@ void main() {
           break;
         case ("getDocumentWithId"):
           if (arguments.containsKey("id")) {
-            return {"testdoc": "test"};
+            return {
+              "id": arguments["id"],
+              "doc": {"testdoc": "test"}
+            };
           } else {
             return PlatformException(
                 code: "errArgs",
@@ -99,6 +102,9 @@ void main() {
         case "stopReplicator":
           return null;
           break;
+        default:
+          return UnimplementedError();
+          break;
       }
     });
   });
@@ -115,7 +121,7 @@ void main() {
     expect(await database.count, 1);
     expect(await database.saveDocument(Document({})), "documentid");
     expect(await database.saveDocumentWithId("docid", Document({})), "docid");
-    expect(await database.documentWithId("myid"), {"testdoc": "test"});
+    await database.documentWithId("myid");
   });
 
   test('testQuery', () async {

@@ -16,7 +16,7 @@ In your flutter project add the dependency:
 ```
 dependencies:
   ...
-  couchbase_lite: ^2.5.0
+  couchbase_lite: ^2.5.1+1
 ```
 
 For help getting started with Flutter, view the 

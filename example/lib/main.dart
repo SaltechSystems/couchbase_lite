@@ -42,7 +42,8 @@ class _MyAppState extends State<MyApp> {
 
     Future.delayed(Duration(seconds: 5)).whenComplete(() async {
       if (database != null) {
-        database.deleteDocument("test");
+        await database.documentWithId("test");
+        await database.deleteDocument("test");
         final int count = await database.count;
 
         if (!mounted) return;

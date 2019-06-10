@@ -25,21 +25,30 @@ class Replicator {
 
   Replicator(this.config);
 
+  /// Starts the replicator.
+  ///
+  /// The replicator runs asynchronously and will report its progress throuh the replicator change notification.
   Future<void> start() async {
     await _channel.invokeMethod('startReplicator', this);
   }
 
+  /// Stops a running replicator.
+  ///
+  /// When the replicator actually stops, the replicator will change its status’s activity level to .stopped and the replicator change notification will be notified accordingly.
   Future<void> stop() async {
     await _channel.invokeMethod('stopReplicator', this);
   }
 
+  /// Adds a replicator change listener.
+  ///
+  /// Returns the listener token object for removing the listener.
   ListenerToken addChangeListener(ListenerCallback callback) {
     var token = ListenerToken();
     tokens[token] = _replicationStream
         .where((data) => data["replicator"] == replicatorId)
         .listen((data) {
       var activity = activityFromString(data["activity"]);
-      String error = null;
+      String error;
       if (data["error"] is String) {
         error = data["error"];
       }
@@ -50,6 +59,7 @@ class Replicator {
     return token;
   }
 
+  /// Removes a change listener with the given listener token.
   Future<ListenerToken> removeChangeListener(ListenerToken token) async {
     var subscription = tokens.remove(token);
 

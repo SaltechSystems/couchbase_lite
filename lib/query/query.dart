@@ -27,6 +27,9 @@ class Query {
     this.param = new Parameters();
   }
 
+  /// Executes the query.
+  ///
+  /// Returns the ResultSet object representing the query result.
   Future<ResultSet> execute() async {
     this.options["queryId"] = queryId;
 
@@ -47,7 +50,7 @@ class Query {
       }
 
       return ResultSet(results);
-    } on PlatformException catch (e) {
+    } on PlatformException {
       // Remove all listeners on error
       tokens.keys.forEach((token) {
         removeChangeListener(token);
@@ -65,6 +68,9 @@ class Query {
     param = parameters;
   }
 
+  /// Adds a query change listener and posts changes to [callback].
+  ///
+  /// Returns the listener token object for removing the listener.
   Future<ListenerToken> addChangeListener(ListenerCallback callback) async {
     var token = ListenerToken();
     tokens[token] =
@@ -99,6 +105,7 @@ class Query {
     return token;
   }
 
+  /// Removes a change listener wih the given listener token.
   Future<void> removeChangeListener(ListenerToken token) async {
     final subscription = tokens.remove(token);
 
