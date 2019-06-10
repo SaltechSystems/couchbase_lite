@@ -1,7 +1,4 @@
-
-abstract class Authenticator {
-
-}
+abstract class Authenticator {}
 
 class BasicAuthenticator implements Authenticator {
   final String username;
@@ -22,7 +19,7 @@ class SessionAuthenticator implements Authenticator {
   final String sessionId;
   final String cookieName;
 
-  SessionAuthenticator(this.sessionId,{this.cookieName});
+  SessionAuthenticator(this.sessionId, {this.cookieName});
 
   Map<String, dynamic> toJson() {
     return {

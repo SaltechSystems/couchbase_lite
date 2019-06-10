@@ -1,11 +1,7 @@
 import 'database.dart';
 import 'authenticator.dart';
 
-enum ReplicatorType {
-  pushAndPull,
-  push,
-  pull
-}
+enum ReplicatorType { pushAndPull, push, pull }
 
 class ReplicatorConfiguration {
   final Database database;
@@ -19,7 +15,7 @@ class ReplicatorConfiguration {
 
   Map<String, dynamic> toJson() {
     String replicatorTypeString;
-    switch(replicatorType) {
+    switch (replicatorType) {
       case ReplicatorType.pushAndPull:
         replicatorTypeString = "PUSH_AND_PULL";
         break;

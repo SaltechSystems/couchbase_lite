@@ -6,7 +6,8 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  rxdart: ^0.21.0
+  # rxdart is used for the database and observable response classes
+  # rxdart: ^0.21.0
 
   flutter:
     sdk: flutter

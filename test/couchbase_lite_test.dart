@@ -10,14 +10,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const MethodChannel databaseChannel = MethodChannel('com.saltechsystems.couchbase_lite/database');
-  const MethodChannel jsonChannel = MethodChannel('com.saltechsystems.couchbase_lite/json',JSONMethodCodec());
+  const MethodChannel databaseChannel =
+      MethodChannel('com.saltechsystems.couchbase_lite/database');
+  const MethodChannel jsonChannel = MethodChannel(
+      'com.saltechsystems.couchbase_lite/json', JSONMethodCodec());
 
   setUp(() {
     databaseChannel.setMockMethodCallHandler((MethodCall methodCall) async {
-      Map<dynamic,dynamic> arguments = methodCall.arguments;
+      Map<dynamic, dynamic> arguments = methodCall.arguments;
       if (!arguments.containsKey("database")) {
-        return PlatformException(code: "errArgs", message: "Error: Missing database", details: methodCall.arguments.toString());
+        return PlatformException(
+            code: "errArgs",
+            message: "Error: Missing database",
+            details: methodCall.arguments.toString());
       }
 
       switch (methodCall.method) {
@@ -37,21 +42,26 @@ void main() {
           if (arguments.containsKey("map")) {
             return 'documentid';
           } else {
-            return PlatformException(code: "errArgs", message: "invalid arguments", details: null);
+            return PlatformException(
+                code: "errArgs", message: "invalid arguments", details: null);
           }
           break;
         case ("saveDocumentWithId"):
           if (arguments.containsKey("id") && arguments.containsKey("map")) {
             return arguments["id"];
           } else {
-            return PlatformException(code: "errArgs", message: "invalid arguments", details: null);
+            return PlatformException(
+                code: "errArgs", message: "invalid arguments", details: null);
           }
           break;
         case ("getDocumentWithId"):
           if (arguments.containsKey("id")) {
-            return {"testdoc":"test"};
+            return {"testdoc": "test"};
           } else {
-            return PlatformException(code: "errArgs", message: "Query Error: Invalid Arguments", details: arguments.toString());
+            return PlatformException(
+                code: "errArgs",
+                message: "Query Error: Invalid Arguments",
+                details: arguments.toString());
           }
 
           break;
@@ -59,7 +69,10 @@ void main() {
           if (arguments.containsKey("id")) {
             return null;
           } else {
-            return PlatformException(code: "errArgs", message: "Query Error: Invalid Arguments", details: arguments.toString());
+            return PlatformException(
+                code: "errArgs",
+                message: "Query Error: Invalid Arguments",
+                details: arguments.toString());
           }
           break;
         case ("getDocumentCount"):
@@ -100,19 +113,21 @@ void main() {
     await database.close();
     await database.deleteDocument("docid");
     expect(await database.count, 1);
-    expect(await database.saveDocument(Document({})),"documentid");
-    expect(await database.saveDocumentWithId("docid", Document({})),"docid");
-    expect(await database.documentWithId("myid"),{"testdoc":"test"});
+    expect(await database.saveDocument(Document({})), "documentid");
+    expect(await database.saveDocumentWithId("docid", Document({})), "docid");
+    expect(await database.documentWithId("myid"), {"testdoc": "test"});
   });
 
   test('testQuery', () async {
-    Query query = QueryBuilder.select([SelectResult.all()]).from("test", as: "sheets");
+    Query query =
+        QueryBuilder.select([SelectResult.all()]).from("test", as: "sheets");
     query.execute();
   });
 
   test('testReplicator', () async {
     Database database = await Database.initWithName("testdb");
-    ReplicatorConfiguration config = ReplicatorConfiguration(database, "wss://10.0.2.2:4984/local-android-db");
+    ReplicatorConfiguration config = ReplicatorConfiguration(
+        database, "wss://10.0.2.2:4984/local-android-db");
     config.replicatorType = ReplicatorType.pushAndPull;
     config.continuous = true;
     config.pinnedServerCertificate = "assets/cert-android.cer";

@@ -14,11 +14,13 @@ class Query {
   bool _stored = false;
   Map<String, dynamic> options;
   Parameters param;
-  Map<ListenerToken,StreamSubscription> tokens = {};
+  Map<ListenerToken, StreamSubscription> tokens = {};
 
   static const JSONMethodCodec _jsonMethod = const JSONMethodCodec();
-  static const MethodChannel _channel = const MethodChannel('com.saltechsystems.couchbase_lite/json', _jsonMethod);
-  static const EventChannel _queryEventChannel = const EventChannel("com.saltechsystems.couchbase_lite/queryEventChannel", _jsonMethod);
+  static const MethodChannel _channel = const MethodChannel(
+      'com.saltechsystems.couchbase_lite/json', _jsonMethod);
+  static const EventChannel _queryEventChannel = const EventChannel(
+      "com.saltechsystems.couchbase_lite/queryEventChannel", _jsonMethod);
   static final Stream _stream = _queryEventChannel.receiveBroadcastStream();
 
   Query() {
@@ -33,10 +35,11 @@ class Query {
     }
 
     try {
-      final List<dynamic> resultSet = await _channel.invokeMethod('executeQuery', this);
+      final List<dynamic> resultSet =
+          await _channel.invokeMethod('executeQuery', this);
 
       List<Result> results = List<Result>();
-      for(dynamic result in resultSet) {
+      for (dynamic result in resultSet) {
         Result newResult = Result();
         newResult.setMap(result["map"]);
         newResult.setList(result["list"]);
@@ -64,7 +67,8 @@ class Query {
 
   Future<ListenerToken> addChangeListener(ListenerCallback callback) async {
     var token = ListenerToken();
-    tokens[token] = _stream.where((data) => data["query"] == queryId).listen((data) {
+    tokens[token] =
+        _stream.where((data) => data["query"] == queryId).listen((data) {
       Map<String, dynamic> qcJson = data;
       final List<dynamic> resultList = qcJson["results"];
 
@@ -116,5 +120,5 @@ class QueryChange {
   final ResultSet results;
   final String error;
 
-  QueryChange({this.query,this.results,this.error}) : assert(query != null);
+  QueryChange({this.query, this.results, this.error}) : assert(query != null);
 }

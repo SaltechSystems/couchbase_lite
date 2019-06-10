@@ -1,8 +1,8 @@
 name: couchbase_lite
 description: Community edition of Couchbase Lite.  Couchbase Lite is an embedded lightweight, document-oriented (NoSQL), syncable database engine.
 version: 2.5.0
-author: Bryan Welter
-homepage:
+author: Bryan Welter <weltbr01@gmail.com>
+homepage: https://github.com/bawelter/couchbase_lite
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
