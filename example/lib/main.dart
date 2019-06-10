@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:couchbase_lite/database.dart';
-import 'package:couchbase_lite/document.dart';
+import 'package:couchbase_lite/couchbase_lite.dart';
 
 void main() => runApp(MyApp());
 

@@ -11,3 +11,7 @@
 * Changed return type of class Database documentWithId from Map to Document
 * Populated doc/api using dartdoc
 * Fixed some format issues
+
+## 2.5.1+2
+
+* Added all classes as part of couchbase_lite library to eliminate the need to import every class individually

@@ -1,11 +1,4 @@
-import 'package:couchbase_lite/database.dart';
-import 'package:couchbase_lite/document.dart';
-import 'package:couchbase_lite/query/query.dart';
-import 'package:couchbase_lite/query/query_builder.dart';
-import 'package:couchbase_lite/query/select_result.dart';
-import 'package:couchbase_lite/replicator.dart';
-import 'package:couchbase_lite/replicator_configuration.dart';
-import 'package:couchbase_lite/authenticator.dart';
+import 'package:couchbase_lite/couchbase_lite.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 

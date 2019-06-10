@@ -1,15 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:couchbase_lite/query/array_function.dart';
-import 'package:couchbase_lite/query/expression/expression.dart';
-import 'package:couchbase_lite/query/expression/meta.dart';
-import 'package:couchbase_lite/query/functions.dart';
-import 'package:couchbase_lite/query/join.dart';
-import 'package:couchbase_lite/query/ordering.dart';
-import 'package:couchbase_lite/query/query.dart';
-import 'package:couchbase_lite/query/query_builder.dart';
-import 'package:couchbase_lite/query/select_result.dart';
+import 'package:couchbase_lite/couchbase_lite.dart';
 
 void main() {
   group("Query creation", () {

@@ -1,6 +1,6 @@
 name: couchbase_lite
-description: Community edition of Couchbase Lite.  Couchbase Lite is an embedded lightweight, document-oriented (NoSQL), syncable database engine.
-version: 2.5.1+1
+description: Flutter plugin for Couchbase Lite Community Edition, an embedded lightweight, noSQL database with live synchronization and offline support on Android and iOS.
+version: 2.5.1+2
 author: Bryan Welter <weltbr01@gmail.com>
 homepage: https://github.com/bawelter/couchbase_lite
 

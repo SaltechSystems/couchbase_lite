@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the Expression class from the couchbase_lite library, for the Dart programming language.">
+  <title>Expression class - couchbase_lite library - Dart API</title>
+  <!-- required because all the links are pseudo-absolute -->
+  <base href="..">
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500,400i,400,300|Source+Sans+Pro:400,300,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="static-assets/github.css">
+  <link rel="stylesheet" href="static-assets/styles.css">
+  <link rel="icon" href="static-assets/favicon.png">
+  
+</head>
+
+<body>
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="index.html">couchbase_lite</a></li>
+    <li><a href="couchbase_lite/couchbase_lite-library.html">couchbase_lite</a></li>
+    <li class="self-crumb">Expression abstract class</li>
+  </ol>
+  <div class="self-name">Expression</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+  <div id="dartdoc-sidebar-left" class="col-xs-6 col-sm-3 col-md-2 sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+      <form class="search-sidebar" role="search">
+        <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+      </form>
+    </header>
+    
+    <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+      <li><a href="index.html">couchbase_lite</a></li>
+      <li><a href="couchbase_lite/couchbase_lite-library.html">couchbase_lite</a></li>
+      <li class="self-crumb">Expression abstract class</li>
+    </ol>
+    
+    <h5>couchbase_lite library</h5>
+    <ol>
+      <li class="section-title"><a href="couchbase_lite/couchbase_lite-library.html#classes">Classes</a></li>
+      <li><a href="couchbase_lite/ArrayFunction-class.html">ArrayFunction</a></li>
+      <li><a href="couchbase_lite/Authenticator-class.html">Authenticator</a></li>
+      <li><a href="couchbase_lite/BasicAuthenticator-class.html">BasicAuthenticator</a></li>
+      <li><a href="couchbase_lite/Database-class.html">Database</a></li>
+      <li><a href="couchbase_lite/Document-class.html">Document</a></li>
+      <li><a href="couchbase_lite/Expression-class.html">Expression</a></li>
+      <li><a href="couchbase_lite/From-class.html">From</a></li>
+      <li><a href="couchbase_lite/Functions-class.html">Functions</a></li>
+      <li><a href="couchbase_lite/GroupBy-class.html">GroupBy</a></li>
+      <li><a href="couchbase_lite/Having-class.html">Having</a></li>
+      <li><a href="couchbase_lite/Join-class.html">Join</a></li>
+      <li><a href="couchbase_lite/Joins-class.html">Joins</a></li>
+      <li><a href="couchbase_lite/Limit-class.html">Limit</a></li>
+      <li><a href="couchbase_lite/ListenerToken-class.html">ListenerToken</a></li>
+      <li><a href="couchbase_lite/Meta-class.html">Meta</a></li>
+      <li><a href="couchbase_lite/MetaExpression-class.html">MetaExpression</a></li>
+      <li><a href="couchbase_lite/MutableDocument-class.html">MutableDocument</a></li>
+      <li><a href="couchbase_lite/OrderBy-class.html">OrderBy</a></li>
+      <li><a href="couchbase_lite/Ordering-class.html">Ordering</a></li>
+      <li><a href="couchbase_lite/Parameters-class.html">Parameters</a></li>
+      <li><a href="couchbase_lite/PropertyExpression-class.html">PropertyExpression</a></li>
+      <li><a href="couchbase_lite/Query-class.html">Query</a></li>
+      <li><a href="couchbase_lite/QueryBuilder-class.html">QueryBuilder</a></li>
+      <li><a href="couchbase_lite/QueryChange-class.html">QueryChange</a></li>
+      <li><a href="couchbase_lite/Replicator-class.html">Replicator</a></li>
+      <li><a href="couchbase_lite/ReplicatorChange-class.html">ReplicatorChange</a></li>
+      <li><a href="couchbase_lite/ReplicatorConfiguration-class.html">ReplicatorConfiguration</a></li>
+      <li><a href="couchbase_lite/ReplicatorStatus-class.html">ReplicatorStatus</a></li>
+      <li><a href="couchbase_lite/Result-class.html">Result</a></li>
+      <li><a href="couchbase_lite/ResultSet-class.html">ResultSet</a></li>
+      <li><a href="couchbase_lite/Select-class.html">Select</a></li>
+      <li><a href="couchbase_lite/SelectResult-class.html">SelectResult</a></li>
+      <li><a href="couchbase_lite/SelectResultAs-class.html">SelectResultAs</a></li>
+      <li><a href="couchbase_lite/SelectResultFrom-class.html">SelectResultFrom</a></li>
+      <li><a href="couchbase_lite/SelectResultProtocol-class.html">SelectResultProtocol</a></li>
+      <li><a href="couchbase_lite/SessionAuthenticator-class.html">SessionAuthenticator</a></li>
+      <li><a href="couchbase_lite/VariableExpression-class.html">VariableExpression</a></li>
+      <li><a href="couchbase_lite/Where-class.html">Where</a></li>
+    
+    
+    
+    
+    
+      <li class="section-title"><a href="couchbase_lite/couchbase_lite-library.html#enums">Enums</a></li>
+      <li><a href="couchbase_lite/ReplicatorActivityLevel-class.html">ReplicatorActivityLevel</a></li>
+      <li><a href="couchbase_lite/ReplicatorType-class.html">ReplicatorType</a></li>
+    
+    
+    </ol>
+  </div>
+
+  <div id="dartdoc-main-content" class="col-xs-12 col-sm-9 col-md-8 main-content">
+      <div><h1>Expression class </h1></div>
+
+    
+    <section>
+      <dl class="dl-horizontal">
+
+
+
+        <dt>Implementers</dt>
+        <dd><ul class="comma-separated clazz-relationships">
+          <li><a href="couchbase_lite/ArrayFunction-class.html">ArrayFunction</a></li>
+          <li><a href="couchbase_lite/Functions-class.html">Functions</a></li>
+          <li><a href="couchbase_lite/MetaExpression-class.html">MetaExpression</a></li>
+          <li><a href="couchbase_lite/PropertyExpression-class.html">PropertyExpression</a></li>
+          <li><a href="couchbase_lite/VariableExpression-class.html">VariableExpression</a></li>
+        </ul></dd>
+
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor" id="constructors">
+      <h2>Constructors</h2>
+
+      <dl class="constructor-summary-list">
+        <dt id="Expression.all" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.all.html">Expression.all</a></span><span class="signature">()</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+        <dt id="Expression.booleanValue" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.booleanValue.html">Expression.booleanValue</a></span><span class="signature">(<span class="parameter" id="booleanValue-param-value"><span class="type-annotation"><a href="dart-core/bool-class.html">bool</a></span> <span class="parameter-name">value</span></span>)</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+        <dt id="Expression.doubleValue" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.doubleValue.html">Expression.doubleValue</a></span><span class="signature">(<span class="parameter" id="doubleValue-param-value"><span class="type-annotation"><a href="dart-core/double-class.html">double</a></span> <span class="parameter-name">value</span></span>)</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+        <dt id="Expression.intValue" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.intValue.html">Expression.intValue</a></span><span class="signature">(<span class="parameter" id="intValue-param-value"><span class="type-annotation"><a href="dart-core/int-class.html">int</a></span> <span class="parameter-name">value</span></span>)</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+        <dt id="Expression.negated" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.negated.html">Expression.negated</a></span><span class="signature">(<span class="parameter" id="negated-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+        <dt id="Expression.not" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.not.html">Expression.not</a></span><span class="signature">(<span class="parameter" id="not-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+        <dt id="Expression.property" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.property.html">Expression.property</a></span><span class="signature">(<span class="parameter" id="property-param-value"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">value</span></span>)</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+        <dt id="Expression.string" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.string.html">Expression.string</a></span><span class="signature">(<span class="parameter" id="string-param-value"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">value</span></span>)</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+        <dt id="Expression.value" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/Expression.value.html">Expression.value</a></span><span class="signature">(<span class="parameter" id="value-param-value"><span class="type-annotation"><a href="dart-core/Object-class.html">Object</a></span> <span class="parameter-name">value</span></span>)</span>
+        </dt>
+        <dd>
+          
+          <div class="constructor-modifier features">factory</div>
+        </dd>
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor" id="instance-properties">
+      <h2>Properties</h2>
+
+      <dl class="properties">
+        <dt id="internalExpressionStack" class="property">
+          <span class="name"><a href="couchbase_lite/Expression/internalExpressionStack.html">internalExpressionStack</a></span>
+          <span class="signature">&#8594; <a href="dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>&gt;</span></span>         
+        </dt>
+        <dd>
+          
+                  <div class="features">final</div>
+</dd>
+        <dt id="hashCode" class="property inherited">
+          <span class="name"><a href="dart-core/Object/hashCode.html">hashCode</a></span>
+          <span class="signature">&#8594; <a href="dart-core/int-class.html">int</a></span>         
+        </dt>
+        <dd class="inherited">
+          The hash code for this object. <a href="dart-core/Object/hashCode.html">[...]</a>
+                  <div class="features">read-only, inherited</div>
+</dd>
+        <dt id="runtimeType" class="property inherited">
+          <span class="name"><a href="dart-core/Object/runtimeType.html">runtimeType</a></span>
+          <span class="signature">&#8594; <a href="dart-core/Type-class.html">Type</a></span>         
+        </dt>
+        <dd class="inherited">
+          A representation of the runtime type of the object.
+                  <div class="features">read-only, inherited</div>
+</dd>
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor" id="instance-methods">
+      <h2>Methods</h2>
+      <dl class="callables">
+        <dt id="add" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/add.html">add</a></span><span class="signature">(<wbr><span class="parameter" id="add-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="and" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/and.html">and</a></span><span class="signature">(<wbr><span class="parameter" id="and-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="between" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/between.html">between</a></span><span class="signature">(<wbr><span class="parameter" id="between-param-expression1"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression1</span>, </span> <span class="parameter" id="between-param-expression2"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression2</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="divide" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/divide.html">divide</a></span><span class="signature">(<wbr><span class="parameter" id="divide-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="equalTo" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/equalTo.html">equalTo</a></span><span class="signature">(<wbr><span class="parameter" id="equalTo-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="from" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/from.html">from</a></span><span class="signature">(<wbr><span class="parameter" id="from-param-alias"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">alias</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="greaterThan" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/greaterThan.html">greaterThan</a></span><span class="signature">(<wbr><span class="parameter" id="greaterThan-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="greaterThanOrEqualTo" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/greaterThanOrEqualTo.html">greaterThanOrEqualTo</a></span><span class="signature">(<wbr><span class="parameter" id="greaterThanOrEqualTo-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="In" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/In.html">In</a></span><span class="signature">(<wbr><span class="parameter" id="In-param-listExpression"><span class="type-annotation"><a href="dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="couchbase_lite/Expression-class.html">Expression</a></span>&gt;</span></span> <span class="parameter-name">listExpression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="isNot" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/isNot.html">isNot</a></span><span class="signature">(<wbr><span class="parameter" id="isNot-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="isNullOrMissing" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/isNullOrMissing.html">isNullOrMissing</a></span><span class="signature">(<wbr>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="lessThan" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/lessThan.html">lessThan</a></span><span class="signature">(<wbr><span class="parameter" id="lessThan-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="lessThanOrEqualTo" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/lessThanOrEqualTo.html">lessThanOrEqualTo</a></span><span class="signature">(<wbr><span class="parameter" id="lessThanOrEqualTo-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="like" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/like.html">like</a></span><span class="signature">(<wbr><span class="parameter" id="like-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="modulo" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/modulo.html">modulo</a></span><span class="signature">(<wbr><span class="parameter" id="modulo-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="multiply" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/multiply.html">multiply</a></span><span class="signature">(<wbr><span class="parameter" id="multiply-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="notEqualTo" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/notEqualTo.html">notEqualTo</a></span><span class="signature">(<wbr><span class="parameter" id="notEqualTo-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="notNullOrMissing" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/notNullOrMissing.html">notNullOrMissing</a></span><span class="signature">(<wbr>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="or" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/or.html">or</a></span><span class="signature">(<wbr><span class="parameter" id="or-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="regex" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/regex.html">regex</a></span><span class="signature">(<wbr><span class="parameter" id="regex-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="subtract" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/subtract.html">subtract</a></span><span class="signature">(<wbr><span class="parameter" id="subtract-param-expression"><span class="type-annotation"><a href="couchbase_lite/Expression-class.html">Expression</a></span> <span class="parameter-name">expression</span></span>)
+            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Expression-class.html">Expression</a></span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="toJson" class="callable">
+          <span class="name"><a href="couchbase_lite/Expression/toJson.html">toJson</a></span><span class="signature">(<wbr>)
+            <span class="returntype parameter">&#8594; dynamic</span>
+          </span>
+                  </dt>
+        <dd>
+          
+                  
+</dd>
+        <dt id="noSuchMethod" class="callable inherited">
+          <span class="name"><a href="dart-core/Object/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation"><a href="dart-core/Invocation-class.html">Invocation</a></span> <span class="parameter-name">invocation</span></span>)
+            <span class="returntype parameter">&#8594; dynamic</span>
+          </span>
+                  </dt>
+        <dd class="inherited">
+          Invoked when a non-existent method or property is accessed. <a href="dart-core/Object/noSuchMethod.html">[...]</a>
+                  <div class="features">inherited</div>
+</dd>
+        <dt id="toString" class="callable inherited">
+          <span class="name"><a href="dart-core/Object/toString.html">toString</a></span><span class="signature">(<wbr>)
+            <span class="returntype parameter">&#8594; <a href="dart-core/String-class.html">String</a></span>
+          </span>
+                  </dt>
+        <dd class="inherited">
+          Returns a string representation of this object.
+                  <div class="features">inherited</div>
+</dd>
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor inherited" id="operators">
+      <h2>Operators</h2>
+      <dl class="callables">
+        <dt id="operator ==" class="callable inherited">
+          <span class="name"><a href="dart-core/Object/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation">dynamic</span> <span class="parameter-name">other</span></span>)
+            <span class="returntype parameter">&#8594; <a href="dart-core/bool-class.html">bool</a></span>
+          </span>
+                  </dt>
+        <dd class="inherited">
+          The equality operator. <a href="dart-core/Object/operator_equals.html">[...]</a>
+                  <div class="features">inherited</div>
+</dd>
+      </dl>
+    </section>
+
+
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-right" class="col-xs-6 col-sm-6 col-md-2 sidebar sidebar-offcanvas-right">
+    <ol>
+      <li class="section-title"><a href="couchbase_lite/Expression-class.html#constructors">Constructors</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.all.html">all</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.booleanValue.html">booleanValue</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.doubleValue.html">doubleValue</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.intValue.html">intValue</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.negated.html">negated</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.not.html">not</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.property.html">property</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.string.html">string</a></li>
+      <li><a href="couchbase_lite/Expression/Expression.value.html">value</a></li>
+    
+      <li class="section-title">
+        <a href="couchbase_lite/Expression-class.html#instance-properties">Properties</a>
+      </li>
+      <li><a href="couchbase_lite/Expression/internalExpressionStack.html">internalExpressionStack</a></li>
+      <li class="inherited"><a href="dart-core/Object/hashCode.html">hashCode</a></li>
+      <li class="inherited"><a href="dart-core/Object/runtimeType.html">runtimeType</a></li>
+    
+      <li class="section-title"><a href="couchbase_lite/Expression-class.html#instance-methods">Methods</a></li>
+      <li><a href="couchbase_lite/Expression/add.html">add</a></li>
+      <li><a href="couchbase_lite/Expression/and.html">and</a></li>
+      <li><a href="couchbase_lite/Expression/between.html">between</a></li>
+      <li><a href="couchbase_lite/Expression/divide.html">divide</a></li>
+      <li><a href="couchbase_lite/Expression/equalTo.html">equalTo</a></li>
+      <li><a href="couchbase_lite/Expression/from.html">from</a></li>
+      <li><a href="couchbase_lite/Expression/greaterThan.html">greaterThan</a></li>
+      <li><a href="couchbase_lite/Expression/greaterThanOrEqualTo.html">greaterThanOrEqualTo</a></li>
+      <li><a href="couchbase_lite/Expression/In.html">In</a></li>
+      <li><a href="couchbase_lite/Expression/isNot.html">isNot</a></li>
+      <li><a href="couchbase_lite/Expression/isNullOrMissing.html">isNullOrMissing</a></li>
+      <li><a href="couchbase_lite/Expression/lessThan.html">lessThan</a></li>
+      <li><a href="couchbase_lite/Expression/lessThanOrEqualTo.html">lessThanOrEqualTo</a></li>
+      <li><a href="couchbase_lite/Expression/like.html">like</a></li>
+      <li><a href="couchbase_lite/Expression/modulo.html">modulo</a></li>
+      <li><a href="couchbase_lite/Expression/multiply.html">multiply</a></li>
+      <li><a href="couchbase_lite/Expression/notEqualTo.html">notEqualTo</a></li>
+      <li><a href="couchbase_lite/Expression/notNullOrMissing.html">notNullOrMissing</a></li>
+      <li><a href="couchbase_lite/Expression/or.html">or</a></li>
+      <li><a href="couchbase_lite/Expression/regex.html">regex</a></li>
+      <li><a href="couchbase_lite/Expression/subtract.html">subtract</a></li>
+      <li><a href="couchbase_lite/Expression/toJson.html">toJson</a></li>
+      <li class="inherited"><a href="dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+      <li class="inherited"><a href="dart-core/Object/toString.html">toString</a></li>
+    
+      <li class="section-title inherited"><a href="couchbase_lite/Expression-class.html#operators">Operators</a></li>
+      <li class="inherited"><a href="dart-core/Object/operator_equals.html">operator ==</a></li>
+    
+    
+    
+    </ol>
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    couchbase_lite 2.5.1+2
+  </span>
+
+  
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="static-assets/typeahead.bundle.min.js"></script>
+<script src="static-assets/highlight.pack.js"></script>
+<script src="static-assets/URI.js"></script>
+<script src="static-assets/script.js"></script>
+
+
+</body>
+
+</html>

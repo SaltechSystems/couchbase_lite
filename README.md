@@ -1,8 +1,8 @@
 # couchbase_lite plugin
 
-Community edition of Couchbase Lite.  Couchbase Lite is an embedded lightweight, document-oriented (NoSQL), syncable database engine.
+Flutter plugin for Couchbase Lite Community Edition. An embedded lightweight, noSQL database with live synchronization and offline support on Android and iOS.
 
-The goal of this project is to align the code to be as similar as possible to Couchbase Lite iOS for Swift.
+The goal of this project is to align this library with the [Swift SDK API](https://docs.couchbase.com/mobile/2.5.0/couchbase-lite-swift/) for Couchbase Lite.
 
 *Note*: This plugin is still under development, and some APIs might not be available yet.
 [Feedback](https://github.com/bawelter/couchbase_lite/issues) and [Pull Requests](https://github.com/bawelter/couchbase_lite/pulls) are most welcome!
@@ -16,7 +16,7 @@ In your flutter project add the dependency:
 ```
 dependencies:
   ...
-  couchbase_lite: ^2.5.1+1
+  couchbase_lite: ^2.5.1+2
 ```
 
 For help getting started with Flutter, view the 
