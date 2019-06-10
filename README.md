@@ -28,10 +28,11 @@ For help getting started with Flutter, view the
 ## Supported Versions
 
 | Platform | Minimum OS version |
-| ----------------------------- |
+| -------- | ------------------ |
 | iOS      | 9.0                |
 
 | Platform | Runtime architectures | Minimum API Level |
+| -------- | --------------------- | ----------------- |
 | Android  | armeabi-v7a           | 19                |
 | Android  | arm64-v8a             | 21                |
 | Android  | x86                   | 19                |
