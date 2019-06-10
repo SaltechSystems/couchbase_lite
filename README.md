@@ -22,14 +22,15 @@ dependencies:
 For help getting started with Flutter, view the 
 [online documentation](https://flutter.dev/docs)
 
-For help getting started with Flutter, view the 
-[online documentation](https://flutter.dev/docs)
-
 ## Supported Versions
+
+### iOS
 
 | Platform | Minimum OS version |
 | -------- | ------------------ |
 | iOS      | 9.0                |
+
+### Android
 
 | Platform | Runtime architectures | Minimum API Level |
 | -------- | --------------------- | ----------------- |
