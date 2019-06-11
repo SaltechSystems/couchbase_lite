@@ -36,7 +36,5 @@ class Join {
     return Join._internal("leftOuterJoin", _dataSource, as: as);
   }
 
-  toJson() {
-    return _internalStack;
-  }
+  toJson() => _internalStack;
 }

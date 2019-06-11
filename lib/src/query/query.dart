@@ -3,9 +3,11 @@ part of couchbase_lite;
 class Query {
   final queryId = Uuid().v1();
   bool _stored = false;
-  Map<String, dynamic> options;
-  Parameters param;
+  Map<String, dynamic> _options = {};
+  Parameters param = Parameters();
   Map<ListenerToken, StreamSubscription> tokens = {};
+
+  Map<String, dynamic> get options => Map.from(_options);
 
   static const JSONMethodCodec _jsonMethod = const JSONMethodCodec();
   static const MethodChannel _channel = const MethodChannel(
@@ -14,15 +16,11 @@ class Query {
       "com.saltechsystems.couchbase_lite/queryEventChannel", _jsonMethod);
   static final Stream _stream = _queryEventChannel.receiveBroadcastStream();
 
-  Query() {
-    this.param = new Parameters();
-  }
-
   /// Executes the query.
   ///
   /// Returns the ResultSet object representing the query result.
   Future<ResultSet> execute() async {
-    this.options["queryId"] = queryId;
+    this._options["queryId"] = queryId;
 
     if (!_stored && tokens.length > 0) {
       _stored = await _channel.invokeMethod('storeQuery', this);
@@ -111,7 +109,7 @@ class Query {
     }
   }
 
-  Map<String, dynamic> toJson() => options;
+  Map<String, dynamic> toJson() => this.options;
 }
 
 class QueryChange {

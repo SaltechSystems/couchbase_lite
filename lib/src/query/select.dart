@@ -2,20 +2,18 @@ part of couchbase_lite;
 
 class Select extends Query {
   Select() {
-    super.options = new Map<String, dynamic>();
+    super._options = new Map<String, dynamic>();
     super.param = new Parameters();
   }
 
   From from(String databaseName, {String as}) {
     var resultQuery = new From();
-    resultQuery.options = this.options;
+    resultQuery._options = this.options;
     if (as != null) {
-      options["from"] = {"database": databaseName, "as": as};
+      resultQuery._options["from"] = {"database": databaseName, "as": as};
     } else {
-      options["from"] = {"database": databaseName};
+      resultQuery._options["from"] = {"database": databaseName};
     }
     return resultQuery;
   }
-
-  Map<String, dynamic> toJson() => options;
 }

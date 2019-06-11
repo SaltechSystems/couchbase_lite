@@ -57,7 +57,7 @@ public class QueryJson {
     private func inflateLimit() {
         let limitArray = queryMap.limit
         if (limitArray.count == 1) {
-            let limitExpression = inflateExpressionFromArray(expressionParametersArray: limitArray)
+            let limitExpression = inflateExpressionFromArray(expressionParametersArray: limitArray[0])
             switch query {
             case let _from as From:
                 query = _from.limit(limitExpression)
@@ -73,8 +73,8 @@ public class QueryJson {
                 break
             }
         } else if (limitArray.count == 2) {
-            let limitExpression = inflateExpressionFromArray(expressionParametersArray:[limitArray[0]])
-            let offsetExpression = inflateExpressionFromArray(expressionParametersArray:[limitArray[1]])
+            let limitExpression = inflateExpressionFromArray(expressionParametersArray:limitArray[0])
+            let offsetExpression = inflateExpressionFromArray(expressionParametersArray:limitArray[1])
             
             switch query {
             case let _from as From:
@@ -435,10 +435,12 @@ private class QueryMap {
     var mWhere: Array<Dictionary<String, Any>> = []
     var hasGroupBy = false
     var groupBy: Array<Dictionary<String, Any>> = []
+    var hasHaving = false
+    var having: Array<Dictionary<String, Any>> = []
     var hasOrderBy = false
     var orderBy: Array<Array<Dictionary<String, Any>>> = []
     var hasLimit = false
-    var limit: Array<Dictionary<String, Any>> = []
+    var limit: Array<Array<Dictionary<String, Any>>> = []
     
     init(jsonObject: Any) {
         switch jsonObject {
@@ -471,13 +473,17 @@ private class QueryMap {
             self.hasGroupBy = true
             self.groupBy = getList(key: "groupBy")
         }
+        if let _ = queryMap["having"] {
+            self.hasHaving = true
+            self.having = getList(key: "having")
+        }
         if let _ = queryMap["orderBy"] {
             self.hasOrderBy = true
             self.orderBy = getListofList(key: "orderBy")
         }
         if let _ = queryMap["limit"] {
             self.hasLimit = true
-            self.limit = getList(key: "limit")
+            self.limit = getListofList(key: "limit")
         }
     }
     

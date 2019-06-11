@@ -14,7 +14,6 @@ part 'src/mutable_document.dart';
 part 'src/replicator.dart';
 part 'src/replicator_configuration.dart';
 
-part 'src/query/array_function.dart';
 part 'src/query/from.dart';
 part 'src/query/functions.dart';
 part 'src/query/group_by.dart';
