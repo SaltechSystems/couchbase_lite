@@ -13,10 +13,12 @@ This project forked from [Fluttercouch](https://github.com/oltrenuovefrontiere/f
 
 In your flutter project add the dependency:
 
-```
+```yaml
 dependencies:
-  ...
   couchbase_lite: ^2.5.1+2
+  
+  flutter:
+      sdk: flutter
 ```
 
 For help getting started with Flutter, view the 
@@ -52,7 +54,7 @@ Below is an example for the database using the BLoC pattern ( View <-> BLoC <-> 
 
 The files can also be found in the plugin example but are not used in the main.dart.  The example will be revised in the near future to use the BLoC pattern.
 
-```
+```dart
 class AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
@@ -174,7 +176,7 @@ class AppDatabase {
 }
 ```
 
-```
+```dart
 class ObservableResponse<T> {
   final Observable<T> result;
   final VoidFunc onDispose;

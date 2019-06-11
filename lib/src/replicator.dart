@@ -8,7 +8,7 @@ class Replicator {
       'com.saltechsystems.couchbase_lite/json', _jsonMethod);
   static const EventChannel _replicationEventChannel = const EventChannel(
       "com.saltechsystems.couchbase_lite/replicationEventChannel");
-  final Stream _replicationStream =
+  static final Stream _replicationStream =
       _replicationEventChannel.receiveBroadcastStream();
 
   final replicatorId = Uuid().v1();
