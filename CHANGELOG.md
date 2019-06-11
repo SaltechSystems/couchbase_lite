@@ -14,4 +14,4 @@
 
 ## 2.5.1+2
 
-* Added all classes as part of couchbase_lite library to eliminate the need to import every class individually
+* Added all classes as part of couchbase_lite library to eliminate the need to import every class individuallygit

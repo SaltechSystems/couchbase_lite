@@ -62,7 +62,8 @@ class Query {
   /// Adds a query change listener and posts changes to [callback].
   ///
   /// Returns the listener token object for removing the listener.
-  Future<ListenerToken> addChangeListener(Function(QueryChange) callback) async {
+  Future<ListenerToken> addChangeListener(
+      Function(QueryChange) callback) async {
     var token = ListenerToken();
     tokens[token] =
         _stream.where((data) => data["query"] == queryId).listen((data) {
