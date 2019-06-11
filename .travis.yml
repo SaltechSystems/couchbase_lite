@@ -12,8 +12,9 @@ addons:
 before_script:
   - git clone https://github.com/flutter/flutter.git -b beta
   - ./flutter/bin/flutter doctor
-script:
-  - ./flutter/bin/flutter test
+  - pub global activate coverage
+script: ./flutter/bin/flutter test --coverage
+after_success: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
 cache:
   directories:
     - $HOME/.pub-cache
