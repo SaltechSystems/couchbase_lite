@@ -1,6 +1,9 @@
 # couchbase_lite plugin
+[![Build Status](https://travis-ci.org/bawelter/couchbase_lite.svg?branch=master)](https://travis-ci.org/bawelter/couchbase_lite)
+[![Coverage Status](https://coveralls.io/repos/github/bawelter/couchbase_lite/badge.svg)](https://coveralls.io/github/bawelter/couchbase_lite)
+[![pub package](https://img.shields.io/pub/v/couchbase_lite.svg)](https://pub.dartlang.org/packages/couchbase_lite)
 
-Flutter plugin for Couchbase Lite Community Edition. An embedded lightweight, noSQL database with live synchronization and offline support on Android and iOS.
+A Flutter plugin for Couchbase Lite Community Edition. An embedded lightweight, noSQL database with live synchronization and offline support on Android and iOS.
 
 The goal of this project is to align this library with the [Swift SDK API](https://docs.couchbase.com/mobile/2.5.0/couchbase-lite-swift/) for Couchbase Lite.
 
