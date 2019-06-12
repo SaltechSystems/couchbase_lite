@@ -4,7 +4,7 @@ class Query {
   final queryId = Uuid().v1();
   bool _stored = false;
   Map<String, dynamic> _options = {};
-  Parameters param = Parameters();
+  Parameters get parameters => throw UnimplementedError();
   Map<ListenerToken, StreamSubscription> tokens = {};
 
   Map<String, dynamic> get options => Map.from(_options);
@@ -47,14 +47,6 @@ class Query {
 
       rethrow;
     }
-  }
-
-  Parameters getParameters() {
-    return param;
-  }
-
-  setParameters(Parameters parameters) {
-    param = parameters;
   }
 
   /// Adds a query change listener and posts changes to [callback].

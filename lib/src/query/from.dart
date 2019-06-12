@@ -1,11 +1,6 @@
 part of couchbase_lite;
 
 class From extends Query {
-  From() {
-    this._options = new Map<String, dynamic>();
-    this.param = new Parameters();
-  }
-
   Where where(Expression expression) {
     var resultQuery = new Where();
     resultQuery._options = this.options;
