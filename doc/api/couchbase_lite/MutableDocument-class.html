@@ -199,7 +199,7 @@ Returns nil if the property doesn't exists, or its value is not a dictionary. <a
                   
 </dd>
         <dt id="setArray" class="callable">
-          <span class="name"><a href="couchbase_lite/MutableDocument/setArray.html">setArray</a></span><span class="signature">(<wbr><span class="parameter" id="setArray-param-key"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span> <span class="parameter" id="setArray-param-value"><span class="type-annotation"><a href="dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/Object-class.html">Object</a></span>&gt;</span></span> <span class="parameter-name">value</span></span>)
+          <span class="name"><a href="couchbase_lite/MutableDocument/setArray.html">setArray</a></span><span class="signature">(<wbr><span class="parameter" id="setArray-param-key"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span> <span class="parameter" id="setArray-param-value"><span class="type-annotation"><a href="dart-core/List-class.html">List</a></span> <span class="parameter-name">value</span></span>)
             <span class="returntype parameter">&#8594; dynamic</span>
           </span>
                   </dt>
@@ -232,6 +232,24 @@ Returns nil if the property doesn't exists, or its value is not a dictionary. <a
                   </dt>
         <dd>
           Set an int value for the given key. <a href="couchbase_lite/MutableDocument/setInt.html">[...]</a>
+                  
+</dd>
+        <dt id="setList" class="callable">
+          <span class="name"><a href="couchbase_lite/MutableDocument/setList.html">setList</a></span><span class="signature">(<wbr><span class="parameter" id="setList-param-key"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span> <span class="parameter" id="setList-param-value"><span class="type-annotation"><a href="dart-core/List-class.html">List</a></span> <span class="parameter-name">value</span></span>)
+            <span class="returntype parameter">&#8594; dynamic</span>
+          </span>
+                  </dt>
+        <dd>
+          Set a List object for the given key. <a href="couchbase_lite/MutableDocument/setList.html">[...]</a>
+                  
+</dd>
+        <dt id="setMap" class="callable">
+          <span class="name"><a href="couchbase_lite/MutableDocument/setMap.html">setMap</a></span><span class="signature">(<wbr><span class="parameter" id="setMap-param-key"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span> <span class="parameter" id="setMap-param-value"><span class="type-annotation"><a href="dart-core/Map-class.html">Map</a></span> <span class="parameter-name">value</span></span>)
+            <span class="returntype parameter">&#8594; dynamic</span>
+          </span>
+                  </dt>
+        <dd>
+          Set a Map Object object for the given key. A nil value will be converted to an NSNull. <a href="couchbase_lite/MutableDocument/setMap.html">[...]</a>
                   
 </dd>
         <dt id="setString" class="callable">
@@ -291,6 +309,16 @@ object for the property value. <a href="couchbase_lite/Document/contains.html">[
                   </dt>
         <dd class="inherited">
           The number of properties in the document.
+                  <div class="features">inherited</div>
+</dd>
+        <dt id="getArray" class="callable inherited">
+          <span class="name"><a href="couchbase_lite/Document/getArray.html">getArray</a></span><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span><span class="signature">(<wbr><span class="parameter" id="getArray-param-key"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span></span>)
+            <span class="returntype parameter">&#8594; <a href="dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
+          </span>
+                  </dt>
+        <dd class="inherited">
+          Get a property's value as a List Object, which is a mapping object of an array value.
+Returns null if the property doesn't exists, or its value is not an array. <a href="couchbase_lite/Document/getArray.html">[...]</a>
                   <div class="features">inherited</div>
 </dd>
         <dt id="getBoolean" class="callable inherited">
@@ -416,12 +444,15 @@ if the value is null or the property doesn't exist. <a href="couchbase_lite/Docu
       <li><a href="couchbase_lite/MutableDocument/setBoolean.html">setBoolean</a></li>
       <li><a href="couchbase_lite/MutableDocument/setDouble.html">setDouble</a></li>
       <li><a href="couchbase_lite/MutableDocument/setInt.html">setInt</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setList.html">setList</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setMap.html">setMap</a></li>
       <li><a href="couchbase_lite/MutableDocument/setString.html">setString</a></li>
       <li><a href="couchbase_lite/MutableDocument/setValue.html">setValue</a></li>
       <li><a href="couchbase_lite/MutableDocument/toMap.html">toMap</a></li>
       <li><a href="couchbase_lite/MutableDocument/toMutable.html">toMutable</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/contains.html">contains</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/count.html">count</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/getArray.html">getArray</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/getBoolean.html">getBoolean</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/getDouble.html">getDouble</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/getInt.html">getInt</a></li>
@@ -443,7 +474,7 @@ if the value is null or the property doesn't exist. <a href="couchbase_lite/Docu
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+3
+    couchbase_lite 2.5.1+4
   </span>
 
   

@@ -58,7 +58,7 @@ void main() {
     expect(document.getMap("boolInt"), null);
   });
   test("Document: invalid map", () {
-    expect(document.getList("boolInt"), null);
+    expect(document.getArray("boolInt"), null);
   });
   test("Document: getting getKeys", () {
     expect(document.getKeys(), initializer.keys);
@@ -82,6 +82,14 @@ void main() {
     mutableDocument.id = "123456789";
     expect(mutableDocument.id, "123456789");
     expect(mutableDocument.toMutable().id, "123456789");
+  });
+  test("mutableDocument: setting map", () {
+    mutableDocument.setMap('map', <String, dynamic>{"test": true});
+    expect(mutableDocument.getMap('map'), {"test": true});
+  });
+  test("mutableDocument: setting list", () {
+    mutableDocument.setArray('list', List<int>());
+    expect(mutableDocument.getList('list'), []);
   });
   test("mutableDocument: null list", () {
     expect(mutableDocument.getMap("null"), null);

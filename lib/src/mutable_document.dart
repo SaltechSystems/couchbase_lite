@@ -25,9 +25,25 @@ class MutableDocument extends Document {
   /// Set a List object for the given key.
   ///
   /// - Parameters:
-  ///   - value: The ArrayObject object.
+  ///   - value: The List Object object.
   ///   - key: The key.
-  setArray(String key, List<Object> value) {
+  setList(String key, List<dynamic> value) {
+    setValue(key, value);
+  }
+
+  /// Set a List object for the given key.
+  ///
+  /// - Parameters:
+  ///   - value: The List Object object.
+  ///   - key: The key.
+  setArray(String key, List<dynamic> value) => setList(key, value);
+
+  /// Set a Map Object object for the given key. A nil value will be converted to an NSNull.
+  ///
+  /// - Parameters:
+  ///   - value: The Map Object object.
+  ///   - key: The key.
+  setMap(String key, Map<dynamic, dynamic> value) {
     setValue(key, value);
   }
 

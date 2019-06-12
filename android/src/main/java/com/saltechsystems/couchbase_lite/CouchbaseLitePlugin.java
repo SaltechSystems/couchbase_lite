@@ -335,7 +335,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
                   CouchbaseLiteException error = change.getStatus().getError();
                   if (error != null) {
-                    json.put("error",error.getCode());
+                    json.put("error",error.getLocalizedMessage());
                   }
 
                   switch (change.getStatus().getActivityLevel()) {

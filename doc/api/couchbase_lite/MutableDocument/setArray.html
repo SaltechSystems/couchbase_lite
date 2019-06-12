@@ -71,12 +71,15 @@
       <li><a href="couchbase_lite/MutableDocument/setBoolean.html">setBoolean</a></li>
       <li><a href="couchbase_lite/MutableDocument/setDouble.html">setDouble</a></li>
       <li><a href="couchbase_lite/MutableDocument/setInt.html">setInt</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setList.html">setList</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setMap.html">setMap</a></li>
       <li><a href="couchbase_lite/MutableDocument/setString.html">setString</a></li>
       <li><a href="couchbase_lite/MutableDocument/setValue.html">setValue</a></li>
       <li><a href="couchbase_lite/MutableDocument/toMap.html">toMap</a></li>
       <li><a href="couchbase_lite/MutableDocument/toMutable.html">toMutable</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/contains.html">contains</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/count.html">count</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/getArray.html">getArray</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/getBoolean.html">getBoolean</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/getDouble.html">getDouble</a></li>
       <li class="inherited"><a href="couchbase_lite/Document/getInt.html">getInt</a></li>
@@ -100,18 +103,16 @@
     <section class="multi-line-signature">
       <span class="returntype">dynamic</span>
             <span class="name ">setArray</span>
-(<wbr><span class="parameter" id="setArray-param-key"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span> <span class="parameter" id="setArray-param-value"><span class="type-annotation"><a href="dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/Object-class.html">Object</a></span>&gt;</span></span> <span class="parameter-name">value</span></span>)
+(<wbr><span class="parameter" id="setArray-param-key"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span>, </span> <span class="parameter" id="setArray-param-value"><span class="type-annotation"><a href="dart-core/List-class.html">List</a></span> <span class="parameter-name">value</span></span>)
       
     </section>
     <section class="desc markdown">
-      <p>Set a List object for the given key.</p><ul><li>Parameters:<ul><li>value: The ArrayObject object.</li><li>key: The key.</li></ul></li></ul>
+      <p>Set a List object for the given key.</p><ul><li>Parameters:<ul><li>value: The List Object object.</li><li>key: The key.</li></ul></li></ul>
     </section>
     
     <section class="summary source-code" id="source">
       <h2><span>Implementation</span></h2>
-      <pre class="language-dart"><code class="language-dart">setArray(String key, List&lt;Object&gt; value) {
-  setValue(key, value);
-}</code></pre>
+      <pre class="language-dart"><code class="language-dart">setArray(String key, List&lt;dynamic&gt; value) =&gt; setList(key, value);</code></pre>
     </section>
 
   </div> <!-- /.main-content -->
@@ -123,7 +124,7 @@
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+3
+    couchbase_lite 2.5.1+4
   </span>
 
   

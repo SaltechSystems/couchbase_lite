@@ -137,6 +137,13 @@ class Document {
     return null;
   }
 
+  /// Get a property's value as a List Object, which is a mapping object of an array value.
+  /// Returns null if the property doesn't exists, or its value is not an array.
+  ///
+  /// - Parameter key: The key.
+  /// - Returns: The List Object object or null.
+  List<T> getArray<T>(String key) => getList(key);
+
   /// Get a property's value as a Map Object, which is a mapping object of
   /// a dictionary value.
   /// Returns null if the property doesn't exists, or its value is not a dictionary.
