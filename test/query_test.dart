@@ -445,27 +445,76 @@ void main() {
   });
 
   group("Results", () {
+    var map = {
+      "int": 1,
+      "bool": true,
+      "list": [],
+      "double": 1.2,
+      "string": "test",
+      "object": {}
+    };
     Map<dynamic, dynamic> result = {
-      "map": {
-        "int": 1,
-        "bool": true,
-        "list": [],
-        "double": 1.2,
-        "string": "test",
-        "object": {}
-      },
-      "list": []
+      "map": map,
+      "list": [1]
     };
 
     var newResult = Result();
     newResult.setMap(result["map"]);
     newResult.setList(result["list"]);
 
-    test("allResults()", () {
-      newResult.count();
+    test("contains()", () {
+      expect(newResult.contains("int"), true);
+    });
+
+    test("count()", () {
+      expect(newResult.count(), map.length);
+    });
+
+    test("getList()", () {
+      expect(newResult.getList(key: "list"), []);
+    });
+
+    test("getBoolean()", () {
+      expect(newResult.getBoolean(key: "bool"), true);
+    });
+
+    test("getDouble()", () {
+      expect(newResult.getDouble(key: "double"), 1.2);
+    });
+
+    test("getInt()", () {
+      expect(newResult.getInt(key: "int"), 1);
+    });
+
+    test("getKeys()", () {
+      expect(newResult.getKeys(), map.keys);
+    });
+
+    test("getString()", () {
+      expect(newResult.getString(key: "string"), "test");
+    });
+
+    test("getValue()", () {
+      expect(newResult.getValue(key: "int"), 1);
+    });
+
+    test("getValueIndex()", () {
+      expect(newResult.getValue(index: 0), 1);
+    });
+
+    test("toList()", () {
+      expect(newResult.toList(), [1]);
+    });
+
+    test("toMap()", () {
+      expect(newResult.toMap(), map);
     });
 
     var results = ResultSet([newResult]);
+
+    test("allResults()", () {
+      expect(results.allResults(), [newResult]);
+    });
 
     test("allResults()", () {
       expect(results.allResults(), [newResult]);

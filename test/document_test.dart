@@ -2,17 +2,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:couchbase_lite/couchbase_lite.dart';
 
 void main() {
+  Map initializer;
   Document document;
   MutableDocument mutableDocument;
   setUp(() {
-    var initializer = new Map();
+    initializer = new Map();
     initializer['string'] = "string";
     initializer['double'] = 3.14;
     initializer['int'] = 12;
+    initializer['map'] = {};
+    initializer['boolInt'] = 0;
+    initializer['bool'] = true;
+    initializer['list'] = [];
     document = Document(initializer, "123456789");
     mutableDocument = MutableDocument();
   });
 
+  test("Document: getting string", () {
+    expect(document.count(), initializer.length);
+  });
   test("Document: getting string", () {
     expect(document.getString('string'), "string");
   });
@@ -21,6 +29,15 @@ void main() {
   });
   test("Document: getting int", () {
     expect(document.getInt('int'), 12);
+  });
+  test("Document: getting map", () {
+    expect(document.getMap('map'), {});
+  });
+  test("Document: getting list", () {
+    expect(document.getList('list'), []);
+  });
+  test("Document: getting list", () {
+    expect(document.toMap(), initializer);
   });
   test("Document: getting id", () {
     expect(document.id, "123456789");
@@ -41,5 +58,8 @@ void main() {
     mutableDocument.id = "123456789";
     expect(mutableDocument.id, "123456789");
     expect(mutableDocument.toMutable().id, "123456789");
+  });
+  test("NullDocument", () {
+    expect(Document(null, "test").toMap(), {});
   });
 }

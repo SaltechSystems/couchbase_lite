@@ -7,7 +7,8 @@ void main() {
       MethodChannel('com.saltechsystems.couchbase_lite/database');
   const MethodChannel jsonChannel = MethodChannel(
       'com.saltechsystems.couchbase_lite/json', JSONMethodCodec());
-  //const EventChannel eventChannel = EventChannel("com.saltechsystems.couchbase_lite/queryEventChannel");
+  const EventChannel eventChannel =
+      EventChannel("com.saltechsystems.couchbase_lite/queryEventChannel");
 
   setUp(() {
     databaseChannel.setMockMethodCallHandler((MethodCall methodCall) async {
@@ -145,6 +146,18 @@ void main() {
     config.authenticator = BasicAuthenticator("username", "password");
     Replicator replicator = Replicator(config);
     await replicator.start();
+    await replicator.stop();
+  });
+
+  test('testReplicatorActivity', () async {
+    expect(Replicator.activityFromString("BUSY"), ReplicatorActivityLevel.busy);
+    expect(Replicator.activityFromString("IDLE"), ReplicatorActivityLevel.idle);
+    expect(Replicator.activityFromString("OFFLINE"),
+        ReplicatorActivityLevel.offline);
+    expect(Replicator.activityFromString("STOPPED"),
+        ReplicatorActivityLevel.stopped);
+    expect(Replicator.activityFromString("CONNECTING"),
+        ReplicatorActivityLevel.connecting);
   });
 
   test('basicAuthenticator', () async {

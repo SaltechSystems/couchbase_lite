@@ -3,13 +3,13 @@ part of couchbase_lite;
 class MutableDocument extends Document {
   String id;
 
-  MutableDocument({Map<dynamic, dynamic> map, String id}) : super(map, id) {
+  MutableDocument([Map<dynamic, dynamic> data, String id]) : super(data, id) {
     this.id = id;
   }
 
   setValue(String key, Object value) {
     if (value != null) {
-      super.internalState[key] = value;
+      super._data[key] = value;
     }
   }
 
@@ -34,6 +34,6 @@ class MutableDocument extends Document {
   }
 
   remove(String key) {
-    super.internalState.remove(key);
+    super._data.remove(key);
   }
 }
