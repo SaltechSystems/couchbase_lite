@@ -2,16 +2,16 @@ part of couchbase_lite;
 
 class Document {
   Map<String, dynamic> internalState;
-  String id;
+  String _id;
 
-  Document([Map<dynamic, dynamic> _map, String _id]) {
+  String get id => _id;
+
+  Document([Map<dynamic, dynamic> _map, this._id]) {
     if (_map != null) {
       internalState = stringMapFromDynamic(_map);
     } else {
       internalState = Map<String, dynamic>();
     }
-
-    _id != null ? this.id = _id : _id = "random UUID";
   }
 
   Map<String, dynamic> stringMapFromDynamic(Map<dynamic, dynamic> _map) {
@@ -121,21 +121,5 @@ class Document {
 
   MutableDocument toMutable() {
     return MutableDocument(map: internalState, id: id);
-  }
-
-  String getId() {
-    return id;
-  }
-
-  bool isNotEmpty() {
-    return internalState.isNotEmpty;
-  }
-
-  bool isNotNull() {
-    return internalState != null;
-  }
-
-  bool isEmpty() {
-    return internalState.isEmpty;
   }
 }
