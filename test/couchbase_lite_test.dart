@@ -135,14 +135,33 @@ void main() {
   });
 
   test('testReplicator', () async {
+    BasicAuthenticator authenticator =
+        BasicAuthenticator("username", "password");
+    Map<String, dynamic> extected = {
+      "database": "testdb",
+      "target": "wss://10.0.2.2:4984/local-android-db",
+      "replicatorType": "PUSH_AND_PULL",
+      "continuous": true,
+      "pinnedServerCertificate": "assets/cert-android.cer",
+      "authenticator": authenticator,
+    };
     Database database = await Database.initWithName("testdb");
     ReplicatorConfiguration config = ReplicatorConfiguration(
         database, "wss://10.0.2.2:4984/local-android-db");
-    config.replicatorType = ReplicatorType.pushAndPull;
     config.continuous = true;
     config.pinnedServerCertificate = "assets/cert-android.cer";
-    config.authenticator = BasicAuthenticator("username", "password");
+    config.authenticator = authenticator;
+    config.replicatorType = ReplicatorType.pushAndPull;
+    expect(config.toJson(), extected);
+    config.replicatorType = ReplicatorType.push;
+    extected["replicatorType"] = "PUSH";
+    expect(config.toJson(), extected);
+    config.replicatorType = ReplicatorType.pull;
+    extected["replicatorType"] = "PULL";
+    expect(config.toJson(), extected);
     Replicator replicator = Replicator(config);
+
+    await replicator.addChangeListener((change) {});
     await replicator.start();
     await replicator.stop();
   });

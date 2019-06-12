@@ -91,11 +91,9 @@
     <section class="summary source-code" id="source">
       <h2><span>Implementation</span></h2>
       <pre class="language-dart"><code class="language-dart">Ordering descending() {
-  this
-      ._internalExpression
-      .internalExpressionStack
-      .add({&quot;orderingSortOrder&quot;: &quot;descending&quot;});
-  return this;
+  Expression clone = _internalExpression._clone();
+  clone._internalExpressionStack.add({&quot;orderingSortOrder&quot;: &quot;descending&quot;});
+  return Ordering._internal(clone);
 }</code></pre>
     </section>
 
@@ -108,7 +106,7 @@
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+2
+    couchbase_lite 2.5.1+4
   </span>
 
   

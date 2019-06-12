@@ -81,6 +81,7 @@
       <li><a href="couchbase_lite/Expression/greaterThan.html">greaterThan</a></li>
       <li><a href="couchbase_lite/Expression/greaterThanOrEqualTo.html">greaterThanOrEqualTo</a></li>
       <li><a href="couchbase_lite/Expression/In.html">In</a></li>
+      <li><a href="couchbase_lite/Expression/Is.html">Is</a></li>
       <li><a href="couchbase_lite/Expression/isNot.html">isNot</a></li>
       <li><a href="couchbase_lite/Expression/isNullOrMissing.html">isNullOrMissing</a></li>
       <li><a href="couchbase_lite/Expression/lessThan.html">lessThan</a></li>
@@ -118,8 +119,9 @@
     <section class="summary source-code" id="source">
       <h2><span>Implementation</span></h2>
       <pre class="language-dart"><code class="language-dart">Expression isNullOrMissing() {
-  internalExpressionStack.add({&quot;isNullOrMissing&quot;: null});
-  return this;
+  Expression clone = this._clone();
+  clone._internalExpressionStack.add({&quot;isNullOrMissing&quot;: null});
+  return clone;
 }</code></pre>
     </section>
 
@@ -132,7 +134,7 @@
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+2
+    couchbase_lite 2.5.1+4
   </span>
 
   
