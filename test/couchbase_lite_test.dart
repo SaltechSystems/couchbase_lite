@@ -7,8 +7,6 @@ void main() {
       MethodChannel('com.saltechsystems.couchbase_lite/database');
   const MethodChannel jsonChannel = MethodChannel(
       'com.saltechsystems.couchbase_lite/json', JSONMethodCodec());
-  const EventChannel eventChannel =
-      EventChannel("com.saltechsystems.couchbase_lite/queryEventChannel");
 
   setUp(() {
     databaseChannel.setMockMethodCallHandler((MethodCall methodCall) async {

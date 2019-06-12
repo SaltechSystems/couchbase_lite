@@ -12,6 +12,9 @@ class Query {
   static const JSONMethodCodec _jsonMethod = const JSONMethodCodec();
   static const MethodChannel _channel = const MethodChannel(
       'com.saltechsystems.couchbase_lite/json', _jsonMethod);
+  static const EventChannel _queryEventChannel = const EventChannel(
+      "com.saltechsystems.couchbase_lite/queryEventChannel", _jsonMethod);
+  static final Stream _stream = _queryEventChannel.receiveBroadcastStream();
 
   /// Executes the query.
   ///
