@@ -129,7 +129,5 @@ class MutableDocument extends Document {
   /// Gets content of the current object as a Dictionary.
   ///
   /// - Returns: The Dictionary representing the content of the current object.
-  Map<String, dynamic> toMap() {
-    return _data;
-  }
+  Map<String, dynamic> toMap() => Map.from(_data);
 }

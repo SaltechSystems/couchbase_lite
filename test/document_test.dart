@@ -103,6 +103,16 @@ void main() {
   test("mutableDocument: invalid map", () {
     expect(mutableDocument.getList("boolInt"), null);
   });
+  test("mutableDocument: to map", () {
+    mutableDocument.setBoolean("bool", true);
+    mutableDocument.setInt('int', 12);
+    mutableDocument.remove('int');
+    expect(mutableDocument.toMap(), {"bool": true});
+  });
+  test("mutableDocument: getting bool", () {
+    mutableDocument.setBoolean("bool", true);
+    expect(document.getBoolean("bool"), true);
+  });
   test("NullDocument", () {
     expect(Document(null, "test").toMap(), {});
   });
