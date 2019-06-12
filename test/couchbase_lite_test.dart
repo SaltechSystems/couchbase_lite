@@ -7,6 +7,7 @@ void main() {
       MethodChannel('com.saltechsystems.couchbase_lite/database');
   const MethodChannel jsonChannel = MethodChannel(
       'com.saltechsystems.couchbase_lite/json', JSONMethodCodec());
+  //const EventChannel eventChannel = EventChannel("com.saltechsystems.couchbase_lite/queryEventChannel");
 
   setUp(() {
     databaseChannel.setMockMethodCallHandler((MethodCall methodCall) async {
@@ -120,7 +121,18 @@ void main() {
   test('testQuery', () async {
     Query query =
         QueryBuilder.select([SelectResult.all()]).from("test", as: "sheets");
-    query.execute();
+    await query.execute();
+    //expect(await query.parameters, throwsUnimplementedError);
+  });
+
+  test('testQueryChangeListener', () async {
+    Query query =
+        QueryBuilder.select([SelectResult.all()]).from("test", as: "sheets");
+    var token = await query.addChangeListener((change) {
+      //Do Something
+    });
+    await query.execute();
+    await query.removeChangeListener(token);
   });
 
   test('testReplicator', () async {
@@ -132,6 +144,18 @@ void main() {
     config.pinnedServerCertificate = "assets/cert-android.cer";
     config.authenticator = BasicAuthenticator("username", "password");
     Replicator replicator = Replicator(config);
-    replicator.start();
+    await replicator.start();
+  });
+
+  test('basicAuthenticator', () async {
+    var auth = BasicAuthenticator("username", "password");
+    expect(auth.toJson(),
+        {"method": "basic", "username": "username", "password": "password"});
+  });
+
+  test('sessionAuthenticator', () async {
+    var auth = SessionAuthenticator("sessionId");
+    expect(auth.toJson(),
+        {"method": "session", "sessionId": "sessionId", "cookieName": null});
   });
 }

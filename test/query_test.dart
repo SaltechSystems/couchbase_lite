@@ -59,11 +59,11 @@ void main() {
     });
 
     test("SelectFromAs", () {
-      Query query = QueryBuilder.select(
+      Query query = QueryBuilder.selectDistinct(
               [SelectResult.expression(Meta.sequence.from("myAlias"))])
           .from("database", as: "myAlias");
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"meta":"sequence"},{"from":"myAlias"}]],"from":{"database":"database","as":"myAlias"}}');
+          '{"selectDistinct":true,"selectResult":[[{"meta":"sequence"},{"from":"myAlias"}]],"from":{"database":"database","as":"myAlias"}}');
     });
 
     test("SelectFromWhere", () {
@@ -407,6 +407,74 @@ void main() {
       expected.addAll(orderByDescJson);
       expect(json.encode(baseQuery.orderBy(orderByDescExpr)),
           json.encode(expected));
+    });
+
+    Where whereExpr = baseQuery
+        .where(Expression.property("country").equalTo(Expression.string("US")));
+    Map<String, dynamic> whereJson = Map.from(baseJson);
+    whereJson.addAll({
+      "where": [
+        {"property": "country"},
+        {
+          "equalTo": [
+            {"string": "US"}
+          ]
+        }
+      ]
+    });
+
+    test("whereLimitOffset", () {
+      Map expected = Map.from(whereJson);
+      expected.addAll(limitOffsetJson);
+      expect(json.encode(whereExpr.limit(limitExpr, offset: offsetExpr)),
+          json.encode(expected));
+    });
+
+    test("whereGroupBy", () {
+      Map expected = Map.from(whereJson);
+      expected.addAll({
+        "groupBy": [
+          [
+            {"property": "country"}
+          ]
+        ]
+      });
+      expect(json.encode(whereExpr.groupBy([Expression.property("country")])),
+          json.encode(expected));
+    });
+  });
+
+  group("Results", () {
+    Map<dynamic, dynamic> result = {
+      "map": {
+        "int": 1,
+        "bool": true,
+        "list": [],
+        "double": 1.2,
+        "string": "test",
+        "object": {}
+      },
+      "list": []
+    };
+
+    var newResult = Result();
+    newResult.setMap(result["map"]);
+    newResult.setList(result["list"]);
+
+    test("allResults()", () {
+      newResult.count();
+    });
+
+    var results = ResultSet([newResult]);
+
+    test("allResults()", () {
+      expect(results.allResults(), [newResult]);
+    });
+
+    test("iterator", () {
+      var itr = results.iterator;
+      itr.moveNext();
+      expect(itr.current, newResult);
     });
   });
 }
