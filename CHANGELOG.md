@@ -20,3 +20,5 @@
 
 * Fixed issue with Replication EventChannel
 * Added Travis CI and Code Coverage with Coveralls
+* Added support for the having clause
+* Fixed some issues with Queries
