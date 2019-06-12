@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the getMap method from the MutableDocument class, for the Dart programming language.">
+  <title>getMap method - MutableDocument class - couchbase_lite library - Dart API</title>
+  <!-- required because all the links are pseudo-absolute -->
+  <base href="../..">
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500,400i,400,300|Source+Sans+Pro:400,300,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="static-assets/github.css">
+  <link rel="stylesheet" href="static-assets/styles.css">
+  <link rel="icon" href="static-assets/favicon.png">
+  
+</head>
+
+<body>
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="index.html">couchbase_lite</a></li>
+    <li><a href="couchbase_lite/couchbase_lite-library.html">couchbase_lite</a></li>
+    <li><a href="couchbase_lite/MutableDocument-class.html">MutableDocument</a></li>
+    <li class="self-crumb">getMap&lt;<wbr><span class="type-parameter">K</span>, <span class="type-parameter">V</span>&gt; method</li>
+  </ol>
+  <div class="self-name">getMap</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+  <div id="dartdoc-sidebar-left" class="col-xs-6 col-sm-3 col-md-2 sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+      <form class="search-sidebar" role="search">
+        <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+      </form>
+    </header>
+    
+    <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+      <li><a href="index.html">couchbase_lite</a></li>
+      <li><a href="couchbase_lite/couchbase_lite-library.html">couchbase_lite</a></li>
+      <li><a href="couchbase_lite/MutableDocument-class.html">MutableDocument</a></li>
+      <li class="self-crumb">getMap&lt;<wbr><span class="type-parameter">K</span>, <span class="type-parameter">V</span>&gt; method</li>
+    </ol>
+    
+    <h5>MutableDocument class</h5>
+    <ol>
+      <li class="section-title"><a href="couchbase_lite/MutableDocument-class.html#constructors">Constructors</a></li>
+      <li><a href="couchbase_lite/MutableDocument/MutableDocument.html">MutableDocument</a></li>
+    
+      <li class="section-title">
+        <a href="couchbase_lite/MutableDocument-class.html#instance-properties">Properties</a>
+      </li>
+      <li><a href="couchbase_lite/MutableDocument/id.html">id</a></li>
+      <li class="inherited"><a href="dart-core/Object/hashCode.html">hashCode</a></li>
+      <li class="inherited"><a href="dart-core/Object/runtimeType.html">runtimeType</a></li>
+    
+      <li class="section-title"><a href="couchbase_lite/MutableDocument-class.html#instance-methods">Methods</a></li>
+      <li><a href="couchbase_lite/MutableDocument/getList.html">getList</a></li>
+      <li><a href="couchbase_lite/MutableDocument/getMap.html">getMap</a></li>
+      <li><a href="couchbase_lite/MutableDocument/remove.html">remove</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setArray.html">setArray</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setBoolean.html">setBoolean</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setDouble.html">setDouble</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setInt.html">setInt</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setString.html">setString</a></li>
+      <li><a href="couchbase_lite/MutableDocument/setValue.html">setValue</a></li>
+      <li><a href="couchbase_lite/MutableDocument/toMap.html">toMap</a></li>
+      <li><a href="couchbase_lite/MutableDocument/toMutable.html">toMutable</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/contains.html">contains</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/count.html">count</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/getBoolean.html">getBoolean</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/getDouble.html">getDouble</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/getInt.html">getInt</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/getKeys.html">getKeys</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/getString.html">getString</a></li>
+      <li class="inherited"><a href="couchbase_lite/Document/getValue.html">getValue</a></li>
+      <li class="inherited"><a href="dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+      <li class="inherited"><a href="dart-core/Object/toString.html">toString</a></li>
+    
+      <li class="section-title inherited"><a href="couchbase_lite/MutableDocument-class.html#operators">Operators</a></li>
+      <li class="inherited"><a href="dart-core/Object/operator_equals.html">operator ==</a></li>
+    
+    
+    
+    </ol>
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-main-content" class="col-xs-12 col-sm-9 col-md-8 main-content">
+      <div><h1>getMap&lt;<wbr><span class="type-parameter">K</span>, <span class="type-parameter">V</span>&gt; method</h1></div>
+
+    <section class="multi-line-signature">
+      <span class="returntype"><a href="dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter">K</span>, <span class="type-parameter">V</span>&gt;</span></span>
+            <span class="name ">getMap</span>
+&lt;<wbr><span class="type-parameter">K</span>, <span class="type-parameter">V</span>&gt;(<wbr><span class="parameter" id="getMap-param-key"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">key</span></span>)
+      <div class="features">override</div>
+    </section>
+    <section class="desc markdown">
+      <p>Get a property's value as a Map Object, which is a mapping object of
+a dictionary value.
+Returns nil if the property doesn't exists, or its value is not a dictionary.</p><ul><li>Parameter key: The key.</li><li>Returns: The Map Object object or nil.</li></ul>
+    </section>
+    
+    <section class="summary source-code" id="source">
+      <h2><span>Implementation</span></h2>
+      <pre class="language-dart"><code class="language-dart">Map&lt;K, V&gt; getMap&lt;K, V&gt;(String key) {
+  var _result = getValue(key);
+  if (_result is Map) {
+    return Map.castFrom&lt;dynamic, dynamic, K, V&gt;(_result);
+  }
+
+  return null;
+}</code></pre>
+    </section>
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-right" class="col-xs-6 col-sm-6 col-md-2 sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    couchbase_lite 2.5.1+3
+  </span>
+
+  
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="static-assets/typeahead.bundle.min.js"></script>
+<script src="static-assets/highlight.pack.js"></script>
+<script src="static-assets/URI.js"></script>
+<script src="static-assets/script.js"></script>
+
+
+</body>
+
+</html>

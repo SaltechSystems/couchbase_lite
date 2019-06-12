@@ -52,7 +52,6 @@
     <h5>couchbase_lite library</h5>
     <ol>
       <li class="section-title"><a href="couchbase_lite/couchbase_lite-library.html#classes">Classes</a></li>
-      <li><a href="couchbase_lite/ArrayFunction-class.html">ArrayFunction</a></li>
       <li><a href="couchbase_lite/Authenticator-class.html">Authenticator</a></li>
       <li><a href="couchbase_lite/BasicAuthenticator-class.html">BasicAuthenticator</a></li>
       <li><a href="couchbase_lite/Database-class.html">Database</a></li>
@@ -149,19 +148,19 @@
 </dd>
         <dt id="options" class="property inherited">
           <span class="name"><a href="couchbase_lite/Query/options.html">options</a></span>
-          <span class="signature">&#8596; <a href="dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>         
+          <span class="signature">&#8594; <a href="dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>         
         </dt>
         <dd class="inherited">
           
-                  <div class="features">read / write, inherited</div>
+                  <div class="features">read-only, inherited</div>
 </dd>
-        <dt id="param" class="property inherited">
-          <span class="name"><a href="couchbase_lite/Query/param.html">param</a></span>
-          <span class="signature">&#8596; <a href="couchbase_lite/Parameters-class.html">Parameters</a></span>         
+        <dt id="parameters" class="property inherited">
+          <span class="name"><a href="couchbase_lite/Query/parameters.html">parameters</a></span>
+          <span class="signature">&#8594; <a href="couchbase_lite/Parameters-class.html">Parameters</a></span>         
         </dt>
         <dd class="inherited">
           
-                  <div class="features">read / write, inherited</div>
+                  <div class="features">read-only, inherited</div>
 </dd>
         <dt id="queryId" class="property inherited">
           <span class="name"><a href="couchbase_lite/Query/queryId.html">queryId</a></span>
@@ -202,15 +201,6 @@
           
                   
 </dd>
-        <dt id="toJson" class="callable">
-          <span class="name"><a href="couchbase_lite/OrderBy/toJson.html">toJson</a></span><span class="signature">(<wbr>)
-            <span class="returntype parameter">&#8594; <a href="dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>
-          </span>
-                  </dt>
-        <dd>
-          
-                  <div class="features">override</div>
-</dd>
         <dt id="addChangeListener" class="callable inherited">
           <span class="name"><a href="couchbase_lite/Query/addChangeListener.html">addChangeListener</a></span><span class="signature">(<wbr><span class="parameter" id="addChangeListener-param-callback"><span class="type-annotation">dynamic</span> <span class="parameter-name">callback</span>(<span class="parameter" id="callback-param-"><span class="type-annotation"><a href="couchbase_lite/QueryChange-class.html">QueryChange</a></span></span>)</span>)
             <span class="returntype parameter">&#8594; <a href="dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="couchbase_lite/ListenerToken-class.html">ListenerToken</a></span>&gt;</span></span>
@@ -227,15 +217,6 @@
                   </dt>
         <dd class="inherited">
           Executes the query. <a href="couchbase_lite/Query/execute.html">[...]</a>
-                  <div class="features">inherited</div>
-</dd>
-        <dt id="getParameters" class="callable inherited">
-          <span class="name"><a href="couchbase_lite/Query/getParameters.html">getParameters</a></span><span class="signature">(<wbr>)
-            <span class="returntype parameter">&#8594; <a href="couchbase_lite/Parameters-class.html">Parameters</a></span>
-          </span>
-                  </dt>
-        <dd class="inherited">
-          
                   <div class="features">inherited</div>
 </dd>
         <dt id="noSuchMethod" class="callable inherited">
@@ -256,9 +237,9 @@
           Removes a change listener wih the given listener token.
                   <div class="features">inherited</div>
 </dd>
-        <dt id="setParameters" class="callable inherited">
-          <span class="name"><a href="couchbase_lite/Query/setParameters.html">setParameters</a></span><span class="signature">(<wbr><span class="parameter" id="setParameters-param-parameters"><span class="type-annotation"><a href="couchbase_lite/Parameters-class.html">Parameters</a></span> <span class="parameter-name">parameters</span></span>)
-            <span class="returntype parameter">&#8594; dynamic</span>
+        <dt id="toJson" class="callable inherited">
+          <span class="name"><a href="couchbase_lite/Query/toJson.html">toJson</a></span><span class="signature">(<wbr>)
+            <span class="returntype parameter">&#8594; <a href="dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>
           </span>
                   </dt>
         <dd class="inherited">
@@ -307,20 +288,18 @@
       </li>
       <li class="inherited"><a href="dart-core/Object/hashCode.html">hashCode</a></li>
       <li class="inherited"><a href="couchbase_lite/Query/options.html">options</a></li>
-      <li class="inherited"><a href="couchbase_lite/Query/param.html">param</a></li>
+      <li class="inherited"><a href="couchbase_lite/Query/parameters.html">parameters</a></li>
       <li class="inherited"><a href="couchbase_lite/Query/queryId.html">queryId</a></li>
       <li class="inherited"><a href="dart-core/Object/runtimeType.html">runtimeType</a></li>
       <li class="inherited"><a href="couchbase_lite/Query/tokens.html">tokens</a></li>
     
       <li class="section-title"><a href="couchbase_lite/OrderBy-class.html#instance-methods">Methods</a></li>
       <li><a href="couchbase_lite/OrderBy/limit.html">limit</a></li>
-      <li><a href="couchbase_lite/OrderBy/toJson.html">toJson</a></li>
       <li class="inherited"><a href="couchbase_lite/Query/addChangeListener.html">addChangeListener</a></li>
       <li class="inherited"><a href="couchbase_lite/Query/execute.html">execute</a></li>
-      <li class="inherited"><a href="couchbase_lite/Query/getParameters.html">getParameters</a></li>
       <li class="inherited"><a href="dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
       <li class="inherited"><a href="couchbase_lite/Query/removeChangeListener.html">removeChangeListener</a></li>
-      <li class="inherited"><a href="couchbase_lite/Query/setParameters.html">setParameters</a></li>
+      <li class="inherited"><a href="couchbase_lite/Query/toJson.html">toJson</a></li>
       <li class="inherited"><a href="dart-core/Object/toString.html">toString</a></li>
     
       <li class="section-title inherited"><a href="couchbase_lite/OrderBy-class.html#operators">Operators</a></li>
@@ -335,7 +314,7 @@
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+2
+    couchbase_lite 2.5.1+3
   </span>
 
   

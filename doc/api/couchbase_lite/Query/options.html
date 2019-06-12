@@ -60,7 +60,7 @@
         <a href="couchbase_lite/Query-class.html#instance-properties">Properties</a>
       </li>
       <li><a href="couchbase_lite/Query/options.html">options</a></li>
-      <li><a href="couchbase_lite/Query/param.html">param</a></li>
+      <li><a href="couchbase_lite/Query/parameters.html">parameters</a></li>
       <li><a href="couchbase_lite/Query/queryId.html">queryId</a></li>
       <li><a href="couchbase_lite/Query/tokens.html">tokens</a></li>
       <li class="inherited"><a href="dart-core/Object/hashCode.html">hashCode</a></li>
@@ -69,9 +69,7 @@
       <li class="section-title"><a href="couchbase_lite/Query-class.html#instance-methods">Methods</a></li>
       <li><a href="couchbase_lite/Query/addChangeListener.html">addChangeListener</a></li>
       <li><a href="couchbase_lite/Query/execute.html">execute</a></li>
-      <li><a href="couchbase_lite/Query/getParameters.html">getParameters</a></li>
       <li><a href="couchbase_lite/Query/removeChangeListener.html">removeChangeListener</a></li>
-      <li><a href="couchbase_lite/Query/setParameters.html">setParameters</a></li>
       <li><a href="couchbase_lite/Query/toJson.html">toJson</a></li>
       <li class="inherited"><a href="dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
       <li class="inherited"><a href="dart-core/Object/toString.html">toString</a></li>
@@ -87,18 +85,21 @@
   <div id="dartdoc-main-content" class="col-xs-12 col-sm-9 col-md-8 main-content">
       <div><h1>options property</h1></div>
 
+
+        <section id="getter">
+        
         <section class="multi-line-signature">
           <span class="returntype"><a href="dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span></span>
-          <span class="name ">options</span>
-          <div class="features">read / write</div>
-        </section>
-                <section class="summary source-code" id="source">
+                  <span class="name ">options</span>
+          
+</section>
+        
+                        <section class="summary source-code" id="source">
           <h2><span>Implementation</span></h2>
-          <pre class="language-dart"><code class="language-dart">Map&lt;String, dynamic&gt; options
-
-</code></pre>
+          <pre class="language-dart"><code class="language-dart">Map&lt;String, dynamic&gt; get options =&gt; Map.from(_options);</code></pre>
         </section>
-
+</section>
+        
   </div> <!-- /.main-content -->
 
   <div id="dartdoc-sidebar-right" class="col-xs-6 col-sm-6 col-md-2 sidebar sidebar-offcanvas-right">
@@ -108,7 +109,7 @@
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+2
+    couchbase_lite 2.5.1+3
   </span>
 
   

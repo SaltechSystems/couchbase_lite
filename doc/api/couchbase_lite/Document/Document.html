@@ -60,7 +60,6 @@
         <a href="couchbase_lite/Document-class.html#instance-properties">Properties</a>
       </li>
       <li><a href="couchbase_lite/Document/id.html">id</a></li>
-      <li><a href="couchbase_lite/Document/internalState.html">internalState</a></li>
       <li class="inherited"><a href="dart-core/Object/hashCode.html">hashCode</a></li>
       <li class="inherited"><a href="dart-core/Object/runtimeType.html">runtimeType</a></li>
     
@@ -69,18 +68,12 @@
       <li><a href="couchbase_lite/Document/count.html">count</a></li>
       <li><a href="couchbase_lite/Document/getBoolean.html">getBoolean</a></li>
       <li><a href="couchbase_lite/Document/getDouble.html">getDouble</a></li>
-      <li><a href="couchbase_lite/Document/getId.html">getId</a></li>
       <li><a href="couchbase_lite/Document/getInt.html">getInt</a></li>
       <li><a href="couchbase_lite/Document/getKeys.html">getKeys</a></li>
       <li><a href="couchbase_lite/Document/getList.html">getList</a></li>
-      <li><a href="couchbase_lite/Document/getListOfMap.html">getListOfMap</a></li>
       <li><a href="couchbase_lite/Document/getMap.html">getMap</a></li>
       <li><a href="couchbase_lite/Document/getString.html">getString</a></li>
       <li><a href="couchbase_lite/Document/getValue.html">getValue</a></li>
-      <li><a href="couchbase_lite/Document/isEmpty.html">isEmpty</a></li>
-      <li><a href="couchbase_lite/Document/isNotEmpty.html">isNotEmpty</a></li>
-      <li><a href="couchbase_lite/Document/isNotNull.html">isNotNull</a></li>
-      <li><a href="couchbase_lite/Document/stringMapFromDynamic.html">stringMapFromDynamic</a></li>
       <li><a href="couchbase_lite/Document/toMap.html">toMap</a></li>
       <li><a href="couchbase_lite/Document/toMutable.html">toMutable</a></li>
       <li class="inherited"><a href="dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
@@ -99,20 +92,20 @@
 
     <section class="multi-line-signature">
       
-      <span class="name ">Document</span>(<wbr>[<span class="parameter" id="-param-_map"><span class="type-annotation"><a href="dart-core/Map-class.html">Map</a></span> <span class="parameter-name">_map</span>, </span> <span class="parameter" id="-param-_id"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">_id</span></span> ])
+      <span class="name ">Document</span>(<wbr>[<span class="parameter" id="-param-data"><span class="type-annotation"><a href="dart-core/Map-class.html">Map</a></span> <span class="parameter-name">data</span>, </span> <span class="parameter" id="-param-id"><span class="type-annotation"><a href="dart-core/String-class.html">String</a></span> <span class="parameter-name">id</span></span> ])
     </section>
 
     
     <section class="summary source-code" id="source">
       <h2><span>Implementation</span></h2>
-      <pre class="language-dart"><code class="language-dart">Document([Map&lt;dynamic, dynamic&gt; _map, String _id]) {
-  if (_map != null) {
-    internalState = stringMapFromDynamic(_map);
+      <pre class="language-dart"><code class="language-dart">Document([Map&lt;dynamic, dynamic&gt; data, String id]) {
+  if (data != null) {
+    _data = _stringMapFromDynamic(data);
   } else {
-    internalState = Map&lt;String, dynamic&gt;();
+    _data = Map&lt;String, dynamic&gt;();
   }
 
-  _id != null ? this.id = _id : _id = &quot;random UUID&quot;;
+  _id = id;
 }</code></pre>
     </section>
 
@@ -125,7 +118,7 @@
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+2
+    couchbase_lite 2.5.1+3
   </span>
 
   

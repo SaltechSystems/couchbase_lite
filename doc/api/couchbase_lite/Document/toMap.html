@@ -60,7 +60,6 @@
         <a href="couchbase_lite/Document-class.html#instance-properties">Properties</a>
       </li>
       <li><a href="couchbase_lite/Document/id.html">id</a></li>
-      <li><a href="couchbase_lite/Document/internalState.html">internalState</a></li>
       <li class="inherited"><a href="dart-core/Object/hashCode.html">hashCode</a></li>
       <li class="inherited"><a href="dart-core/Object/runtimeType.html">runtimeType</a></li>
     
@@ -69,18 +68,12 @@
       <li><a href="couchbase_lite/Document/count.html">count</a></li>
       <li><a href="couchbase_lite/Document/getBoolean.html">getBoolean</a></li>
       <li><a href="couchbase_lite/Document/getDouble.html">getDouble</a></li>
-      <li><a href="couchbase_lite/Document/getId.html">getId</a></li>
       <li><a href="couchbase_lite/Document/getInt.html">getInt</a></li>
       <li><a href="couchbase_lite/Document/getKeys.html">getKeys</a></li>
       <li><a href="couchbase_lite/Document/getList.html">getList</a></li>
-      <li><a href="couchbase_lite/Document/getListOfMap.html">getListOfMap</a></li>
       <li><a href="couchbase_lite/Document/getMap.html">getMap</a></li>
       <li><a href="couchbase_lite/Document/getString.html">getString</a></li>
       <li><a href="couchbase_lite/Document/getValue.html">getValue</a></li>
-      <li><a href="couchbase_lite/Document/isEmpty.html">isEmpty</a></li>
-      <li><a href="couchbase_lite/Document/isNotEmpty.html">isNotEmpty</a></li>
-      <li><a href="couchbase_lite/Document/isNotNull.html">isNotNull</a></li>
-      <li><a href="couchbase_lite/Document/stringMapFromDynamic.html">stringMapFromDynamic</a></li>
       <li><a href="couchbase_lite/Document/toMap.html">toMap</a></li>
       <li><a href="couchbase_lite/Document/toMutable.html">toMutable</a></li>
       <li class="inherited"><a href="dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
@@ -103,11 +96,14 @@
 (<wbr>)
       
     </section>
+    <section class="desc markdown">
+      <p>Gets content of the current object as a Dictionary.</p><ul><li>Returns: The Dictionary representing the content of the current object.</li></ul>
+    </section>
     
     <section class="summary source-code" id="source">
       <h2><span>Implementation</span></h2>
       <pre class="language-dart"><code class="language-dart">Map&lt;String, dynamic&gt; toMap() {
-  return internalState;
+  return Map.unmodifiable(_data);
 }</code></pre>
     </section>
 
@@ -120,7 +116,7 @@
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+2
+    couchbase_lite 2.5.1+3
   </span>
 
   

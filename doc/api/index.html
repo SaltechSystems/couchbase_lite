@@ -67,16 +67,21 @@
   <div id="dartdoc-main-content" class="col-xs-12 col-sm-9 col-md-8 main-content">
       <section class="desc markdown">
         <h1 id="couchbase_lite-plugin">couchbase_lite plugin</h1>
-<p>Flutter plugin for Couchbase Lite Community Edition. An embedded lightweight, noSQL database with live synchronization and offline support on Android and iOS.</p>
+<p><a href="https://travis-ci.org/bawelter/couchbase_lite"><img alt="Build Status" src="https://travis-ci.org/bawelter/couchbase_lite.svg?branch=master"></a>
+<a href="https://coveralls.io/github/bawelter/couchbase_lite?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/bawelter/couchbase_lite/badge.svg?branch=master"></a>
+<a href="https://pub.dartlang.org/packages/couchbase_lite"><img alt="pub package" src="https://img.shields.io/pub/v/couchbase_lite.svg"></a></p>
+<p>A Flutter plugin for Couchbase Lite Community Edition. An embedded lightweight, noSQL database with live synchronization and offline support on Android and iOS.</p>
 <p>The goal of this project is to align this library with the <a href="https://docs.couchbase.com/mobile/2.5.0/couchbase-lite-swift/">Swift SDK API</a> for Couchbase Lite.</p>
 <p><em>Note</em>: This plugin is still under development, and some APIs might not be available yet.
 <a href="https://github.com/bawelter/couchbase_lite/issues">Feedback</a> and <a href="https://github.com/bawelter/couchbase_lite/pulls">Pull Requests</a> are most welcome!</p>
 <p>This project forked from <a href="https://github.com/oltrenuovefrontiere/fluttercouch">Fluttercouch</a></p>
 <h2 id="getting-started">Getting Started</h2>
 <p>In your flutter project add the dependency:</p>
-<pre class="language-dart"><code>dependencies:
-  ...
-  couchbase_lite: ^2.5.1+2
+<pre class="language-yaml"><code class="language-yaml">dependencies:
+  couchbase_lite: ^2.5.1+3
+  
+  flutter:
+      sdk: flutter
 </code></pre>
 <p>For help getting started with Flutter, view the 
 <a href="https://flutter.dev/docs">online documentation</a></p>
@@ -90,7 +95,7 @@
 <h2 id="usage-example">Usage example</h2>
 <p>Below is an example for the database using the BLoC pattern ( View &lt;-&gt; BLoC &lt;-&gt; Repository &lt;-&gt; Database )</p>
 <p>The files can also be found in the plugin example but are not used in the main.dart.  The example will be revised in the near future to use the BLoC pattern.</p>
-<pre class="language-dart"><code>class AppDatabase {
+<pre class="language-dart"><code class="language-dart">class AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   AppDatabase._internal();
@@ -210,7 +215,7 @@
   }
 }
 </code></pre>
-<pre class="language-dart"><code>class ObservableResponse&lt;T&gt; {
+<pre class="language-dart"><code class="language-dart">class ObservableResponse&lt;T&gt; {
   final Observable&lt;T&gt; result;
   final VoidFunc onDispose;
   ObservableResponse(this.result,this.onDispose);
@@ -309,7 +314,7 @@ communicating only via messages. <a href="dart-isolate/dart-isolate-library.html
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+2
+    couchbase_lite 2.5.1+3
   </span>
 
   

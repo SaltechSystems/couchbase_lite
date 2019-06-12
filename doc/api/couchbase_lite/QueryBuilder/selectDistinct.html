@@ -91,8 +91,8 @@
       <h2><span>Implementation</span></h2>
       <pre class="language-dart"><code class="language-dart">static Select selectDistinct(List&lt;SelectResultProtocol&gt; _selectResult) {
   var query = Select();
-  query.options[&quot;selectDistinct&quot;] = true;
-  query.options[&quot;selectResult&quot;] = _selectResult;
+  query._options[&quot;selectDistinct&quot;] = true;
+  query._options[&quot;selectResult&quot;] = _selectResult;
   return query;
 }</code></pre>
     </section>
@@ -106,7 +106,7 @@
 
 <footer>
   <span class="no-break">
-    couchbase_lite 2.5.1+2
+    couchbase_lite 2.5.1+3
   </span>
 
   
