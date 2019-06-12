@@ -378,7 +378,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           }
 
           replicator = mCBManager.getReplicator(id);
-          if (replicator == null) {
+          if (replicator != null) {
             replicator.stop();
           }
 

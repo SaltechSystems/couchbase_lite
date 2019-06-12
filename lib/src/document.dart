@@ -1,17 +1,19 @@
 part of couchbase_lite;
 
 class Document {
-  Map<String, dynamic> internalState;
-  String id;
+  Map<dynamic, dynamic> _data;
+  String _id;
 
-  Document([Map<dynamic, dynamic> _map, String _id]) {
-    if (_map != null) {
-      internalState = stringMapFromDynamic(_map);
+  String get id => _id;
+
+  Document([Map<dynamic, dynamic> data, String id]) {
+    if (data != null) {
+      _data = stringMapFromDynamic(data);
     } else {
-      internalState = Map<String, dynamic>();
+      _data = Map<String, dynamic>();
     }
 
-    _id != null ? this.id = _id : _id = "random UUID";
+    _id = id;
   }
 
   Map<String, dynamic> stringMapFromDynamic(Map<dynamic, dynamic> _map) {
@@ -19,9 +21,7 @@ class Document {
   }
 
   bool contains(String key) {
-    if (internalState != null &&
-        internalState.isNotEmpty &&
-        internalState.containsKey(key)) {
+    if (_data != null && _data.isNotEmpty && _data.containsKey(key)) {
       return true;
     } else {
       return false;
@@ -29,7 +29,7 @@ class Document {
   }
 
   int count() {
-    return internalState.length;
+    return _data.length;
   }
 
   bool getBoolean(String key) {
@@ -65,8 +65,8 @@ class Document {
   }
 
   List<String> getKeys() {
-    if (internalState != null) {
-      return internalState.keys;
+    if (_data != null) {
+      return _data.keys;
     } else {
       return List<String>();
     }
@@ -79,7 +79,7 @@ class Document {
 
   Object getValue(String key) {
     if (contains(key)) {
-      return internalState[key] as Object;
+      return _data[key] as Object;
     } else {
       return null;
     }
@@ -94,18 +94,6 @@ class Document {
     }
   }
 
-  List<Map<K, V>> getListOfMap<K, V>(String key) {
-    List<dynamic> _result = getValue(key);
-    if (_result != null) {
-      return _result
-          .cast<Map<dynamic, dynamic>>()
-          .map((item) => item.cast<K, V>())
-          .toList();
-    } else {
-      return List<Map<K, V>>();
-    }
-  }
-
   Map<K, V> getMap<K, V>(String key) {
     Map<dynamic, dynamic> _result = getValue(key);
     if (_result != null) {
@@ -116,26 +104,10 @@ class Document {
   }
 
   Map<String, dynamic> toMap() {
-    return internalState;
+    return Map.of(_data);
   }
 
   MutableDocument toMutable() {
-    return MutableDocument(map: internalState, id: id);
-  }
-
-  String getId() {
-    return id;
-  }
-
-  bool isNotEmpty() {
-    return internalState.isNotEmpty;
-  }
-
-  bool isNotNull() {
-    return internalState != null;
-  }
-
-  bool isEmpty() {
-    return internalState.isEmpty;
+    return MutableDocument(_data, id);
   }
 }

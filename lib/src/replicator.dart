@@ -63,7 +63,7 @@ class Replicator {
     return token;
   }
 
-  ReplicatorActivityLevel activityFromString(String _status) {
+  static ReplicatorActivityLevel activityFromString(String _status) {
     switch (_status) {
       case "BUSY":
         return ReplicatorActivityLevel.busy;

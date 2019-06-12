@@ -15,3 +15,8 @@
 ## 2.5.1+2
 
 * Added all classes as part of couchbase_lite library to eliminate the need to import every class individuallygit
+
+## 2.5.1+3
+
+* Fixed issue with Replication EventChannel
+* Added Travis CI and Code Coverage with Coveralls

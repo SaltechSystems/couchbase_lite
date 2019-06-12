@@ -1,7 +1,10 @@
 part of couchbase_lite;
 
 abstract class Expression {
-  final List<Map<String, dynamic>> internalExpressionStack = new List();
+  final List<Map<String, dynamic>> _internalExpressionStack = new List();
+
+  List<Map<String, dynamic>> get internalExpressionStack =>
+      List.from(_internalExpressionStack);
 
   factory Expression.all() {
     return PropertyExpression({"property": null});
@@ -35,11 +38,11 @@ abstract class Expression {
   }
 
   factory Expression.negated(Expression expression) {
-    return MetaExpression({"negated": expression.internalExpressionStack});
+    return MetaExpression({"negated": expression._internalExpressionStack});
   }
 
   factory Expression.not(Expression expression) {
-    return MetaExpression({"not": expression.internalExpressionStack});
+    return MetaExpression({"not": expression._internalExpressionStack});
   }
 
   Expression add(Expression expression) {
@@ -76,15 +79,18 @@ abstract class Expression {
     return _addList("in", listExpression);
   }
 
-  // implement is(Expression expression) but "is" is a reserved keyword
+  Expression Is(Expression expression) {
+    return _addExpression("is", expression);
+  }
 
   Expression isNot(Expression expression) {
     return _addExpression("isNot", expression);
   }
 
   Expression isNullOrMissing() {
-    internalExpressionStack.add({"isNullOrMissing": null});
-    return this;
+    Expression clone = this._clone();
+    clone._internalExpressionStack.add({"isNullOrMissing": null});
+    return clone;
   }
 
   Expression lessThan(Expression expression) {
@@ -112,8 +118,9 @@ abstract class Expression {
   }
 
   Expression notNullOrMissing() {
-    internalExpressionStack.add({"notNullOrMissing": null});
-    return this;
+    Expression clone = this._clone();
+    clone._internalExpressionStack.add({"notNullOrMissing": null});
+    return clone;
   }
 
   Expression or(Expression expression) {
@@ -129,30 +136,37 @@ abstract class Expression {
   }
 
   Expression from(String alias) {
-    internalExpressionStack.add({"from": alias});
-    return this;
-  }
-
-  toJson() {
-    return internalExpressionStack;
+    Expression fromExpression = this._clone();
+    fromExpression._internalExpressionStack.add({"from": alias});
+    return fromExpression;
   }
 
   Expression _addExpression(String selector, Expression expression,
       {String secondSelector, Expression secondExpression}) {
+    Expression clone = this._clone();
     if (secondSelector != null && secondExpression != null) {
-      internalExpressionStack.add({
+      clone._internalExpressionStack.add({
         selector: expression.internalExpressionStack,
         secondSelector: secondExpression.internalExpressionStack
       });
     } else {
-      internalExpressionStack
+      clone._internalExpressionStack
           .add({selector: expression.internalExpressionStack});
     }
-    return this;
+    return clone;
   }
 
   Expression _addList(String selector, List<Expression> listExpression) {
-    internalExpressionStack.add({selector: listExpression});
-    return this;
+    Expression clone = this._clone();
+    List json = [];
+    listExpression.forEach((expression) {
+      json.add(expression.internalExpressionStack);
+    });
+    clone._internalExpressionStack.add({selector: json});
+    return clone;
   }
+
+  Expression _clone();
+
+  toJson() => internalExpressionStack;
 }

@@ -1,19 +1,15 @@
 part of couchbase_lite;
 
 class MutableDocument extends Document {
-  MutableDocument({Map<dynamic, dynamic> map, String id}) {
-    if (map != null) {
-      super.internalState = super.stringMapFromDynamic(map);
-    } else {
-      super.internalState = Map<String, dynamic>();
-    }
+  String id;
 
-    id != null ? super.id = id : super.id = "random UUID";
+  MutableDocument([Map<dynamic, dynamic> data, String id]) : super(data, id) {
+    this.id = id;
   }
 
   setValue(String key, Object value) {
     if (value != null) {
-      super.internalState[key] = value;
+      super._data[key] = value;
     }
   }
 
@@ -38,6 +34,6 @@ class MutableDocument extends Document {
   }
 
   remove(String key) {
-    super.internalState.remove(key);
+    super._data.remove(key);
   }
 }

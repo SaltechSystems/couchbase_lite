@@ -1,7 +1,7 @@
 part of couchbase_lite;
 
 class Parameters {
-  Map<String, dynamic> map;
+  /*Map<String, dynamic> map;
 
   dynamic getValue(String name) {
     if (map.containsKey(name)) {
@@ -39,5 +39,5 @@ class Parameters {
   Parameters setValue(String name, dynamic value) {
     map[name] = value;
     return this;
-  }
+  }*/
 }

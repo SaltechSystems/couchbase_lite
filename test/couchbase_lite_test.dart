@@ -120,7 +120,18 @@ void main() {
   test('testQuery', () async {
     Query query =
         QueryBuilder.select([SelectResult.all()]).from("test", as: "sheets");
-    query.execute();
+    await query.execute();
+    //expect(await query.parameters, throwsUnimplementedError);
+  });
+
+  test('testQueryChangeListener', () async {
+    Query query =
+        QueryBuilder.select([SelectResult.all()]).from("test", as: "sheets");
+    var token = await query.addChangeListener((change) {
+      //Do Something
+    });
+    await query.execute();
+    await query.removeChangeListener(token);
   });
 
   test('testReplicator', () async {
@@ -132,6 +143,30 @@ void main() {
     config.pinnedServerCertificate = "assets/cert-android.cer";
     config.authenticator = BasicAuthenticator("username", "password");
     Replicator replicator = Replicator(config);
-    replicator.start();
+    await replicator.start();
+    await replicator.stop();
+  });
+
+  test('testReplicatorActivity', () async {
+    expect(Replicator.activityFromString("BUSY"), ReplicatorActivityLevel.busy);
+    expect(Replicator.activityFromString("IDLE"), ReplicatorActivityLevel.idle);
+    expect(Replicator.activityFromString("OFFLINE"),
+        ReplicatorActivityLevel.offline);
+    expect(Replicator.activityFromString("STOPPED"),
+        ReplicatorActivityLevel.stopped);
+    expect(Replicator.activityFromString("CONNECTING"),
+        ReplicatorActivityLevel.connecting);
+  });
+
+  test('basicAuthenticator', () async {
+    var auth = BasicAuthenticator("username", "password");
+    expect(auth.toJson(),
+        {"method": "basic", "username": "username", "password": "password"});
+  });
+
+  test('sessionAuthenticator', () async {
+    var auth = SessionAuthenticator("sessionId");
+    expect(auth.toJson(),
+        {"method": "session", "sessionId": "sessionId", "cookieName": null});
   });
 }

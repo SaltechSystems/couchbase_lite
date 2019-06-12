@@ -1,13 +1,8 @@
 part of couchbase_lite;
 
 class Result {
-  Map<String, dynamic> _internalMap;
-  List<dynamic> _internalList;
-
-  Result() {
-    this._internalMap = new Map<String, dynamic>();
-    this._internalList = new List<dynamic>();
-  }
+  Map<String, dynamic> _internalMap = {};
+  List<dynamic> _internalList = [];
 
   bool contains(String key) {
     if (_internalMap != null) {
