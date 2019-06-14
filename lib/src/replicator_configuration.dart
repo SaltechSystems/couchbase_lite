@@ -6,33 +6,39 @@ class ReplicatorConfiguration {
   final Database database;
   final String target;
   ReplicatorType replicatorType = ReplicatorType.pushAndPull;
-  bool continuous = false;
+  bool continuous;
   String pinnedServerCertificate;
   Authenticator authenticator;
 
   ReplicatorConfiguration(this.database, this.target);
 
   Map<String, dynamic> toJson() {
-    String replicatorTypeString;
+    Map<String, dynamic> map = {"database": database.name, "target": target};
+
     switch (replicatorType) {
       case ReplicatorType.pushAndPull:
-        replicatorTypeString = "PUSH_AND_PULL";
+        map["replicatorType"] = "PUSH_AND_PULL";
         break;
       case ReplicatorType.push:
-        replicatorTypeString = "PUSH";
+        map["replicatorType"] = "PUSH";
         break;
       case ReplicatorType.pull:
-        replicatorTypeString = "PULL";
+        map["replicatorType"] = "PULL";
         break;
     }
 
-    return {
-      "database": database.name,
-      "target": target,
-      "replicatorType": replicatorTypeString,
-      "continuous": continuous,
-      "pinnedServerCertificate": pinnedServerCertificate,
-      "authenticator": authenticator,
-    };
+    if (pinnedServerCertificate != null) {
+      map["pinnedServerCertificate"] = pinnedServerCertificate;
+    }
+
+    if (authenticator != null) {
+      map["authenticator"] = authenticator;
+    }
+
+    if (continuous != null) {
+      map["continuous"] = continuous;
+    }
+
+    return map;
   }
 }

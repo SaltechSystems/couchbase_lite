@@ -27,3 +27,8 @@
 
 * Updated documentation
 * Added more test cases
+
+# 2.5.1+5
+
+* Fixed Replicator Configuration bug which required certain variables like Pinned Certificate to not receive an Platform Error
+* Changed the Map object in Document from unmodifiable to a modifiable copy of the Map object
