@@ -1,6 +1,6 @@
 # couchbase_lite plugin
-[![Build Status](https://travis-ci.org/fluttercouch/couchbase_lite.svg?branch=master)](https://travis-ci.org/fluttercouch/couchbase_lite)
-[![Coverage Status](https://coveralls.io/repos/github/fluttercouch/couchbase_lite/badge.svg?branch=master)](https://coveralls.io/github/fluttercouch/couchbase_lite?branch=master)
+[![Build Status](https://travis-ci.org/SaltechSystems/couchbase_lite.svg?branch=master)](https://travis-ci.org/SaltechSystems/couchbase_lite)
+[![Coverage Status](https://coveralls.io/repos/github/SaltechSystems/couchbase_lite/badge.svg?branch=master)](https://coveralls.io/github/SaltechSystems/couchbase_lite?branch=master)
 [![pub package](https://img.shields.io/pub/v/couchbase_lite.svg)](https://pub.dartlang.org/packages/couchbase_lite)
 
 A Flutter plugin for Couchbase Lite Community Edition. An embedded lightweight, noSQL database with live synchronization and offline support on Android and iOS.
@@ -8,7 +8,7 @@ A Flutter plugin for Couchbase Lite Community Edition. An embedded lightweight, 
 The goal of this project is to align this library with the [Swift SDK API](https://docs.couchbase.com/mobile/2.5.0/couchbase-lite-swift/) for Couchbase Lite.
 
 *Note*: This plugin is still under development, and some APIs might not be available yet.
-[Feedback](https://github.com/bawelter/couchbase_lite/issues) and [Pull Requests](https://github.com/bawelter/couchbase_lite/pulls) are most welcome!
+[Feedback](https://github.com/SaltechSystems/couchbase_lite/issues) and [Pull Requests](https://github.com/SaltechSystems/couchbase_lite/pulls) are most welcome!
 
 This project forked from [Fluttercouch](https://github.com/oltrenuovefrontiere/fluttercouch)
 
@@ -18,7 +18,7 @@ In your flutter project add the dependency:
 
 ```yaml
 dependencies:
-  couchbase_lite: ^2.5.1+4
+  couchbase_lite: ^2.5.1+5
   
   flutter:
       sdk: flutter
