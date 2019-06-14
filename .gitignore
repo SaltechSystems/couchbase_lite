@@ -6,5 +6,6 @@
 .pub/
 pubspec.lock
 
+doc/
 build/
 .idea/workspace.xml

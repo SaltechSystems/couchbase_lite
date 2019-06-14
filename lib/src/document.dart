@@ -131,7 +131,7 @@ class Document {
   List<T> getList<T>(String key) {
     var _result = getValue(key);
     if (_result is List) {
-      return List.unmodifiable(List.castFrom<dynamic, T>(_result));
+      return List.from(List.castFrom<dynamic, T>(_result));
     }
 
     return null;
@@ -153,7 +153,7 @@ class Document {
   Map<K, V> getMap<K, V>(String key) {
     var _result = getValue(key);
     if (_result is Map) {
-      return Map.unmodifiable(Map.castFrom<dynamic, dynamic, K, V>(_result));
+      return Map.from(Map.castFrom<dynamic, dynamic, K, V>(_result));
     }
 
     return null;
@@ -163,7 +163,7 @@ class Document {
   ///
   /// - Returns: The Dictionary representing the content of the current object.
   Map<String, dynamic> toMap() {
-    return Map.unmodifiable(_data);
+    return Map.from(_data);
   }
 
   /// Returns a mutable copy of the document.
