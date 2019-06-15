@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -197,7 +196,7 @@ void main() {
     });
 
     test("is()", () {
-      expect(intExpr.Is(intExpr).toJson(), [
+      expect(intExpr.iS(intExpr).toJson(), [
         {'intValue': 1452},
         {
           'is': [
@@ -269,7 +268,7 @@ void main() {
     });
 
     test("in()", () {
-      expect(intExpr.In([intExpr]).toJson(), [
+      expect(intExpr.iN([intExpr]).toJson(), [
         {'intValue': 1452},
         {
           'in': [

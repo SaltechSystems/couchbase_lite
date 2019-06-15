@@ -1,8 +1,6 @@
 part of couchbase_lite;
 
 class Ordering {
-  Expression _internalExpression;
-
   Ordering._internal(Expression _expression) {
     this._internalExpression = _expression;
   }
@@ -15,9 +13,7 @@ class Ordering {
     return Ordering._internal(_expression);
   }
 
-  toJson() {
-    return _internalExpression.internalExpressionStack;
-  }
+  Expression _internalExpression;
 
   Ordering ascending() {
     Expression clone = _internalExpression._clone();
@@ -29,5 +25,9 @@ class Ordering {
     Expression clone = _internalExpression._clone();
     clone._internalExpressionStack.add({"orderingSortOrder": "descending"});
     return Ordering._internal(clone);
+  }
+
+  List<Map<String, dynamic>> toJson() {
+    return _internalExpression.internalExpressionStack;
   }
 }

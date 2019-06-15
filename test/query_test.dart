@@ -99,7 +99,7 @@ void main() {
       Query query = QueryBuilder.select([SelectResult.property("name")])
           .from("database")
           .where(Expression.property("country")
-              .In([Expression.string("Latvia"), Expression.string("usa")]).and(
+              .iN([Expression.string("Latvia"), Expression.string("usa")]).and(
                   Expression.property("type")
                       .equalTo(Expression.string("airport"))))
           .orderBy([Ordering.property("name")]);

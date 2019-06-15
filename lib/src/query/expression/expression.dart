@@ -1,11 +1,6 @@
 part of couchbase_lite;
 
 abstract class Expression {
-  final List<Map<String, dynamic>> _internalExpressionStack = new List();
-
-  List<Map<String, dynamic>> get internalExpressionStack =>
-      List.from(_internalExpressionStack);
-
   factory Expression.all() {
     return PropertyExpression({"property": null});
   }
@@ -45,6 +40,11 @@ abstract class Expression {
     return MetaExpression({"not": expression._internalExpressionStack});
   }
 
+  final List<Map<String, dynamic>> _internalExpressionStack = new List();
+
+  List<Map<String, dynamic>> get internalExpressionStack =>
+      List.from(_internalExpressionStack);
+
   Expression add(Expression expression) {
     return _addExpression("add", expression);
   }
@@ -75,11 +75,11 @@ abstract class Expression {
   }
 
   // implement in(Expression... expressions) but lacking variable arguments number feature in Dart
-  Expression In(List<Expression> listExpression) {
+  Expression iN(List<Expression> listExpression) {
     return _addList("in", listExpression);
   }
 
-  Expression Is(Expression expression) {
+  Expression iS(Expression expression) {
     return _addExpression("is", expression);
   }
 
@@ -168,5 +168,5 @@ abstract class Expression {
 
   Expression _clone();
 
-  toJson() => internalExpressionStack;
+  List<Map<String, dynamic>> toJson() => internalExpressionStack;
 }

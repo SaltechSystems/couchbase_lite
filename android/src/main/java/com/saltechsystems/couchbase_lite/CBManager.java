@@ -2,34 +2,23 @@ package com.saltechsystems.couchbase_lite;
 
 import android.content.res.AssetManager;
 
-import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
-import com.couchbase.lite.Endpoint;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
-import com.couchbase.lite.ReplicatorConfiguration;
-import com.couchbase.lite.SessionAuthenticator;
-import com.couchbase.lite.URLEndpoint;
 import com.couchbase.lite.Query;
-
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.flutter.plugin.common.JSONUtil;
 
 class CBManager {
     private HashMap<String, Database> mDatabase = new HashMap<>();

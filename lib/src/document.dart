@@ -2,12 +2,6 @@ part of couchbase_lite;
 
 /// Couchbase Lite document. The Document is immutable.
 class Document {
-  Map<dynamic, dynamic> _data;
-  String _id;
-
-  /// The document's ID.
-  String get id => _id;
-
   Document([Map<dynamic, dynamic> data, String id]) {
     if (data != null) {
       _data = _stringMapFromDynamic(data);
@@ -17,6 +11,12 @@ class Document {
 
     _id = id;
   }
+
+  Map<dynamic, dynamic> _data;
+  String _id;
+
+  /// The document's ID.
+  String get id => _id;
 
   Map<String, dynamic> _stringMapFromDynamic(Map<dynamic, dynamic> _map) {
     return Map.castFrom<dynamic, dynamic, String, dynamic>(_map);

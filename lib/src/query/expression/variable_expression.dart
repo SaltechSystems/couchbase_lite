@@ -9,6 +9,7 @@ class VariableExpression extends Object with Expression {
     this._internalExpressionStack.addAll(expression.internalExpressionStack);
   }
 
+  @override
   VariableExpression _clone() {
     return VariableExpression._clone(this);
   }

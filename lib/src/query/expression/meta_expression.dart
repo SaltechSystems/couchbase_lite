@@ -9,6 +9,7 @@ class MetaExpression extends Object with Expression {
     this._internalExpressionStack.addAll(expression.internalExpressionStack);
   }
 
+  @override
   MetaExpression _clone() {
     return MetaExpression._clone(this);
   }

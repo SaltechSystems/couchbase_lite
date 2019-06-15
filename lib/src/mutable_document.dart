@@ -1,11 +1,12 @@
 part of couchbase_lite;
 
 class MutableDocument extends Document {
-  String id;
-
   MutableDocument([Map<dynamic, dynamic> data, String id]) : super(data, id) {
     this.id = id;
   }
+
+  @override
+  String id;
 
   /// Set a value for the given key. Allowed value types are Array, Map,
   /// Number types, null, String, Array Object, Map and nil.
@@ -16,7 +17,7 @@ class MutableDocument extends Document {
   ///   - value: The value.
   ///   - key: The key.
   /// - Returns: The self object.
-  setValue(String key, Object value) {
+  void setValue(String key, Object value) {
     if (value != null) {
       super._data[key] = value;
     }
@@ -27,7 +28,7 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The List Object object.
   ///   - key: The key.
-  setList(String key, List<dynamic> value) {
+  void setList(String key, List<dynamic> value) {
     setValue(key, value);
   }
 
@@ -36,14 +37,14 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The List Object object.
   ///   - key: The key.
-  setArray(String key, List<dynamic> value) => setList(key, value);
+  void setArray(String key, List<dynamic> value) => setList(key, value);
 
   /// Set a Map Object object for the given key. A nil value will be converted to an NSNull.
   ///
   /// - Parameters:
   ///   - value: The Map Object object.
   ///   - key: The key.
-  setMap(String key, Map<dynamic, dynamic> value) {
+  void setMap(String key, Map<dynamic, dynamic> value) {
     setValue(key, value);
   }
 
@@ -52,7 +53,7 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The boolean value.
   ///   - key: The key.
-  setBoolean(String key, bool value) {
+  void setBoolean(String key, bool value) {
     setValue(key, value);
   }
 
@@ -61,7 +62,7 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The double value.
   ///   - key: The key.
-  setDouble(String key, double value) {
+  void setDouble(String key, double value) {
     setValue(key, value);
   }
 
@@ -70,7 +71,7 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The int value.
   ///   - key: The key.
-  setInt(String key, int value) {
+  void setInt(String key, int value) {
     setValue(key, value);
   }
 
@@ -79,7 +80,7 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The String value.
   ///   - key: The Document object.
-  setString(String key, String value) {
+  void setString(String key, String value) {
     setValue(key, value);
   }
 
@@ -93,6 +94,7 @@ class MutableDocument extends Document {
   /// Returns the same MutableDocument object.
   ///
   /// - Returns: The MutableDocument object.
+  @override
   MutableDocument toMutable() {
     return this;
   }
@@ -102,6 +104,7 @@ class MutableDocument extends Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The List Object object or null.
+  @override
   List<T> getList<T>(String key) {
     var _result = getValue(key);
     if (_result is List) {
@@ -117,6 +120,7 @@ class MutableDocument extends Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Map Object object or nil.
+  @override
   Map<K, V> getMap<K, V>(String key) {
     var _result = getValue(key);
     if (_result is Map) {

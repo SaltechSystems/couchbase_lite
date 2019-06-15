@@ -3,14 +3,14 @@ part of couchbase_lite;
 enum ReplicatorType { pushAndPull, push, pull }
 
 class ReplicatorConfiguration {
+  ReplicatorConfiguration(this.database, this.target);
+
   final Database database;
   final String target;
   ReplicatorType replicatorType = ReplicatorType.pushAndPull;
   bool continuous;
   String pinnedServerCertificate;
   Authenticator authenticator;
-
-  ReplicatorConfiguration(this.database, this.target);
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {"database": database.name, "target": target};

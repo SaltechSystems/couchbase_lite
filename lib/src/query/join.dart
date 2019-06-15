@@ -1,19 +1,12 @@
 part of couchbase_lite;
 
 class Join {
-  List<Map<String, dynamic>> _internalStack = List();
-
   Join._internal(String selector, String _dataSource, {String as}) {
     if (as != null) {
       this._internalStack.add({selector: _dataSource, "as": as});
     } else {
       this._internalStack.add({selector: _dataSource});
     }
-  }
-
-  Join on(Expression _expression) {
-    this._internalStack.add({"on": _expression});
-    return this;
   }
 
   factory Join.join(String _dataSource, {String as}) {
@@ -36,5 +29,12 @@ class Join {
     return Join._internal("leftOuterJoin", _dataSource, as: as);
   }
 
-  toJson() => _internalStack;
+  List<Map<String, dynamic>> _internalStack = List();
+
+  Join on(Expression _expression) {
+    this._internalStack.add({"on": _expression});
+    return this;
+  }
+
+  List<Map<String, dynamic>> toJson() => _internalStack;
 }

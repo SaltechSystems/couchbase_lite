@@ -16,8 +16,11 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
     public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = SwiftCouchbaseLitePlugin(registrar: registrar)
         
-        let channel = FlutterMethodChannel(name: "com.saltechsystems.couchbase_lite/database", binaryMessenger: registrar.messenger())
-        channel.setMethodCallHandler(instance.handle(_:result:))
+        let databaseChannel = FlutterMethodChannel(name: "com.saltechsystems.couchbase_lite/database", binaryMessenger: registrar.messenger())
+        databaseChannel.setMethodCallHandler(instance.handleDatabase(_:result:))
+        
+        let replicatorChannel = FlutterMethodChannel(name: "com.saltechsystems.couchbase_lite/replicator", binaryMessenger: registrar.messenger())
+        replicatorChannel.setMethodCallHandler(instance.handleReplicator(_:result:))
         
         let jsonMethodChannel = FlutterMethodChannel(name: "com.saltechsystems.couchbase_lite/json", binaryMessenger: registrar.messenger(), codec: FlutterJSONMethodCodec.sharedInstance())
         jsonMethodChannel.setMethodCallHandler(instance.handleJson(_:result:))
@@ -39,9 +42,9 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
         return mRegistrar?.lookupKey(forAsset: assetKey)
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    public func handleDatabase(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let arguments = call.arguments as? [String:Any], let dbname = arguments["database"] as? String else {
-            result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
+            result(FlutterError(code: "errArgs", message: "Error: Missing database", details: call.arguments.debugDescription))
             return
         }
         
@@ -158,6 +161,35 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
         }
     }
     
+    public func handleReplicator(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let arguments = call.arguments as? [String:Any], let replicatorId = arguments["replicatorId"] as? String else {
+            result(FlutterError(code: "errArgs", message: "Error: Missing replicator", details: call.arguments.debugDescription))
+            return
+        }
+        
+        guard let replicator = mCBManager.getReplicator(replicationId: replicatorId) else {
+            result(FlutterError(code: "errReplicator", message: "Error: Replicator already disposed", details: nil))
+            return
+        }
+        
+        switch (call.method) {
+        case "start":
+            replicator.start()
+            result(nil)
+        case "stop":
+            replicator.stop()
+            result(nil)
+        case "resetCheckpoint":
+            replicator.resetCheckpoint()
+            result(nil)
+        case "dispose":
+            let _ = mCBManager.removeReplicator(replicationId: replicatorId)
+            result(nil)
+        default:
+            result(FlutterMethodNotImplemented)
+        }
+    }
+    
     public func handleJson(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         /* call.arguments:
          * Supported messages are acyclic values of these forms: null, bools, nums,
@@ -224,14 +256,9 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             
             let _ = mCBManager.removeQuery(queryId: queryId)
             result(true)
-        case "startReplicator":
+        case "storeReplicator":
             guard let json = call.arguments as? [String:Any], let replicatorId = json["replicatorId"] as? String else {
                 result(FlutterError(code: "errArgs", message: "Replicator Error: Invalid Arguments", details: call.arguments.debugDescription))
-                return
-            }
-            
-            if let _ = mCBManager.getReplicator(replicationId: replicatorId) {
-                result(true)
                 return
             }
             
@@ -252,8 +279,6 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                         map["activity"] = "OFFLINE"
                     case .stopped:
                         map["activity"] = "STOPPED"
-                        // Automatically remove the replicator from memory when stopped
-                        let _ = self?.mCBManager.removeReplicator(replicationId: replicatorId)
                     case .connecting:
                         map["activity"] = "CONNECTING"
                     }
@@ -261,22 +286,11 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                     self?.mReplicatorEventListener.mEventSink?(map)
                 }
                 
-                replicator.start()
                 mCBManager.addReplicator(replicationId: replicatorId, replicator: replicator, listenerToken: token)
                 result(nil)
             } catch {
                 result(FlutterError(code: "errReplicator", message: "Replicator Error: Invalid Arguments", details: error.localizedDescription))
             }
-        case "stopReplicator":
-            guard let json = call.arguments as? Dictionary<String, Any>, let replicatorId = json["replicatorId"] as? String else {
-                result(FlutterError(code: "errArgs", message: "Replicator Error: Invalid Arguments", details: call.arguments.debugDescription))
-                return
-            }
-            
-            let replicator = mCBManager.getReplicator(replicationId: replicatorId)
-            replicator?.stop()
-            
-            result(nil)
         default:
             result(FlutterMethodNotImplemented)
         }

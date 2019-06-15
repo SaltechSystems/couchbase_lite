@@ -9,10 +9,6 @@ class Functions extends Object with Expression {
     this._internalExpressionStack.addAll(expression.internalExpressionStack);
   }
 
-  Functions _clone() {
-    return Functions._clone(this);
-  }
-
   factory Functions.abs(Expression expression) {
     return Functions({"abs": expression.internalExpressionStack});
   }
@@ -168,5 +164,10 @@ class Functions extends Object with Expression {
 
   factory Functions.upper(Expression expression) {
     return Functions({"upper": expression.internalExpressionStack});
+  }
+
+  @override
+  Functions _clone() {
+    return Functions._clone(this);
   }
 }

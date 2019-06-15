@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const MethodChannel databaseChannel =
       MethodChannel('com.saltechsystems.couchbase_lite/database');
+  const MethodChannel replicatorChannel =
+      MethodChannel('com.saltechsystems.couchbase_lite/replicator');
   const MethodChannel jsonChannel = MethodChannel(
       'com.saltechsystems.couchbase_lite/json', JSONMethodCodec());
 
@@ -78,6 +80,34 @@ void main() {
       }
     });
 
+    replicatorChannel.setMockMethodCallHandler((MethodCall methodCall) async {
+      Map<dynamic, dynamic> arguments = methodCall.arguments;
+      if (!arguments.containsKey("replicatorId")) {
+        return PlatformException(
+            code: "errArgs",
+            message: "Error: Missing replicator",
+            details: methodCall.arguments.toString());
+      }
+
+      switch (methodCall.method) {
+        case "start":
+          return [];
+          break;
+        case "stop":
+          return true;
+          break;
+        case "resetCheckpoint":
+          return true;
+          break;
+        case "dispose":
+          return null;
+          break;
+        default:
+          return UnimplementedError();
+          break;
+      }
+    });
+
     jsonChannel.setMockMethodCallHandler((MethodCall methodCall) async {
       switch (methodCall.method) {
         case "executeQuery":
@@ -89,10 +119,7 @@ void main() {
         case "removeQuery":
           return true;
           break;
-        case "startReplicator":
-          return null;
-          break;
-        case "stopReplicator":
+        case "storeReplicator":
           return null;
           break;
         default:
@@ -164,16 +191,20 @@ void main() {
     await replicator.addChangeListener((change) {});
     await replicator.start();
     await replicator.stop();
+    await replicator.resetCheckpoint();
+    await replicator.dispose();
   });
 
   test('testReplicatorActivity', () async {
-    expect(Replicator.activityFromString("BUSY"), ReplicatorActivityLevel.busy);
-    expect(Replicator.activityFromString("IDLE"), ReplicatorActivityLevel.idle);
-    expect(Replicator.activityFromString("OFFLINE"),
+    expect(ReplicatorStatus.activityFromString("BUSY"),
+        ReplicatorActivityLevel.busy);
+    expect(ReplicatorStatus.activityFromString("IDLE"),
+        ReplicatorActivityLevel.idle);
+    expect(ReplicatorStatus.activityFromString("OFFLINE"),
         ReplicatorActivityLevel.offline);
-    expect(Replicator.activityFromString("STOPPED"),
+    expect(ReplicatorStatus.activityFromString("STOPPED"),
         ReplicatorActivityLevel.stopped);
-    expect(Replicator.activityFromString("CONNECTING"),
+    expect(ReplicatorStatus.activityFromString("CONNECTING"),
         ReplicatorActivityLevel.connecting);
   });
 
