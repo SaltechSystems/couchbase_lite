@@ -32,3 +32,5 @@
 
 * Fixed Replicator Configuration bug which required certain variables like Pinned Certificate to not receive an Platform Error
 * Changed the Map object in Document from unmodifiable to a modifiable copy of the Map object
+* Renamed the functions In,Is,As to in,iS,aS to comply with flutter plugin standards
+* Added a destroy method to Replicator for cleaning up variable references and listeners

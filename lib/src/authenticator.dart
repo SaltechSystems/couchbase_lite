@@ -4,11 +4,11 @@ part of couchbase_lite;
 abstract class Authenticator {}
 
 class BasicAuthenticator implements Authenticator {
-  final String username;
-  final String password;
-
   /// The BasicAuthenticator class is an authenticator that will authenticate using HTTP Basic auth with the given [username] and [password].
   BasicAuthenticator(this.username, this.password);
+
+  final String username;
+  final String password;
 
   Map<String, dynamic> toJson() {
     return {
@@ -20,11 +20,11 @@ class BasicAuthenticator implements Authenticator {
 }
 
 class SessionAuthenticator implements Authenticator {
-  final String sessionId;
-  final String cookieName;
-
   /// The SessionAuthenticator class is an authenticator that will authenticate by using the [sessionId] of the session created by a Sync Gateway.
   SessionAuthenticator(this.sessionId, {this.cookieName});
+
+  final String sessionId;
+  final String cookieName;
 
   Map<String, dynamic> toJson() {
     return {

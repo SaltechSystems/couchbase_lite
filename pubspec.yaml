@@ -2,7 +2,7 @@ name: couchbase_lite
 description: Flutter plugin for Couchbase Lite Community Edition, an embedded lightweight, noSQL database with live synchronization and offline support on Android and iOS.
 version: 2.5.1+5
 author: Bryan Welter <weltbr01@gmail.com>
-homepage: https://github.com/bawelter/couchbase_lite
+homepage: https://github.com/SaltechSystems/couchbase_lite
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -14,6 +14,8 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
+  pedantic: ^1.5.0
+
   flutter_test:
     sdk: flutter
 

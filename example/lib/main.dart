@@ -30,40 +30,14 @@ class _MyAppState extends State<MyApp> {
       await database.saveDocumentWithId("test", Document({}));
       int count = await database.count;
       result = "Document Count: $count";
-    } on PlatformException {
-      result = 'Failed to initialize database.';
+    } on PlatformException catch (e) {
+      result = 'Failed to initialize database. ${e.toString()}';
     }
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     if (!mounted) return;
-
-    Future.delayed(Duration(seconds: 5)).whenComplete(() async {
-      if (database != null) {
-        await database.documentWithId("test");
-        await database.deleteDocument("test");
-        final int count = await database.count;
-
-        if (!mounted) return;
-
-        setState(() {
-          _documentCount = "Document Count: $count";
-        });
-      }
-    });
-
-    Future.delayed(Duration(seconds: 10)).whenComplete(() async {
-      if (database != null) {
-        await database.close();
-
-        if (!mounted) return;
-
-        setState(() {
-          _documentCount = "Database Closed";
-        });
-      }
-    });
 
     setState(() {
       _documentCount = result;

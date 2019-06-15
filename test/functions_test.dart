@@ -1,6 +1,3 @@
-import 'dart:collection';
-import 'dart:convert';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:couchbase_lite/couchbase_lite.dart';
 

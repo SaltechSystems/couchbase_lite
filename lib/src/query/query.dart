@@ -22,7 +22,7 @@ class Query {
   Future<ResultSet> execute() async {
     this._options["queryId"] = queryId;
 
-    if (!_stored && tokens.length > 0) {
+    if (!_stored && tokens.isNotEmpty) {
       _stored = await _channel.invokeMethod('storeQuery', this);
     }
 
@@ -95,7 +95,7 @@ class Query {
       await subscription.cancel();
     }
 
-    if (_stored && tokens.length == 0) {
+    if (_stored && tokens.isNotEmpty) {
       // We had to store this before listening to so if stored on the platform
       _stored = !await _channel.invokeMethod('removeQuery', this);
     }
@@ -105,9 +105,9 @@ class Query {
 }
 
 class QueryChange {
+  QueryChange({this.query, this.results, this.error}) : assert(query != null);
+
   final Query query;
   final ResultSet results;
   final String error;
-
-  QueryChange({this.query, this.results, this.error}) : assert(query != null);
 }

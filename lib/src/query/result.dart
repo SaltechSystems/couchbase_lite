@@ -106,12 +106,12 @@ class Result {
     return _internalMap;
   }
 
-  setMap(Map<String, dynamic> map) {
+  void setMap(Map<String, dynamic> map) {
     _internalMap.clear();
     _internalMap.addAll(map);
   }
 
-  setList(List<dynamic> list) {
+  void setList(List<dynamic> list) {
     _internalList.clear();
     _internalList.addAll(list);
   }

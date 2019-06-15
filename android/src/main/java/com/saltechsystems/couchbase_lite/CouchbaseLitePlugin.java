@@ -3,6 +3,7 @@ package com.saltechsystems.couchbase_lite;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.couchbase.lite.BuildConfig;
 import com.couchbase.lite.CouchbaseLiteException;
@@ -37,7 +38,8 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
   private final QueryEventListener mQueryEventListener = new QueryEventListener();
   private final ReplicationEventListener mReplicationEventListener = new ReplicationEventListener();
   private final CBManager mCBManager;
-  private CallHander callHander = new CallHander();
+  private DatabaseCallHander databaseCallHander = new DatabaseCallHander();
+  private ReplicatorCallHander replicatorCallHander = new ReplicatorCallHander();
   private JSONCallHandler jsonCallHandler = new JSONCallHandler();
 
   /**
@@ -46,8 +48,11 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
   public static void registerWith(Registrar registrar) {
     CouchbaseLitePlugin instance = new CouchbaseLitePlugin(registrar);
 
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/database");
-    channel.setMethodCallHandler(instance.callHander);
+    final MethodChannel databaseChannel = new MethodChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/database");
+    databaseChannel.setMethodCallHandler(instance.databaseCallHander);
+
+    final MethodChannel replicatorChannel = new MethodChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/replicator");
+    replicatorChannel.setMethodCallHandler(instance.replicatorCallHander);
 
     final MethodChannel jsonChannel = new MethodChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/json", JSONMethodCodec.INSTANCE);
     jsonChannel.setMethodCallHandler(instance.jsonCallHandler);
@@ -86,7 +91,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     return mRegistrar.context();
   }
 
-  private class CallHander implements MethodCallHandler {
+  private class DatabaseCallHander implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, Result result) {
       if (!call.hasArgument("database")) {
@@ -223,13 +228,55 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     }
   }
 
+  private class ReplicatorCallHander implements MethodCallHandler {
+    @Override
+    public void onMethodCall(MethodCall call, Result result) {
+      if (!call.hasArgument("replicatorId")) {
+        result.error("errArgs", "Error: Missing replicator", call.arguments.toString());
+        return;
+      }
+
+      String replicatorId = call.argument("replicatorId");
+      Replicator replicator = mCBManager.getReplicator(replicatorId);
+
+      if (replicator == null) {
+        result.error("errReplicator", "Error: Replicator already disposed", null);
+        return;
+      }
+
+      switch (call.method) {
+        case ("start"):
+          replicator.start();
+
+          result.success(null);
+          break;
+        case ("stop"):
+          replicator.stop();
+
+          result.success(null);
+          break;
+        case ("resetCheckpoint"):
+          replicator.resetCheckpoint();
+
+          result.success(null);
+          break;
+        case ("dispose"):
+          mCBManager.removeReplicator(replicatorId);
+
+          result.success(null);
+          break;
+        default:
+          result.notImplemented();
+      }
+    }
+  }
+
   private class JSONCallHandler implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, final Result result) {
       final JSONObject json = call.arguments();
 
       final String id;
-      Replicator replicator;
       switch (call.method) {
         case ("executeQuery"):
           try {
@@ -309,7 +356,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           mCBManager.removeQuery(id);
           result.success(true);
           break;
-        case ("startReplicator"):
+        case ("storeReplicator"):
           try {
             id = json.getString("replicatorId");
           } catch (JSONException e) {
@@ -317,69 +364,49 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             return;
           }
 
-          replicator = mCBManager.getReplicator(id);
-          if (replicator == null) {
-            replicator = new ReplicatorJson(json,mCBManager).toCouchbaseReplicator();
-
-            if (replicator != null) {
-              ListenerToken mListenerToken = replicator.addChangeListener(new ReplicatorChangeListener() {
-                @Override
-                public void changed(ReplicatorChange change) {
-                  HashMap<String,Object> json = new HashMap<String,Object>();
-                  json.put("replicator",id);
-
-                  final EventChannel.EventSink mEventSink = mReplicationEventListener.mEventSink;
-                  if (mEventSink == null) {
-                    return;
-                  }
-
-                  CouchbaseLiteException error = change.getStatus().getError();
-                  if (error != null) {
-                    json.put("error",error.getLocalizedMessage());
-                  }
-
-                  switch (change.getStatus().getActivityLevel()) {
-                    case BUSY:
-                      json.put("activity","BUSY");
-                      break;
-                    case IDLE:
-                      json.put("activity","IDLE");
-                      break;
-                    case OFFLINE:
-                      json.put("activity","OFFLINE");
-                      break;
-                    case STOPPED:
-                      json.put("activity","STOPPED");
-                      // Automatically remove the replicator from memory when stopped
-                      mCBManager.removeReplicator(id);
-                      break;
-                    case CONNECTING:
-                      json.put("activity","CONNECTING");
-                      break;
-                  }
-
-                  mEventSink.success(json);
-                }
-              });
-
-              replicator.start();
-              mCBManager.addReplicator(id, replicator, mListenerToken);
-            }
-          }
-
-          result.success(null);
-          break;
-        case ("stopReplicator"):
-          try {
-            id = json.getString("replicatorId");
-          } catch (JSONException e) {
-            result.error("errArg", "Query Error: Invalid Arguments", e);
-            return;
-          }
-
-          replicator = mCBManager.getReplicator(id);
+          Replicator replicator = new ReplicatorJson(json,mCBManager).toCouchbaseReplicator();
           if (replicator != null) {
-            replicator.stop();
+            ListenerToken mListenerToken = replicator.addChangeListener(new ReplicatorChangeListener() {
+              @Override
+              public void changed(ReplicatorChange change) {
+                HashMap<String,Object> json = new HashMap<String,Object>();
+                json.put("replicator",id);
+
+                final EventChannel.EventSink mEventSink = mReplicationEventListener.mEventSink;
+                if (mEventSink == null) {
+                  return;
+                }
+
+                CouchbaseLiteException error = change.getStatus().getError();
+                if (error != null) {
+                  json.put("error",error.getLocalizedMessage());
+                }
+
+                switch (change.getStatus().getActivityLevel()) {
+                  case BUSY:
+                    json.put("activity","BUSY");
+                    break;
+                  case IDLE:
+                    json.put("activity","IDLE");
+                    break;
+                  case OFFLINE:
+                    json.put("activity","OFFLINE");
+                    break;
+                  case STOPPED:
+                    json.put("activity","STOPPED");
+                    break;
+                  case CONNECTING:
+                    json.put("activity","CONNECTING");
+                    break;
+                }
+
+                mEventSink.success(json);
+              }
+            });
+
+            mCBManager.addReplicator(id, replicator, mListenerToken);
+          } else {
+            result.error("errReplicator", "Replicator Error: Failed to initialize replicator", null);
           }
 
           result.success(null);

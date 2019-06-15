@@ -59,9 +59,9 @@ The files can also be found in the plugin example but are not used in the main.d
 
 ```dart
 class AppDatabase {
-  static final AppDatabase instance = AppDatabase._internal();
-
   AppDatabase._internal();
+
+  static final AppDatabase instance = AppDatabase._internal();
 
   String dbName = "myDatabase";
   List<Future> pendingListeners = List();
@@ -73,7 +73,8 @@ class AppDatabase {
     try {
       database = await Database.initWithName(dbName);
       // Note wss://10.0.2.2:4984/my-database is for the android simulator on your local machine's couchbase database
-      ReplicatorConfiguration config = ReplicatorConfiguration(database, "wss://10.0.2.2:4984/my-database");
+      ReplicatorConfiguration config =
+          ReplicatorConfiguration(database, "wss://10.0.2.2:4984/my-database");
       config.replicatorType = ReplicatorType.pushAndPull;
       config.continuous = true;
 
@@ -90,7 +91,7 @@ class AppDatabase {
         print(event.status.activity.toString());
       });
 
-      replicator.start();
+      await replicator.start();
       return true;
     } on PlatformException {
       return false;
@@ -100,17 +101,18 @@ class AppDatabase {
   Future<void> logout() async {
     await Future.wait(pendingListeners);
     replicator.removeChangeListener(_replicatorListenerToken);
-    _replicatorListenerToken = replicator.addChangeListener((ReplicatorChange event) async {
+    _replicatorListenerToken =
+        replicator.addChangeListener((ReplicatorChange event) async {
       if (event.status.activity == ReplicatorActivityLevel.stopped) {
         await database.close();
-        replicator.removeChangeListener(_replicatorListenerToken);
+        await replicator.dispose();
         _replicatorListenerToken = null;
       }
     });
     await replicator.stop();
   }
 
-  Future<Map<String,dynamic>> createDocument(Map<String,dynamic> map) async {
+  Future<Map<String, dynamic>> createDocument(Map<String, dynamic> map) async {
     var id = "mydocument::${Uuid().v1()}";
 
     try {
@@ -127,15 +129,13 @@ class AppDatabase {
     final stream = BehaviorSubject<ResultSet>();
     // Execute a query and then post results and all changes to the stream
 
-    final Query query = QueryBuilder
-        .select([
+    final Query query = QueryBuilder.select([
       SelectResult.expression(Meta.id.from("mydocs")).As("id"),
       SelectResult.expression(Expression.property("foo").from("mydocs")),
       SelectResult.expression(Expression.property("bar").from("mydocs")),
     ])
         .from(dbName, as: "mydocs")
-        .where(Meta.id.from("mydocs").equalTo(Expression.string(documentId))
-    );
+        .where(Meta.id.from("mydocs").equalTo(Expression.string(documentId)));
 
     final processResults = (ResultSet results) {
       if (!stream.isClosed) {
@@ -146,7 +146,10 @@ class AppDatabase {
     return _buildObservableQueryResponse(stream, query, processResults);
   }
 
-  ObservableResponse<T> _buildObservableQueryResponse<T>(BehaviorSubject<T> subject, Query query, ResultSetCallback resultsCallback) {
+  ObservableResponse<T> _buildObservableQueryResponse<T>(
+      BehaviorSubject<T> subject,
+      Query query,
+      ResultSetCallback resultsCallback) {
     final futureToken = query.addChangeListener((change) {
       if (change.results != null) {
         resultsCallback(change.results);
@@ -161,7 +164,9 @@ class AppDatabase {
       });
 
       pendingListeners.add(newFuture);
-      newFuture.whenComplete((){pendingListeners.remove(newFuture);});
+      newFuture.whenComplete(() {
+        pendingListeners.remove(newFuture);
+      });
     };
 
     try {
@@ -181,9 +186,10 @@ class AppDatabase {
 
 ```dart
 class ObservableResponse<T> {
+  ObservableResponse(this.result, this.onDispose);
+
   final Observable<T> result;
   final VoidFunc onDispose;
-  ObservableResponse(this.result,this.onDispose);
 
   void dispose() {
     if (onDispose != null) {

@@ -1,15 +1,10 @@
 part of couchbase_lite;
 
 class Database {
+  Database._internal(this.name);
+
   static const MethodChannel _methodChannel =
       const MethodChannel('com.saltechsystems.couchbase_lite/database');
-
-  final String name;
-
-  Future<int> get count => _methodChannel
-      .invokeMethod('getDocumentCount', <String, dynamic>{'database': name});
-
-  Database._internal(this.name);
 
   /// Initializes a Couchbase Lite database with the given [dbName].
   static Future<Database> initWithName(String dbName) async {
@@ -17,6 +12,11 @@ class Database {
         'initDatabaseWithName', <String, dynamic>{'database': dbName});
     return Database._internal(dbName);
   }
+
+  final String name;
+
+  Future<int> get count => _methodChannel
+      .invokeMethod('getDocumentCount', <String, dynamic>{'database': name});
 
   /// Deletes a database of the given [dbName].
   static Future<void> deleteWithName(String dbName) =>
@@ -50,4 +50,7 @@ class Database {
 
   //Not including this way of deleting for now because I remove the reference when we close the database
   //Future<void> delete() => _methodChannel.invokeMethod('delete', <String, dynamic>{'database': name});
+
+  //Not including this way of disposing for now because I remove the reference when we close the database
+  //Future<void> dispose() => _methodChannel.invokeMethod('dispose', <String, dynamic>{'database': name});
 }

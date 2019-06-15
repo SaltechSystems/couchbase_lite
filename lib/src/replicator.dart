@@ -3,8 +3,14 @@ part of couchbase_lite;
 enum ReplicatorActivityLevel { busy, idle, offline, stopped, connecting }
 
 class Replicator {
+  Replicator(this.config) {
+    _storingReplicator = _jsonChannel.invokeMethod('storeReplicator', this);
+  }
+
+  static const MethodChannel _methodChannel =
+      const MethodChannel('com.saltechsystems.couchbase_lite/replicator');
   static const JSONMethodCodec _jsonMethod = const JSONMethodCodec();
-  static const MethodChannel _channel = const MethodChannel(
+  static const MethodChannel _jsonChannel = const MethodChannel(
       'com.saltechsystems.couchbase_lite/json', _jsonMethod);
   static const EventChannel _replicationEventChannel = const EventChannel(
       "com.saltechsystems.couchbase_lite/replicationEventChannel");
@@ -15,21 +21,36 @@ class Replicator {
   Map<ListenerToken, StreamSubscription> tokens = {};
 
   final ReplicatorConfiguration config;
-
-  Replicator(this.config);
+  Future<void> _storingReplicator;
 
   /// Starts the replicator.
   ///
   /// The replicator runs asynchronously and will report its progress throuh the replicator change notification.
   Future<void> start() async {
-    await _channel.invokeMethod('startReplicator', this);
+    await _storingReplicator;
+
+    await _methodChannel
+        .invokeMethod('start', <String, dynamic>{'replicatorId': replicatorId});
   }
 
   /// Stops a running replicator.
   ///
   /// When the replicator actually stops, the replicator will change its status’s activity level to .stopped and the replicator change notification will be notified accordingly.
   Future<void> stop() async {
-    await _channel.invokeMethod('stopReplicator', this);
+    await _storingReplicator;
+
+    await _methodChannel
+        .invokeMethod('stop', <String, dynamic>{'replicatorId': replicatorId});
+  }
+
+  /// Stops a running replicator.
+  ///
+  /// When the replicator actually stops, the replicator will change its status’s activity level to .stopped and the replicator change notification will be notified accordingly.
+  Future<void> resetCheckpoint() async {
+    await _storingReplicator;
+
+    await _methodChannel.invokeMethod(
+        'resetCheckpoint', <String, dynamic>{'replicatorId': replicatorId});
   }
 
   /// Adds a replicator change listener.
@@ -40,7 +61,7 @@ class Replicator {
     tokens[token] = _replicationStream
         .where((data) => data["replicator"] == replicatorId)
         .listen((data) {
-      var activity = activityFromString(data["activity"]);
+      var activity = ReplicatorStatus.activityFromString(data["activity"]);
       String error;
       if (data["error"] is String) {
         error = data["error"];
@@ -57,11 +78,34 @@ class Replicator {
     var subscription = tokens.remove(token);
 
     if (subscription != null) {
-      subscription.cancel();
+      await subscription.cancel();
     }
 
     return token;
   }
+
+  /// Removes change listeners and references on the Platform.  This should be called when finished with the replicator to prevent memory leaks.
+  Future<void> dispose() async {
+    for (var token in List.from(tokens.keys)) {
+      await removeChangeListener(token);
+    }
+
+    await _storingReplicator;
+
+    await _methodChannel.invokeMethod(
+        'dispose', <String, dynamic>{'replicatorId': replicatorId});
+  }
+
+  Map<String, dynamic> toJson() {
+    return {"replicatorId": replicatorId, "config": config};
+  }
+}
+
+class ReplicatorStatus {
+  ReplicatorStatus._internal(this.activity, this.error);
+
+  final ReplicatorActivityLevel activity;
+  final String error;
 
   static ReplicatorActivityLevel activityFromString(String _status) {
     switch (_status) {
@@ -84,22 +128,11 @@ class Replicator {
 
     return null;
   }
-
-  Map<String, dynamic> toJson() {
-    return {"replicatorId": replicatorId, "config": config};
-  }
-}
-
-class ReplicatorStatus {
-  final ReplicatorActivityLevel activity;
-  final String error;
-
-  ReplicatorStatus._internal(this.activity, this.error);
 }
 
 class ReplicatorChange {
+  ReplicatorChange(this.replicator, this.status);
+
   final Replicator replicator;
   final ReplicatorStatus status;
-
-  ReplicatorChange(this.replicator, this.status);
 }
