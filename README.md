@@ -105,7 +105,7 @@ class AppDatabase {
         replicator.addChangeListener((ReplicatorChange event) async {
       if (event.status.activity == ReplicatorActivityLevel.stopped) {
         await database.close();
-        replicator.removeChangeListener(_replicatorListenerToken);
+        await replicator.dispose();
         _replicatorListenerToken = null;
       }
     });
