@@ -95,7 +95,7 @@ class Query {
       await subscription.cancel();
     }
 
-    if (_stored && tokens.isNotEmpty) {
+    if (_stored && tokens.isEmpty) {
       // We had to store this before listening to so if stored on the platform
       _stored = !await _channel.invokeMethod('removeQuery', this);
     }
