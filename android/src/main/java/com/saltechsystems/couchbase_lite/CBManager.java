@@ -87,7 +87,7 @@ class CBManager {
     Database initDatabaseWithName(String _name) throws CouchbaseLiteException {
         if (!mDatabase.containsKey(_name)) {
             Database database = new Database(_name, mDBConfig);
-            mDatabase.put(_name, new Database(_name, mDBConfig));
+            mDatabase.put(_name, database);
             return database;
         }
 

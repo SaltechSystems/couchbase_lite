@@ -18,7 +18,7 @@ In your flutter project add the dependency:
 
 ```yaml
 dependencies:
-  couchbase_lite: ^2.5.1+5
+  couchbase_lite: ^2.5.1+6
   
   flutter:
       sdk: flutter

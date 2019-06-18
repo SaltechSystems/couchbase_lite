@@ -118,7 +118,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           }
 
           try {
-            database.close();
+            mCBManager.closeDatabaseWithName(dbname);
             result.success(null);
           } catch (Exception e) {
             result.error("errClose", "error closing database with name " + dbname, e.toString());
