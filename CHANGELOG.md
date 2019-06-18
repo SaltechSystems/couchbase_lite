@@ -14,7 +14,7 @@
 
 ## 2.5.1+2
 
-* Added all classes as part of couchbase_lite library to eliminate the need to import every class individuallygit
+* Added all classes as part of couchbase_lite library to eliminate the need to import every class individually
 
 ## 2.5.1+3
 
@@ -34,3 +34,8 @@
 * Changed the Map object in Document from unmodifiable to a modifiable copy of the Map object
 * Renamed the functions In,Is,As to in,iS,aS to comply with flutter plugin standards
 * Added a destroy method to Replicator for cleaning up variable references and listeners
+
+# 2.5.1+6
+
+* Fixed an issue where Query Listeners were not being released
+* Fixed an issue where the database reference was not being released on close for Android
