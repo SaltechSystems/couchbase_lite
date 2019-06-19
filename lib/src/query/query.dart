@@ -41,9 +41,9 @@ class Query {
       return ResultSet(results);
     } on PlatformException {
       // Remove all listeners on error
-      tokens.keys.forEach((token) {
-        removeChangeListener(token);
-      });
+      for (var token in List.from(tokens.keys)) {
+        await removeChangeListener(token);
+      }
 
       rethrow;
     }

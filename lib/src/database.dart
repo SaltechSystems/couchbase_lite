@@ -31,11 +31,39 @@ class Database {
     return Document(_docResult["doc"], _docResult["id"]);
   }
 
+  /// Saves a document to the database. When write operations are executed concurrently, the last writer will overwrite all other written values.
+  Future<void> save(MutableDocument doc) async {
+    if (doc.id == null) {
+      doc.id = await _methodChannel.invokeMethod('saveDocument',
+          <String, dynamic>{'database': name, 'map': doc.toMap()});
+    } else {
+      doc.id = await _methodChannel.invokeMethod(
+          'saveDocumentWithId', <String, dynamic>{
+        'database': name,
+        'id': doc.id,
+        'map': doc.toMap()
+      });
+    }
+  }
+
   /// Saves [doc] to the database with the document id set by the database.
-  Future<String> saveDocument(Document doc) => _methodChannel.invokeMethod(
-      'saveDocument', <String, dynamic>{'database': name, 'map': doc.toMap()});
+  @Deprecated('Use `save` instead.')
+  Future<String> saveDocument(Document doc) {
+    if (doc.id == null) {
+      return _methodChannel.invokeMethod('saveDocument',
+          <String, dynamic>{'database': name, 'map': doc.toMap()});
+    } else {
+      return _methodChannel.invokeMethod(
+          'saveDocumentWithId', <String, dynamic>{
+        'database': name,
+        'id': doc.id,
+        'map': doc.toMap()
+      });
+    }
+  }
 
   /// Saves [doc] to the database with the Document id set to [id].
+  @Deprecated('Use `save` instead.')
   Future<String> saveDocumentWithId(String id, Document doc) =>
       _methodChannel.invokeMethod('saveDocumentWithId',
           <String, dynamic>{'database': name, 'id': id, 'map': doc.toMap()});
