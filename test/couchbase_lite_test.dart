@@ -140,7 +140,14 @@ void main() {
     await database.deleteDocument("docid");
     expect(await database.count, 1);
     expect(await database.saveDocument(Document({})), "documentid");
+    expect(await database.saveDocument(Document({}, "docid")), "docid");
     expect(await database.saveDocumentWithId("docid", Document({})), "docid");
+    MutableDocument doc = MutableDocument({});
+    await database.save(doc);
+    expect(doc.id, "documentid");
+    doc.id = "test";
+    await database.save(doc);
+    expect(doc.id, "test");
     await database.documentWithId("myid");
   });
 

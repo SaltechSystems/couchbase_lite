@@ -39,3 +39,8 @@
 
 * Fixed an issue where Query Listeners were not being released
 * Fixed an issue where the database reference was not being released on close for Android
+
+# 2.5.1+7
+
+* Deprecated Database saveDocument methods and replaced with save taking a MutableDocument as an argument
+* Fixed a concurrent modification exception with query listeners
