@@ -44,3 +44,7 @@
 
 * Deprecated Database saveDocument methods and replaced with save taking a MutableDocument as an argument
 * Fixed a concurrent modification exception with query listeners
+
+# 2.5.1+8
+
+* Fixed a bug on Android which results in an error for not posting results on the UI Thread
