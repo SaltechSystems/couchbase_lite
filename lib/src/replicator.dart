@@ -4,6 +4,7 @@ enum ReplicatorActivityLevel { busy, idle, offline, stopped, connecting }
 
 class Replicator {
   Replicator(this.config) {
+    //this.config._isLocked = true;
     _storingReplicator = _jsonChannel.invokeMethod('storeReplicator', this);
   }
 
@@ -59,7 +60,8 @@ class Replicator {
   ListenerToken addChangeListener(Function(ReplicatorChange) callback) {
     var token = ListenerToken();
     tokens[token] = _replicationStream
-        .where((data) => data["replicator"] == replicatorId)
+        .where((data) => (data["replicator"] == replicatorId &&
+            data["type"] == "ReplicatorChange"))
         .listen((data) {
       var activity = ReplicatorStatus.activityFromString(data["activity"]);
       String error;
@@ -69,6 +71,22 @@ class Replicator {
 
       callback(
           ReplicatorChange(this, ReplicatorStatus._internal(activity, error)));
+    });
+    return token;
+  }
+
+  /// Adds a document replicator change listener.
+  ///
+  /// Returns the listener token object for removing the listener.
+  ListenerToken addDocumentReplicationListener(
+      Function(DocumentReplication) callback) {
+    var token = ListenerToken();
+    tokens[token] = _replicationStream
+        .where((data) => ((data["replicator"] == replicatorId &&
+            data["type"] == "DocumentReplication")))
+        .listen((data) {
+      callback(DocumentReplication.fromMap(data)
+          .rebuild((b) => b..replicator = this));
     });
     return token;
   }

@@ -35,15 +35,15 @@ void main() {
           break;
         case ("saveDocument"):
           if (arguments.containsKey("map")) {
-            return 'documentid';
+            return {"id": "documentid", "sequence": 1, "success": true};
           } else {
             return PlatformException(
                 code: "errArgs", message: "invalid arguments", details: null);
           }
           break;
         case ("saveDocumentWithId"):
-          if (arguments.containsKey("id") && arguments.containsKey("map")) {
-            return arguments["id"];
+          if (arguments.containsKey("map") && arguments.containsKey("id")) {
+            return {"id": arguments["id"], "sequence": 1, "success": true};
           } else {
             return PlatformException(
                 code: "errArgs", message: "invalid arguments", details: null);
@@ -139,15 +139,13 @@ void main() {
     await database.close();
     await database.deleteDocument("docid");
     expect(await database.count, 1);
-    expect(await database.saveDocument(Document({})), "documentid");
-    expect(await database.saveDocument(Document({}, "docid")), "docid");
-    expect(await database.saveDocumentWithId("docid", Document({})), "docid");
-    MutableDocument doc = MutableDocument({});
-    await database.save(doc);
+    expect(await database.saveDocument(MutableDocument()), true);
+    expect(await database.saveDocument(MutableDocument(id: "docid")), true);
+    MutableDocument doc = MutableDocument();
+    await database.saveDocument(doc);
     expect(doc.id, "documentid");
-    doc.id = "test";
-    await database.save(doc);
-    expect(doc.id, "test");
+    await database.saveDocument(doc);
+    expect(doc.id, "documentid");
     await database.documentWithId("myid");
   });
 

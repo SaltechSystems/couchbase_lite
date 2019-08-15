@@ -1,5 +1,7 @@
 part of couchbase_lite;
 
+enum ConcurrencyControl { lastWriteWins, failOnConflict }
+
 class Database {
   Database._internal(this.name);
 
@@ -24,53 +26,95 @@ class Database {
           'deleteDatabaseWithName', <String, dynamic>{'database': dbName});
 
   /// Gets a Document object with the given [id]
-  Future<Document> documentWithId(String id) async {
+  Future<Document> document(String id) async {
     Map<dynamic, dynamic> _docResult = await _methodChannel.invokeMethod(
         'getDocumentWithId', <String, dynamic>{'database': name, 'id': id});
 
-    return Document(_docResult["doc"], _docResult["id"]);
-  }
-
-  /// Saves a document to the database. When write operations are executed concurrently, the last writer will overwrite all other written values.
-  Future<void> save(MutableDocument doc) async {
-    if (doc.id == null) {
-      doc.id = await _methodChannel.invokeMethod('saveDocument',
-          <String, dynamic>{'database': name, 'map': doc.toMap()});
+    if (_docResult["doc"] == null) {
+      return null;
     } else {
-      doc.id = await _methodChannel.invokeMethod(
-          'saveDocumentWithId', <String, dynamic>{
-        'database': name,
-        'id': doc.id,
-        'map': doc.toMap()
-      });
+      return Document._init(
+          _docResult["doc"], _docResult["id"], name, _docResult["sequence"]);
     }
   }
 
-  /// Saves [doc] to the database with the document id set by the database.
-  @Deprecated('Use `save` instead.')
-  Future<String> saveDocument(Document doc) {
-    if (doc.id == null) {
-      return _methodChannel.invokeMethod('saveDocument',
-          <String, dynamic>{'database': name, 'map': doc.toMap()});
-    } else {
-      return _methodChannel.invokeMethod(
-          'saveDocumentWithId', <String, dynamic>{
-        'database': name,
-        'id': doc.id,
-        'map': doc.toMap()
-      });
-    }
+  /// Gets a Document object with the given [id]
+  @Deprecated('Replaced by `document`.')
+  Future<Document> documentWithId(String id) => document(id);
+
+  /// All index names.
+  Future<List<String>> get indexes async {
+    var result = await _methodChannel
+        .invokeMethod('getIndexes', <String, dynamic>{'database': name});
+
+    return List.castFrom<dynamic, String>(result);
   }
 
-  /// Saves [doc] to the database with the Document id set to [id].
-  @Deprecated('Use `save` instead.')
-  Future<String> saveDocumentWithId(String id, Document doc) =>
-      _methodChannel.invokeMethod('saveDocumentWithId',
-          <String, dynamic>{'database': name, 'id': id, 'map': doc.toMap()});
+  /// Saves [doc] to the database with the document id set by the database. When write operations are executed concurrently, the last write wins by default.
+  @Deprecated('Replaced by `saveDocument`.')
+  Future<bool> save(MutableDocument doc,
+          {ConcurrencyControl concurrencyControl =
+              ConcurrencyControl.lastWriteWins}) =>
+      saveDocument(doc, concurrencyControl: concurrencyControl);
+
+  /// Saves [doc] to the database with the document id set by the database. When write operations are executed concurrently, the last write wins by default.
+  Future<bool> saveDocument(MutableDocument doc,
+      {ConcurrencyControl concurrencyControl =
+          ConcurrencyControl.lastWriteWins}) async {
+    Map<dynamic, dynamic> result;
+    if (doc.id == null) {
+      result =
+          await _methodChannel.invokeMethod('saveDocument', <String, dynamic>{
+        'database': name,
+        'map': doc.toMap(),
+        'concurrencyControl':
+            concurrencyControl == ConcurrencyControl.failOnConflict
+                ? 'failOnConflict'
+                : 'lastWriteWins'
+      });
+    } else if (doc.sequence != null) {
+      result = await _methodChannel
+          .invokeMethod('saveDocumentWithId', <String, dynamic>{
+        'database': name,
+        'id': doc.id,
+        'sequence': doc.sequence,
+        'map': doc.toMap(),
+        'concurrencyControl':
+            concurrencyControl == ConcurrencyControl.failOnConflict
+                ? 'failOnConflict'
+                : 'lastWriteWins'
+      });
+    } else {
+      result = await _methodChannel
+          .invokeMethod('saveDocumentWithId', <String, dynamic>{
+        'database': name,
+        'id': doc.id,
+        'map': doc.toMap(),
+        'concurrencyControl':
+            concurrencyControl == ConcurrencyControl.failOnConflict
+                ? 'failOnConflict'
+                : 'lastWriteWins'
+      });
+    }
+
+    if (result["success"] == true) {
+      doc._dbname = name;
+      doc._id = result["id"];
+      doc._sequence = result["sequence"];
+      doc._data = Map<String, dynamic>.from(result["doc"]);
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   /// Deletes document with [id] from the database.
-  Future<void> deleteDocument(String id) => _methodChannel.invokeMethod(
-      'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': id});
+  Future<bool> deleteDocument(String id) async {
+    await _methodChannel.invokeMethod(
+        'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': id});
+
+    return true;
+  }
 
   /// Closes database.
   Future<void> close() => _methodChannel.invokeMethod(
@@ -81,4 +125,7 @@ class Database {
 
   //Not including this way of disposing for now because I remove the reference when we close the database
   //Future<void> dispose() => _methodChannel.invokeMethod('dispose', <String, dynamic>{'database': name});
+
+  Future<void> compact() => _methodChannel.invokeMethod(
+      'compactDatabaseWithName', <String, dynamic>{'database': name});
 }

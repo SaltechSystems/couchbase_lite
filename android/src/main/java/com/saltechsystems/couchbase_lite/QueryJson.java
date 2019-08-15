@@ -3,6 +3,7 @@ package com.saltechsystems.couchbase_lite;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
+import com.couchbase.lite.Function;
 import com.couchbase.lite.GroupBy;
 import com.couchbase.lite.Join;
 import com.couchbase.lite.Joins;
@@ -318,6 +319,117 @@ class QueryJson {
                     case ("value"):
                         returnExpression = Expression.value(currentExpression.get("value"));
                         break;
+                    case ("abs"):
+                        returnExpression = Function.abs(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("abs"))));
+                        break;
+                    case ("acos"):
+                        returnExpression = Function.acos(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("acos"))));
+                        break;
+                    case ("asin"):
+                        returnExpression = Function.asin(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("asin"))));
+                        break;
+                    case ("atan"):
+                        returnExpression = Function.atan(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("atan"))));
+                        break;
+                    case ("atan2"):
+                        returnExpression = Function.atan2(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("atan2"))),inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("y"))));
+                        break;
+                    case ("avg"):
+                        returnExpression = Function.avg(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("avg"))));
+                        break;
+                    case ("ceil"):
+                        returnExpression = Function.ceil(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("ceil"))));
+                        break;
+                    case ("contains"):
+                        returnExpression = Function.contains(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("contains"))),inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("y"))));
+                        break;
+                    case ("cos"):
+                        returnExpression = Function.cos(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("cos"))));
+                        break;
+                    case ("count"):
+                        returnExpression = Function.count(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("count"))));
+                        break;
+                    case ("degrees"):
+                        returnExpression = Function.degrees(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("degrees"))));
+                        break;
+                    case ("e"):
+                        returnExpression = Function.e();
+                        break;
+                    case ("exp"):
+                        returnExpression = Function.exp(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("exp"))));
+                        break;
+                    case ("floor"):
+                        returnExpression = Function.floor(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("floor"))));
+                        break;
+                    case ("length"):
+                        returnExpression = Function.length(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("length"))));
+                        break;
+                    case ("ln"):
+                        returnExpression = Function.ln(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("ln"))));
+                        break;
+                    case ("log"):
+                        returnExpression = Function.log(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("log"))));
+                        break;
+                    case ("lower"):
+                        returnExpression = Function.lower(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("lower"))));
+                        break;
+                    case ("ltrim"):
+                        returnExpression = Function.ltrim(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("ltrim"))));
+                        break;
+                    case ("max"):
+                        returnExpression = Function.max(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("max"))));
+                        break;
+                    case ("min"):
+                        returnExpression = Function.min(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("min"))));
+                        break;
+                    case ("pi"):
+                        returnExpression = Function.pi();
+                        break;
+                    case ("power"):
+                        returnExpression = Function.power(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("power"))),inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("exponent"))));
+                        break;
+                    case ("radians"):
+                        returnExpression = Function.radians(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("radians"))));
+                        break;
+                    case ("round"):
+                        if (currentExpression.containsKey("digits")) {
+                            returnExpression = Function.round(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("round"))), inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("digits"))));
+                        } else {
+                            returnExpression = Function.round(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("round"))));
+                        }
+                        break;
+                    case ("rtrim"):
+                        returnExpression = Function.rtrim(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("rtrim"))));
+                        break;
+                    case ("sign"):
+                        returnExpression = Function.sign(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("sign"))));
+                        break;
+                    case ("sin"):
+                        returnExpression = Function.sin(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("sin"))));
+                        break;
+                    case ("sqrt"):
+                        returnExpression = Function.sqrt(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("sqrt"))));
+                        break;
+                    case ("sum"):
+                        returnExpression = Function.sum(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("sum"))));
+                        break;
+                    case ("tan"):
+                        returnExpression = Function.tan(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("tan"))));
+                        break;
+                    case ("trim"):
+                        returnExpression = Function.trim(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("trim"))));
+                        break;
+                    case ("trunc"):
+                        if (currentExpression.containsKey("digits")) {
+                            returnExpression = Function.trunc(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("trunc"))),inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("digits"))));
+                        } else {
+                            returnExpression = Function.trunc(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("trunc"))));
+                        }
+                        break;
+                    case ("upper"):
+                        returnExpression = Function.upper(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("upper"))));
+                        break;
+
                 }
             } else {
                 switch (currentExpression.keySet().iterator().next()) {
@@ -384,6 +496,21 @@ class QueryJson {
                         break;
                     case ("subtract"):
                         returnExpression = returnExpression.subtract(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("subtract"))));
+                        break;
+                    case ("between"):
+                        returnExpression = returnExpression.between(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("between"))),inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("and"))));
+                        break;
+                    case ("in"):
+                        List<Expression> inExpressions = new ArrayList<>();
+                        Object objectList = currentExpression.get("in");
+                        if (objectList instanceof List<?>) {
+                            List<?> genericList = (List<?>) objectList;
+                            for (Object listObject : genericList) {
+                                inExpressions.add(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(listObject)));
+                            }
+                        }
+
+                        returnExpression = returnExpression.in(inExpressions.toArray(new Expression[]{}));
                         break;
                 }
             }

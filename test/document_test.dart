@@ -14,7 +14,7 @@ void main() {
     initializer['boolInt'] = 0;
     initializer['bool'] = true;
     initializer['list'] = [];
-    document = Document(initializer, "123456789");
+    document = MutableDocument(data: initializer, id: "123456789");
     mutableDocument = MutableDocument();
   });
 
@@ -78,11 +78,6 @@ void main() {
     mutableDocument.setInt('int', 12);
     expect(mutableDocument.getInt('int'), 12);
   });
-  test("mutableDocument: setting id", () {
-    mutableDocument.id = "123456789";
-    expect(mutableDocument.id, "123456789");
-    expect(mutableDocument.toMutable().id, "123456789");
-  });
   test("mutableDocument: setting map", () {
     mutableDocument.setMap('map', <String, dynamic>{"test": true});
     expect(mutableDocument.getMap('map'), {"test": true});
@@ -114,6 +109,6 @@ void main() {
     expect(document.getBoolean("bool"), true);
   });
   test("NullDocument", () {
-    expect(Document(null, "test").toMap(), {});
+    expect(MutableDocument(id: "test").toMap(), {});
   });
 }

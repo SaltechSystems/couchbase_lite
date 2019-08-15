@@ -277,7 +277,7 @@ public class QueryJson {
     private func inflateExpressionFromArray(expressionParametersArray: Array<Dictionary<String, Any>> ) -> ExpressionProtocol {
         var returnExpression: ExpressionProtocol? = nil
         for currentExpression in expressionParametersArray {
-            guard let currentKey = currentExpression.keys.first, let currentValue = currentExpression[currentKey] else {
+            guard let (currentKey, currentValue) = currentExpression.first else {
                 // If property is the key and null is the value then it is an all expression
                 if currentExpression.keys.first == "property" {
                     returnExpression = Expression.all()
@@ -286,132 +286,261 @@ public class QueryJson {
                 continue
             }
             
+            let secondaryArgument = currentExpression.first(where: {$0.key != currentKey})
+            
             if let existingExpression = returnExpression {
-                switch (currentKey, currentValue) {
-                case ("from", let alias as String):
+                switch (currentKey, currentValue, secondaryArgument?.value) {
+                case ("from", let alias as String, _):
                     if let existingExpression = returnExpression as? PropertyExpressionProtocol {
                         returnExpression = existingExpression.from(alias)
                     } else if let existingExpression = returnExpression as? MetaExpressionProtocol {
                         returnExpression = existingExpression.from(alias)
                     }
-                case ("add", let value):
+                case ("add", let value, _):
                     returnExpression = existingExpression
                         .add(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("and", let value):
+                case ("and", let value, _):
                     returnExpression = existingExpression
                         .and(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("divide", let value):
+                case ("divide", let value, _):
                     returnExpression = existingExpression
                         .divide(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("equalTo", let value):
+                case ("equalTo", let value, _):
                     returnExpression = existingExpression
                         .equalTo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("greaterThan", let value):
+                case ("greaterThan", let value, _):
                     returnExpression = existingExpression
                         .greaterThan(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("greaterThanOrEqualTo", let value):
+                case ("greaterThanOrEqualTo", let value, _):
                     returnExpression = existingExpression
                         .greaterThanOrEqualTo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("is", let value):
+                case ("is", let value, _):
                     returnExpression = existingExpression
                         .is(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("isNot", let value):
+                case ("isNot", let value, _):
                     returnExpression = existingExpression
                         .isNot(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("isNullOrMissing", _):
+                case ("isNullOrMissing", _, _):
                     returnExpression = existingExpression.isNullOrMissing()
-                case ("lessThan", let value):
+                case ("lessThan", let value, _):
                     returnExpression = existingExpression
                         .lessThan(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("lessThanOrEqualTo", let value):
+                case ("lessThanOrEqualTo", let value, _):
                     returnExpression = existingExpression
                         .lessThanOrEqualTo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("like", let value):
+                case ("like", let value, _):
                     returnExpression = existingExpression
                         .like(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("modulo", let value):
+                case ("modulo", let value, _):
                     returnExpression = existingExpression
                         .modulo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("multiply", let value):
+                case ("multiply", let value, _):
                     returnExpression = existingExpression
                         .multiply(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("notEqualTo", let value):
+                case ("notEqualTo", let value, _):
                     returnExpression = existingExpression
                         .notEqualTo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("notNullOrMissing", _):
+                case ("notNullOrMissing", _, _):
                     returnExpression = existingExpression.notNullOrMissing()
-                case ("or", let value):
+                case ("or", let value, _):
                     returnExpression = existingExpression
                         .or(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("regex", let value):
+                case ("regex", let value, _):
                     returnExpression = existingExpression
                         .regex(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
-                case ("subtract", let value):
+                case ("subtract", let value, _):
                     returnExpression = existingExpression
                         .subtract(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
+                case ("between", let value, let secondaryValue as Array<Any>):
+                    returnExpression = existingExpression
+                        .between(inflateExpressionFromArray(expressionParametersArray:
+                            QueryMap.getListOfMapFromGenericList(objectList: value)), and: inflateExpressionFromArray(expressionParametersArray:
+                                QueryMap.getListOfMapFromGenericList(objectList: secondaryValue))
+                    )
+                case ("in", let value as Array<Any>, _):
+                    var expressions = Array<ExpressionProtocol>()
+                    value.forEach({
+                        expressions.append(inflateExpressionFromArray(expressionParametersArray:
+                            QueryMap.getListOfMapFromGenericList(objectList: $0)))
+                    })
+                    
+                    returnExpression = existingExpression
+                        .in(expressions)
                 default:
                     break
                 }
             } else {
-                switch (currentKey, currentValue) {
-                case ("property", let value as String):
+                switch (currentKey, currentValue, secondaryArgument?.value) {
+                case ("property", let value as String, _):
                     returnExpression = Expression.property(value)
-                case ("property", _ as NSNull):
+                case ("property", _ as NSNull, _):
                     returnExpression = Expression.all()
-                case ("meta", let value as String):
+                case ("meta", let value as String, _):
                     if (value == "id") {
                         returnExpression = Meta.id
                     } else if (value == "sequence") {
                         returnExpression = Meta.sequence
                     }
-                case ("booleanValue", let value as Bool):
+                case ("booleanValue", let value as Bool, _):
                     returnExpression = Expression.boolean(value)
-                case ("date", let value as Date):
+                case ("date", let value as Date, _):
                     returnExpression = Expression.date(value)
-                case ("doubleValue", let value as Double):
+                case ("doubleValue", let value as Double, _):
                     returnExpression = Expression.double(value)
-                case ("floatValue", let value as Float):
+                case ("floatValue", let value as Float, _):
                     returnExpression = Expression.float(value)
-                case ("intValue", let value as Int):
+                case ("intValue", let value as Int, _):
                     returnExpression = Expression.int(value)
-                case ("string", let value as String):
+                case ("string", let value as String, _):
                     returnExpression = Expression.string(value)
-                case ("value", let value):
+                case ("value", let value, _):
                     returnExpression = Expression.value(value)
+                case ("abs", let value, _):
+                    returnExpression = Function.abs(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("acos", let value, _):
+                    returnExpression = Function.acos(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("asin", let value, _):
+                    returnExpression = Function.asin(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("atan", let value, _):
+                    returnExpression = Function.atan(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("atan2", let value, let secondaryValue as Array<Any>):
+                    returnExpression = Function.atan2(x: inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)),y: inflateExpressionFromArray(expressionParametersArray:
+                            QueryMap.getListOfMapFromGenericList(objectList: secondaryValue)))
+                case ("avg", let value, _):
+                    returnExpression = Function.avg(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("ceil", let value, _):
+                    returnExpression = Function.ceil(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("contains", let value, let secondaryValue as Array<Any>):
+                    returnExpression = Function.contains(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)),substring: inflateExpressionFromArray(expressionParametersArray:
+                            QueryMap.getListOfMapFromGenericList(objectList: secondaryValue)))
+                case ("cos", let value, _):
+                    returnExpression = Function.cos(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("count", let value, _):
+                    returnExpression = Function.count(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("degrees", let value, _):
+                    returnExpression = Function.degrees(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("e", _, _):
+                    returnExpression = Function.e()
+                case ("exp", let value, _):
+                    returnExpression = Function.exp(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("floor", let value, _):
+                    returnExpression = Function.floor(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("length", let value, _):
+                    returnExpression = Function.length(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("ln", let value, _):
+                    returnExpression = Function.ln(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("log", let value, _):
+                    returnExpression = Function.log(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("lower", let value, _):
+                    returnExpression = Function.lower(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("ltrim", let value, _):
+                    returnExpression = Function.ltrim(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("max", let value, _):
+                    returnExpression = Function.max(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("min", let value, _):
+                    returnExpression = Function.min(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("pi", _, _):
+                    returnExpression = Function.pi()
+                case ("power", let value, let secondaryValue as Array<Any>):
+                    returnExpression = Function.power(base: inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)), exponent: inflateExpressionFromArray(expressionParametersArray:
+                            QueryMap.getListOfMapFromGenericList(objectList: secondaryValue)))
+                case ("radians", let value, _):
+                    returnExpression = Function.radians(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("round", let value, _):
+                    returnExpression = Function.round(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("round", let value, let secondaryValue as Array<Any>):
+                    returnExpression = Function.round(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)),digits:
+                        inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: secondaryValue)))
+                case ("rtrim", let value, _):
+                    returnExpression = Function.rtrim(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("sign", let value, _):
+                    returnExpression = Function.sign(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("sin", let value, _):
+                    returnExpression = Function.sin(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("sqrt", let value, _):
+                    returnExpression = Function.sqrt(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("sum", let value, _):
+                    returnExpression = Function.sum(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("tan", let value, _):
+                    returnExpression = Function.tan(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("trim", let value, _):
+                    returnExpression = Function.trim(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("trunc", let value, _):
+                    returnExpression = Function.trunc(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("trunc", let value, let secondaryValue as Array<Any>):
+                    returnExpression = Function.trunc(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)),digits: inflateExpressionFromArray(expressionParametersArray:
+                            QueryMap.getListOfMapFromGenericList(objectList: secondaryValue)))
+                case ("upper", let value, _):
+                    returnExpression = Function.upper(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                    
                 default:
                     break
                 }

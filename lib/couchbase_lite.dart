@@ -2,13 +2,21 @@ library couchbase_lite;
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
+import 'src/document_replication.dart';
+import 'src/replicated_document.dart';
+
+export 'src/document_replication.dart';
+export 'src/replicated_document.dart';
+
 part 'src/authenticator.dart';
 part 'src/database.dart';
 part 'src/document.dart';
+part 'src/blob.dart';
 part 'src/listener_token.dart';
 part 'src/mutable_document.dart';
 part 'src/replicator.dart';
