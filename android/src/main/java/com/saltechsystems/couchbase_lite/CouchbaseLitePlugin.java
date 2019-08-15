@@ -270,7 +270,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           // Don't load the content if it isn't found or the digest doesn't match anymore
           if (document != null) {
             Blob _blob = document.getBlob(_key);
-            if (_blob != null && _blob.digest() == _digest) {
+            if (_blob != null && _blob.digest().equals(_digest)) {
               content = _blob.getContent();
             }
           }

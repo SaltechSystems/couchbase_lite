@@ -100,7 +100,7 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The Blob object or null.
   Blob getBlob(String key) {
-    var _result = getValue(key);
+    Map<String, dynamic> _result = getMap(key);
     if (_result is Map && _result["@type"] == "blob") {
       if (_result.containsKey("data")) {
         return Blob.data(_result["contentType"], _result["data"]);

@@ -127,7 +127,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             }
             
             guard let id = arguments["id"] as? String, let concurrencyControlArg = arguments["concurrencyControl"] as? String, let map = arguments["map"] as? [String:Any] else {
-                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
             
@@ -170,7 +170,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             }
             
             guard let id = arguments["id"] as? String else {
-                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
             
@@ -187,12 +187,32 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             }
             
             guard let id = arguments["id"] as? String else {
-                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
             
             if let returnMap = mCBManager.getDocumentWithId(database: database, id: id) {
                 result(NSDictionary(dictionary: returnMap))
+            } else {
+                result(nil)
+            }
+        case "getBlobContentFromDocumentWithId":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            
+            guard let id = arguments["id"] as? String, let key = arguments["key"] as? String, let digest = arguments["digest"] as? String else {
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+            
+            // Don't load the content if it isn't found or the digest doesn't match anymore
+            if let document = database.document(withID: id),
+                let blob = document.blob(forKey: key),
+                blob.digest == digest,
+                let data = blob.content {
+                result(FlutterStandardTypedData(bytes: data))
             } else {
                 result(nil)
             }
