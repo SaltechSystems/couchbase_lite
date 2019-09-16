@@ -181,7 +181,11 @@ class CBManager {
     }
     
     func deleteDatabaseWithName(name: String) throws {
-        try Database.delete(withName: name)
+        if let _db = mDatabase.removeValue(forKey: name) {
+            try _db.delete()
+        } else {
+            try Database.delete(withName: name)
+        }
     }
     
     func closeDatabaseWithName(name: String) throws {

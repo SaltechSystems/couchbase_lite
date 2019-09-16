@@ -168,19 +168,6 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             result.error("errDelete", "error deleting database with name " + dbname, e.toString());
           }
           break;
-        case ("delete"):
-          if (database == null) {
-            result.error("errDatabase", "Database with name " + dbname + "not found", null);
-            return;
-          }
-
-          try {
-            database.delete();
-            result.success(null);
-          } catch (Exception e) {
-            result.error("errDelete", "error deleting database with name " + dbname, e.toString());
-          }
-          break;
         case ("saveDocument"):
           if (database == null) {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);

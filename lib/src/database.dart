@@ -17,6 +17,7 @@ class Database {
 
   final String name;
 
+  /// The number of documents in the database
   Future<int> get count => _methodChannel
       .invokeMethod('getDocumentCount', <String, dynamic>{'database': name});
 
@@ -121,7 +122,8 @@ class Database {
       'closeDatabaseWithName', <String, dynamic>{'database': name});
 
   //Not including this way of deleting for now because I remove the reference when we close the database
-  //Future<void> delete() => _methodChannel.invokeMethod('delete', <String, dynamic>{'database': name});
+  Future<void> delete() => _methodChannel.invokeMethod(
+      'deleteDatabaseWithName', <String, dynamic>{'database': name});
 
   //Not including this way of disposing for now because I remove the reference when we close the database
   //Future<void> dispose() => _methodChannel.invokeMethod('dispose', <String, dynamic>{'database': name});

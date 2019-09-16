@@ -209,7 +209,12 @@ class CBManager {
     }
 
     void deleteDatabaseWithName(String _name) throws CouchbaseLiteException {
-        Database.delete(_name,new File(mDBConfig.getDirectory()));
+        Database _db = mDatabase.remove(_name);
+        if (_db != null) {
+            _db.delete();
+        } else {
+            Database.delete(_name, new File(mDBConfig.getDirectory()));
+        }
     }
 
     void closeDatabaseWithName(String _name) throws CouchbaseLiteException {

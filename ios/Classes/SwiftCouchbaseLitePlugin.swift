@@ -83,18 +83,6 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             } catch {
                 result(FlutterError.init(code: "errDelete", message: "Error deleting database with name \(dbname)", details: error.localizedDescription))
             }
-        case "delete":
-            guard let database = mCBManager.getDatabase(name: dbname) else {
-                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
-                return
-            }
-            
-            do {
-                try database.delete();
-                result(nil)
-            } catch {
-                result(FlutterError.init(code: "errDelete", message: "Error deleting database with name \(dbname)", details: error.localizedDescription))
-            }
         case "saveDocument":
             guard let database = mCBManager.getDatabase(name: dbname) else {
                 result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
