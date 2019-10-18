@@ -81,6 +81,8 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
     mRegistrar = registrar;
 
+    //CouchbaseLite.init(this.getContext());
+
     if (BuildConfig.DEBUG) {
       mCBManager = new CBManager(this,true);
     } else {
