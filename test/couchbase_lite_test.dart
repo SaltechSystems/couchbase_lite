@@ -35,7 +35,12 @@ void main() {
           break;
         case ("saveDocument"):
           if (arguments.containsKey("map")) {
-            return {"id": "documentid", "sequence": 1, "success": true};
+            return {
+              "id": "documentid",
+              "sequence": 1,
+              "success": true,
+              "doc": arguments["map"]
+            };
           } else {
             return PlatformException(
                 code: "errArgs", message: "invalid arguments", details: null);
@@ -43,7 +48,12 @@ void main() {
           break;
         case ("saveDocumentWithId"):
           if (arguments.containsKey("map") && arguments.containsKey("id")) {
-            return {"id": arguments["id"], "sequence": 1, "success": true};
+            return {
+              "id": arguments["id"],
+              "sequence": 1,
+              "success": true,
+              "doc": arguments["map"]
+            };
           } else {
             return PlatformException(
                 code: "errArgs", message: "invalid arguments", details: null);
@@ -65,7 +75,7 @@ void main() {
           break;
         case ("deleteDocumentWithId"):
           if (arguments.containsKey("id")) {
-            return null;
+            return true;
           } else {
             return PlatformException(
                 code: "errArgs",
@@ -131,6 +141,7 @@ void main() {
 
   tearDown(() {
     databaseChannel.setMethodCallHandler(null);
+    replicatorChannel.setMethodCallHandler(null);
     jsonChannel.setMockMethodCallHandler(null);
   });
 
