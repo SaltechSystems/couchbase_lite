@@ -11,6 +11,7 @@ import com.couchbase.lite.Array;
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.BuildConfig;
 import com.couchbase.lite.ConcurrencyControl;
+import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
@@ -81,7 +82,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
     mRegistrar = registrar;
 
-    //CouchbaseLite.init(this.getContext());
+    CouchbaseLite.init(this.getContext());
 
     if (BuildConfig.DEBUG) {
       mCBManager = new CBManager(this,true);
