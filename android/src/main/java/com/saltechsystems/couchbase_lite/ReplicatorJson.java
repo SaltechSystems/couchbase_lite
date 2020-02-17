@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import io.flutter.plugin.common.JSONUtil;
 
@@ -88,6 +89,10 @@ class ReplicatorJson {
             }
         }
 
+        if (replicatorMap.channels != null) {
+            mReplicatorConfig.setChannels(replicatorMap.channels);
+        }
+
         if (replicatorMap.hasAuthenticator) {
             inflateAuthenticator();
         }
@@ -133,6 +138,7 @@ class ReplicatorMap {
     String pinnedServerCertificate;
     boolean hasAuthenticator = false;
     Map<String, Object> authenticator;
+    List channels;
 
     ReplicatorMap(JSONObject jsonObject) {
         Object unwrappedJson = JSONUtil.unwrap(jsonObject);
@@ -168,6 +174,10 @@ class ReplicatorMap {
                     hasAuthenticator = true;
                     authenticator = getMapFromGenericMap(mapObject);
                 }
+            }
+
+            if (config.containsKey("channels")) {
+                channels = (List) config.get("channels");
             }
         }
     }

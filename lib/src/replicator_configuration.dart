@@ -11,6 +11,7 @@ class ReplicatorConfiguration {
   bool continuous;
   String pinnedServerCertificate;
   Authenticator authenticator;
+  List<String> channels;
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {"database": database.name, "target": target};
@@ -37,6 +38,10 @@ class ReplicatorConfiguration {
 
     if (continuous != null) {
       map["continuous"] = continuous;
+    }
+
+    if (channels != null) {
+      map["channels"] = channels;
     }
 
     return map;

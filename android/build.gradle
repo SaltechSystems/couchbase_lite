@@ -28,13 +28,13 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 22
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
         disable 'InvalidPackage'
     }
     dependencies {
-        implementation 'com.couchbase.lite:couchbase-lite-android:2.5.0'
+        implementation 'com.couchbase.lite:couchbase-lite-android:2.7.0'
     }
 }

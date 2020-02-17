@@ -9,6 +9,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
+        android:usesCleartextTraffic="true"
         android:label="couchbase_lite_example"
         android:icon="@mipmap/ic_launcher"
         tools:replace="android:label">

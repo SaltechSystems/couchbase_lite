@@ -12,6 +12,7 @@ import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.CouchbaseLite;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,7 +32,8 @@ class CBManager {
 
     CBManager(CBManagerDelegate delegate, boolean enableLogging) {
         mDelegate = delegate;
-        mDBConfig = new DatabaseConfiguration(mDelegate.getContext());
+        CouchbaseLite.init(mDelegate.getContext());
+        mDBConfig = new DatabaseConfiguration();
 
         if (enableLogging) {
             final File path = mDelegate.getContext().getCacheDir();
