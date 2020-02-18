@@ -175,7 +175,7 @@ class ReplicatorMap {
             }
 
             if (config.containsKey("channels")) {
-                channels = (List) config.get("channels");
+                channels = (List<String>) config.get("channels");
             }
         }
     }
