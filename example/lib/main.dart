@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _documentCount = 'Initializing';
   Database database;
+  Replicator replicator;
 
   @override
   void initState() {
@@ -26,10 +27,31 @@ class _MyAppState extends State<MyApp> {
     String result;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      database = await Database.initWithName("MyNewCouchbaseDB");
-      await database.saveDocumentWithId("test", Document({}));
-      int count = await database.count;
-      result = "Document Count: $count";
+      database = await Database.initWithName("spirit-bucket");
+      await database.saveDocumentWithId(DateTime.now().toIso8601String(), Document({}));
+      ReplicatorConfiguration config =
+      ReplicatorConfiguration(database, "ws://192.168.1.75:4984/spirit-bucket");
+      config.replicatorType = ReplicatorType.pushAndPull;
+      config.continuous = true;
+      config.channels = ['spiritchannel'];
+
+      // Using self signed certificate
+      replicator = Replicator(config);
+
+      replicator.addChangeListener((ReplicatorChange event) async {
+        if (event.status.error != null) {
+          print("Error: " + event.status.error);
+        }
+
+        print(event.status.activity.toString());
+        int count = await database.count;
+        result = "Document Count: $count";
+        setState(() {
+          _documentCount = result;
+        });
+      });
+
+      await replicator.start();
     } on PlatformException catch (e) {
       result = 'Failed to initialize database. ${e.toString()}';
     }
@@ -39,9 +61,7 @@ class _MyAppState extends State<MyApp> {
     // setState to update our non-existent appearance.
     if (!mounted) return;
 
-    setState(() {
-      _documentCount = result;
-    });
+
   }
 
   @override
@@ -52,7 +72,12 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text(_documentCount),
+          child: RaisedButton(
+            onPressed: () async {
+              final doc = await database.documentWithId('1234567');
+              print(doc);
+            },
+            child: Text(_documentCount),),
         ),
       ),
     );
