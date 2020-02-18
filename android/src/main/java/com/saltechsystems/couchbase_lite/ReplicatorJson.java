@@ -1,5 +1,22 @@
 package com.saltechsystems.couchbase_lite;
 
+import com.couchbase.lite.BasicAuthenticator;
+import com.couchbase.lite.Database;
+import com.couchbase.lite.Endpoint;
+import com.couchbase.lite.Query;
+import com.couchbase.lite.Replicator;
+import com.couchbase.lite.ReplicatorConfiguration;
+import com.couchbase.lite.SessionAuthenticator;
+import com.couchbase.lite.URLEndpoint;
+
+import org.json.JSONObject;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
+import io.flutter.plugin.common.JSONUtil;
 
 class ReplicatorJson {
     private ReplicatorMap replicatorMap;
