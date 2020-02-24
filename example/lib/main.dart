@@ -15,6 +15,9 @@ class _MyAppState extends State<MyApp> {
   String _documentCount = 'Initializing';
   Database database;
   Replicator replicator;
+  bool init = true;
+  int s ;
+  int idx = 0;
 
   @override
   void initState() {
@@ -28,24 +31,43 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       database = await Database.initWithName("spirit-bucket");
-      await database.saveDocumentWithId(DateTime.now().toIso8601String(), Document({}));
-      ReplicatorConfiguration config =
-      ReplicatorConfiguration(database, "ws://192.168.1.75:4984/spirit-bucket");
+      ReplicatorConfiguration config = ReplicatorConfiguration(
+          database, "ws://192.168.1.75:4984/spirit-bucket");
       config.replicatorType = ReplicatorType.pushAndPull;
       config.continuous = true;
-      config.channels = ['spiritchannel'];
+      config.channels = ['master'];
+      config.pushAttributeKeyFilter = 'type';
+      config.pushAttributeValuesFilter = ['localdoc'];
+      config.headers = {'Authentication' : 'Bearer token'};
+
 
       // Using self signed certificate
       replicator = Replicator(config);
 
       replicator.addChangeListener((ReplicatorChange event) async {
+        if (init) {
+          init = false;
+          s = DateTime.now().millisecondsSinceEpoch;
+        }
         if (event.status.error != null) {
           print("Error: " + event.status.error);
         }
 
         print(event.status.activity.toString());
+        if (event.status.activity != ReplicatorActivityLevel.idle) {
+          return;
+        }
+
+
+//        Query query = QueryBuilder.select([SelectResult.expression(Functions.count(Expression.all()))])
+//            .from(database.name)
+//            .where(Expression.property("type").iS(Expression.string("villagecode")));
+//        ResultSet qresult = await query.execute();
         int count = await database.count;
-        result = "Document Count: $count";
+        int e = DateTime.now().millisecondsSinceEpoch;
+        final m = ((e-s)~/60000);
+        final ss = ((e-s)%60000)/1000;
+        result = "Document Count: $count ($m:$ss)";
         setState(() {
           _documentCount = result;
         });
@@ -53,15 +75,15 @@ class _MyAppState extends State<MyApp> {
 
       await replicator.start();
     } on PlatformException catch (e) {
-      result = 'Failed to initialize database. ${e.toString()}';
+      //result = 'Failed to initialize database. ${e.toString()}';
     }
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-
+    if (!mounted) {
+      return;
+    }
   }
 
   @override
@@ -72,12 +94,43 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: RaisedButton(
-            onPressed: () async {
-              final doc = await database.documentWithId('1234567');
-              print(doc);
-            },
-            child: Text(_documentCount),),
+          child: Column(
+            children: <Widget>[
+              RaisedButton(
+                onPressed: () async {
+//              Query query = QueryBuilder.select([SelectResult.all()])
+//                  .from(database.name)
+//                  .where(Expression.property("type")
+//                      .iS(Expression.string("villagecode")));
+//              ResultSet qresult = await query.execute();
+//              int count = qresult.length;
+//              int count = await database.count;
+//              var result = "Document Count: $count";
+//              setState(() {
+//                _documentCount = result;
+//              });
+//              final doc = await database.documentWithId('1111');
+//              print(doc);
+                  final t = DateTime.now();
+                  final id = t.millisecondsSinceEpoch.toString();
+                  MutableDocument mutableDoc = MutableDocument();
+                  mutableDoc.id = id;
+                  mutableDoc.setString('id', id);
+                  mutableDoc.setArray('channels', ['spiritchannel']);
+                  mutableDoc.setString('time', t.toIso8601String());
+                  if ((idx % 2) == 0) {
+                    mutableDoc.setString('type', 'localdoc');
+                  } else {
+                    mutableDoc.setString('type', 'notlocaldoc');
+
+                  }
+                  idx++;
+                  await database.save(mutableDoc);
+                },
+                child: Text(_documentCount),
+              ),
+            ],
+          ),
         ),
       ),
     );

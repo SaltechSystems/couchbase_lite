@@ -12,6 +12,9 @@ class ReplicatorConfiguration {
   String pinnedServerCertificate;
   Authenticator authenticator;
   List<String> channels;
+  List<String> pushAttributeValuesFilter;
+  String pushAttributeKeyFilter;
+  Map headers;
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {"database": database.name, "target": target};
@@ -42,6 +45,18 @@ class ReplicatorConfiguration {
 
     if (channels != null) {
       map["channels"] = channels;
+    }
+
+    if (pushAttributeValuesFilter != null) {
+      map["pushAttributeValuesFilter"] =  pushAttributeValuesFilter;
+    }
+
+    if (pushAttributeKeyFilter != null) {
+      map["pushAttributeKeyFilter"] =  pushAttributeKeyFilter;
+    }
+
+    if (headers != null) {
+      map["headers"] =  headers;
     }
 
     return map;
