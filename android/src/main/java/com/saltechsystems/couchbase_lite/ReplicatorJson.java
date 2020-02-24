@@ -1,6 +1,5 @@
 package com.saltechsystems.couchbase_lite;
 
-import android.support.annotation.NonNull;
 
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.Database;
@@ -102,8 +101,8 @@ class ReplicatorJson {
             mReplicatorConfig.setPushFilter(new ReplicationFilter() {
 
                 @Override
-                public boolean filtered(@NonNull Document document,
-                                        @NonNull EnumSet<DocumentFlag> flags) {
+                public boolean filtered(Document document,
+                                        EnumSet<DocumentFlag> flags) {
                     if (replicatorMap.pushAttributeKeyFilter!= null &&
                             document.contains(replicatorMap.pushAttributeKeyFilter) &&
                             replicatorMap.pushAttributeValuesFilter != null &&
