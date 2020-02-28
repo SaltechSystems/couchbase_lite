@@ -140,8 +140,8 @@ class _MyAppState extends State<MyApp> {
                         if (d['spirit-bucket'] != null &&
                             d['spirit-bucket']['data'] != null) {
                           final generator = PBKDF2(hashAlgorithm: sha1);
-                          final key = aes.Key.fromBase16(HEX.encode(generator.generateKey("123456", "123456", 1, 32)));
-                          final iv = aes.IV.fromBase16(HEX.encode(generator.generateKey("123456", "123456", 1, 16)));
+                          final key = aes.Key(generator.generateKey("123456", "123456", 1, 32));
+                          final iv = aes.IV(generator.generateKey("123456", "123456", 1, 16));
 
                           final encrypter = aes.Encrypter(aes.AES(key, mode: aes.AESMode.cbc, padding: 'PKCS7'));
 
