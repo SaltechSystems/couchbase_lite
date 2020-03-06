@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:collection';
 
-import 'package:flutter/services.dart';
 import 'package:couchbase_lite/couchbase_lite.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MyApp());
 
@@ -56,5 +57,14 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  void _insertDummyData() {
+    for (int i = 0; i < 10; i++) {
+      HashMap<String, dynamic> map = HashMap();
+      map["name"] = i.toString();
+      map["index"] = i;
+      database.saveDocumentWithId(i.toString(), Document(map));
+    }
   }
 }

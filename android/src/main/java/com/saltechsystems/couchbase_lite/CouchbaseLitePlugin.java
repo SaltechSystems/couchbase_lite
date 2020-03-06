@@ -277,6 +277,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     @Override
     public void onMethodCall(MethodCall call, final Result result) {
       final JSONObject json = call.arguments();
+      Log.d("couchbaselite","channel input json:-"+json.toString());
 
       final String id;
       Query queryFromJson;
@@ -304,7 +305,10 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             @Override
             public void run() {
               try {
-                final List<Map<String,Object>> resultsList = QueryJson.resultsToJson(query.execute());
+                Log.d("couchbaselite","Final Query:-"+query.toString());
+                ResultSet resultSet = query.execute();
+                Log.d("couchbaselite","Result set:-"+resultSet.toString());
+                final List<Map<String,Object>> resultsList = QueryJson.resultsToJson(resultSet);
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                   @Override
                   public void run() {

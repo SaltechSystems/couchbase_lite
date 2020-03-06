@@ -160,7 +160,7 @@ abstract class Expression {
     Expression clone = this._clone();
     List json = [];
     listExpression.forEach((expression) {
-      json.add(expression.internalExpressionStack);
+      json.add(expression.internalExpressionStack[0]);
     });
     clone._internalExpressionStack.add({selector: json});
     return clone;

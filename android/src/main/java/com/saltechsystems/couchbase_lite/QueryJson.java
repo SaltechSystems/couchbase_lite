@@ -1,5 +1,7 @@
 package com.saltechsystems.couchbase_lite;
 
+import android.util.Log;
+
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
@@ -36,14 +38,15 @@ class QueryJson {
     QueryJson(JSONObject json, CBManager manager) {
         this.mCBManager = manager;
         this.queryMap = new QueryMap(json);
+        Log.d("couchbaselite", "QueryJSON map:-" + queryMap.toString());
     }
 
-    static List<Map<String,Object>> resultsToJson(ResultSet results) {
-        List<Map<String,Object>> rtnList = new ArrayList<>();
-        for (final com.couchbase.lite.Result rslt:results) {
+    static List<Map<String, Object>> resultsToJson(ResultSet results) {
+        List<Map<String, Object>> rtnList = new ArrayList<>();
+        for (final com.couchbase.lite.Result rslt : results) {
             HashMap<String, Object> value = new HashMap<>();
-            value.put("map",rslt.toMap());
-            value.put("list",rslt.toList());
+            value.put("map", rslt.toMap());
+            value.put("list", rslt.toList());
             rtnList.add(value);
         }
 
@@ -143,7 +146,7 @@ class QueryJson {
     private Ordering[] inflateOrdering(List<List<Map<String, Object>>> orderByArray) {
         List<Ordering> resultOrdering = new ArrayList<>();
         for (List<Map<String, Object>> currentOrderByArgument : orderByArray) {
-            Map<String,Object> last = currentOrderByArgument.get(currentOrderByArgument.size() -1);
+            Map<String, Object> last = currentOrderByArgument.get(currentOrderByArgument.size() - 1);
             Expression orderingExpression = inflateExpressionFromArray(currentOrderByArgument);
             Ordering.SortOrder ordering = Ordering.expression(orderingExpression);
 
@@ -171,35 +174,35 @@ class QueryJson {
         if (joinArguments.containsKey("join")) {
             databaseName = (String) joinArguments.get("join");
             if (alias != null) {
-                join = Join.join(getDatasourceFromString(databaseName,alias));
+                join = Join.join(getDatasourceFromString(databaseName, alias));
             } else {
                 join = Join.join(getDatasourceFromString(databaseName));
             }
         } else if (joinArguments.containsKey("crossJoin")) {
             databaseName = (String) joinArguments.get("crossJoin");
             if (alias != null) {
-                join = Join.crossJoin(getDatasourceFromString(databaseName,alias));
+                join = Join.crossJoin(getDatasourceFromString(databaseName, alias));
             } else {
                 join = Join.crossJoin(getDatasourceFromString(databaseName));
             }
         } else if (joinArguments.containsKey("innerJoin")) {
             databaseName = (String) joinArguments.get("innerJoin");
             if (alias != null) {
-                join = Join.innerJoin(getDatasourceFromString(databaseName,alias));
+                join = Join.innerJoin(getDatasourceFromString(databaseName, alias));
             } else {
                 join = Join.innerJoin(getDatasourceFromString(databaseName));
             }
         } else if (joinArguments.containsKey("leftJoin")) {
             databaseName = (String) joinArguments.get("leftJoin");
             if (alias != null) {
-                join = Join.leftJoin(getDatasourceFromString(databaseName,alias));
+                join = Join.leftJoin(getDatasourceFromString(databaseName, alias));
             } else {
                 join = Join.leftJoin(getDatasourceFromString(databaseName));
             }
         } else if (joinArguments.containsKey("leftOuterJoin")) {
             databaseName = (String) joinArguments.get("leftOuterJoin");
             if (alias != null) {
-                join = Join.leftOuterJoin(getDatasourceFromString(databaseName,alias));
+                join = Join.leftOuterJoin(getDatasourceFromString(databaseName, alias));
             } else {
                 join = Join.leftOuterJoin(getDatasourceFromString(databaseName));
             }
@@ -221,7 +224,7 @@ class QueryJson {
         String alias = (String) queryMap.from.get("as");
 
         if (alias != null) {
-            query = ((Select) query).from(getDatasourceFromString(databaseName,alias));
+            query = ((Select) query).from(getDatasourceFromString(databaseName, alias));
         } else {
             query = ((Select) query).from(getDatasourceFromString(databaseName));
         }
@@ -245,18 +248,18 @@ class QueryJson {
     }
 
     private SelectResult[] inflateSelectResultArray() {
-            List<List<Map<String, Object>>> selectResultArray = queryMap.selectResult;
-            List<SelectResult> result = new ArrayList<>();
-            for (List<Map<String, Object>> SelectResultParametersArray : selectResultArray) {
-                result.add(inflateSelectResult(SelectResultParametersArray));
-            }
+        List<List<Map<String, Object>>> selectResultArray = queryMap.selectResult;
+        List<SelectResult> result = new ArrayList<>();
+        for (List<Map<String, Object>> SelectResultParametersArray : selectResultArray) {
+            result.add(inflateSelectResult(SelectResultParametersArray));
+        }
         return result.toArray(new SelectResult[0]);
     }
 
     private SelectResult inflateSelectResult(List<Map<String, Object>> selectResultParametersArray) {
         SelectResult.As result = SelectResult.expression(inflateExpressionFromArray(selectResultParametersArray));
 
-        String alias = (String) selectResultParametersArray.get(selectResultParametersArray.size()-1).get("as");
+        String alias = (String) selectResultParametersArray.get(selectResultParametersArray.size() - 1).get("as");
         if (alias != null) {
             return result.as(alias);
         }
@@ -385,6 +388,16 @@ class QueryJson {
                     case ("subtract"):
                         returnExpression = returnExpression.subtract(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("subtract"))));
                         break;
+                    case ("in"):
+                        List inParams = QueryMap.getListOfMapFromGenericList(currentExpression.get("in"));
+                        Expression[] inExpressions=new Expression[inParams.size()];
+                        for (int j=0; j<inParams.size(); j++) {
+                            List tempList=new ArrayList();
+                            tempList.add(inParams.get(j));
+                            inExpressions[i]=inflateExpressionFromArray(tempList);
+                        }
+                        returnExpression = returnExpression.in(inExpressions);
+                        break;
                 }
             }
         }
@@ -465,7 +478,7 @@ class QueryMap {
     private static Map<String, Object> getMapFromGenericMap(Object objectMap) {
         Map<String, Object> resultMap = new HashMap<>();
         if (objectMap instanceof Map<?, ?>) {
-            Map<?,?> genericMap = (Map<?,?>) objectMap;
+            Map<?, ?> genericMap = (Map<?, ?>) objectMap;
             for (Map.Entry<?, ?> entry : genericMap.entrySet()) {
                 resultMap.put((String) entry.getKey(), entry.getValue());
             }
