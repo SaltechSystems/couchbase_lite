@@ -307,7 +307,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
               try {
                 Log.d("couchbaselite","Final Query:-"+query.toString());
                 ResultSet resultSet = query.execute();
-                Log.d("couchbaselite","Result set:-"+resultSet.toString());
+                Log.d("couchbaselite","Result set:-"+resultSet.allResults().size());
                 final List<Map<String,Object>> resultsList = QueryJson.resultsToJson(resultSet);
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                   @Override

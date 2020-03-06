@@ -391,10 +391,10 @@ class QueryJson {
                     case ("in"):
                         List inParams = QueryMap.getListOfMapFromGenericList(currentExpression.get("in"));
                         Expression[] inExpressions=new Expression[inParams.size()];
-                        for (int j=0; j<inParams.size(); j++) {
+                        for (int k=0; k<inParams.size(); k++) {
                             List tempList=new ArrayList();
-                            tempList.add(inParams.get(j));
-                            inExpressions[i]=inflateExpressionFromArray(tempList);
+                            tempList.add(inParams.get(k));
+                            inExpressions[k]=inflateExpressionFromArray(tempList);
                         }
                         returnExpression = returnExpression.in(inExpressions);
                         break;
