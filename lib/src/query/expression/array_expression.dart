@@ -1,16 +1,20 @@
 part of couchbase_lite;
 
-import '../../../couchbase_lite.dart';
-import 'array_expression_in.dart';
-
-class ArrayExpression extends Object with Expression{
-
-  e QuantifiesType {
-  ANY,
-  ANY_AND_EVERY,
-  EVERY
+class ArrayExpression extends Object with Expression {
+  ArrayExpression(Map<String, dynamic> _passedInternalExpression) {
+    this._internalExpressionStack.add(_passedInternalExpression);
   }
 
+  ArrayExpression._clone(ArrayExpression expression) {
+    this._internalExpressionStack.addAll(expression.internalExpressionStack);
+  }
+
+//  //a variable to represent an element in the forms.primary_form.formData.assigned_to array
+//  VariableExpression assignedToVariableExpression = ArrayExpression.variable("assigned_to");
+//  //a variable to represent every element in the assigned_to array
+//  Expression assignedToArrayExpression = Expression.property("forms.primary_form.formData.assigned_to");
+//  Expression assignedToIdExpression = ArrayExpression.variable("assigned_to.id");
+//  Expression assignedToTypeExpression = ArrayExpression.variable("assigned_to.type");
 
 //  if (TextUtils.equals(Pref.getInstance().getUserLoginType(), Constant.LOGIN_TYPE_WEB)) {
 //  mWhereExpression = ((createdByIdExpression.equalTo(Expression.string
@@ -22,26 +26,24 @@ class ArrayExpression extends Object with Expression{
 //      .and(assignedToTypeExpression.equalTo(Expression.string
 //  ("USERS"))))));
 
-  ArrayExpression(Map<String, dynamic> _passedInternalExpression) {
-    this._internalExpressionStack.add(_passedInternalExpression);
+  static const String quantifiesTypeAny = "arrayInAny";
+
+  static ArrayExpressionIn any(VariableExpression variableExpression) {
+    if (variableExpression == null) {
+      throw Exception("variable cannot be null.");
+    }
+    return ArrayExpressionIn(quantifiesTypeAny, variableExpression);
   }
 
-  ArrayExpression._clone(PropertyExpression expression) {
-    this._internalExpressionStack.addAll(expression.internalExpressionStack);
-  }
-
-  factory ArrayExpression.variable(Object value) {
-    return VariableExpression({"value": value});
+  static VariableExpression variable(String name) {
+    if (name == null) {
+      throw Exception("name cannnot be null.");
+    }
+    return VariableExpression({"value": name});
   }
 
   @override
   ArrayExpression _clone() {
     return ArrayExpression._clone(this);
   }
-
-  factory ArrayExpression.any(VariableExpression variableExpression){
-    return ArrayExpressionIn();
-  }
-
-
 }
