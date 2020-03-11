@@ -2,6 +2,7 @@ package com.saltechsystems.couchbase_lite;
 
 import android.util.Log;
 
+import com.couchbase.lite.ArrayExpression;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
@@ -18,11 +19,14 @@ import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.Select;
 import com.couchbase.lite.SelectResult;
+import com.couchbase.lite.VariableExpression;
 import com.couchbase.lite.Where;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -321,6 +325,9 @@ class QueryJson {
                     case ("value"):
                         returnExpression = Expression.value(currentExpression.get("value"));
                         break;
+                    case ("arrayVariable"):
+                        returnExpression = ArrayExpression.variable(String.valueOf(currentExpression.get("arrayVariable")));
+                        break;
                 }
             } else {
                 switch (currentExpression.keySet().iterator().next()) {
@@ -390,13 +397,20 @@ class QueryJson {
                         break;
                     case ("in"):
                         List inParams = QueryMap.getListOfMapFromGenericList(currentExpression.get("in"));
-                        Expression[] inExpressions=new Expression[inParams.size()];
-                        for (int k=0; k<inParams.size(); k++) {
-                            List tempList=new ArrayList();
-                            tempList.add(inParams.get(k));
-                            inExpressions[k]=inflateExpressionFromArray(tempList);
+                        Expression[] inExpressions = new Expression[inParams.size()];
+                        for (int k = 0; k < inParams.size(); k++) {
+                            inExpressions[k] = inflateExpressionFromArray(Collections.singletonList((Map<String, Object>) inParams.get(k)));
                         }
                         returnExpression = returnExpression.in(inExpressions);
+                        break;
+                    case ("arrayInAny"):
+                    case ("satisfies"):
+                        List arrayInAnyList = QueryMap.getListOfMapFromGenericList(currentExpression.get("arrayInAny"));
+                        List satisfiesList = QueryMap.getListOfMapFromGenericList(currentExpression.get("satisfies"));
+                        returnExpression = ArrayExpression.any((VariableExpression) returnExpression)
+                                .in(inflateExpressionFromArray(arrayInAnyList))
+                                .satisfies(inflateExpressionFromArray(satisfiesList));
+
                         break;
                 }
             }

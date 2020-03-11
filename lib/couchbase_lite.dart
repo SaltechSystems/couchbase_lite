@@ -37,3 +37,6 @@ part 'src/query/expression/meta.dart';
 part 'src/query/expression/meta_expression.dart';
 part 'src/query/expression/property_expression.dart';
 part 'src/query/expression/variable_expression.dart';
+part 'src/query/expression/array_expression.dart';
+part 'src/query/expression/array_expression_in.dart';
+part 'src/query/expression/array_expression_satisfies.dart';

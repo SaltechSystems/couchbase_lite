@@ -15,6 +15,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _documentCount = 'Initializing';
   Database database;
+  final String dbName = "MyNewCouchbaseDB";
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class _MyAppState extends State<MyApp> {
     String result;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      database = await Database.initWithName("MyNewCouchbaseDB");
+      database = await Database.initWithName(dbName);
       await database.saveDocumentWithId("test", Document({}));
       int count = await database.count;
       result = "Document Count: $count";
@@ -53,7 +54,12 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text(_documentCount),
+          child: RaisedButton(
+            child: Text(_documentCount),
+            onPressed: () {
+              _queryData();
+            },
+          ),
         ),
       ),
     );
