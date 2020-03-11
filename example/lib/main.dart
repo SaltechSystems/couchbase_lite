@@ -29,6 +29,7 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       database = await Database.initWithName(dbName);
+      _insertDummyData();
       await database.saveDocumentWithId("test", Document({}));
       int count = await database.count;
       result = "Document Count: $count";
@@ -55,9 +56,37 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: RaisedButton(
-            child: Text(_documentCount),
             onPressed: () {
-              _queryData();
+              //a variable to represent an element in the forms.primary_form.formData.assigned_to array
+              VariableExpression assignedToVariableExpression = ArrayExpression
+                  .variable("assigned_to");
+              //a variable to represent every element in the assigned_to array
+              Expression assignedToArrayExpression = Expression.property(
+                  "forms.primary_form.formData.assigned_to");
+              Expression assignedToIdExpression = ArrayExpression.variable(
+                  "assigned_to.id");
+
+              Query query = QueryBuilder
+                  .select([SelectResult.all()])
+                  .from(dbName)
+                  .where(Expression.property("valueas")
+                  .greaterThan(Expression.intValue(2))
+                  .and(Expression.property("index")
+                  .iN(List<Expression>()
+                ..add(Expression.intValue(1))..add(Expression.intValue(8))..add(
+                    Expression.intValue(5)))
+                  .and(Expression.property("name")
+                  .equalTo(Expression.string("StringValue"))).and(
+                  ArrayExpression.any(assignedToVariableExpression).inA(
+                      assignedToArrayExpression)
+                      .satisfies(
+                      assignedToIdExpression.equalTo(Expression.string
+                        ("Shree"))).or(Expression.property("later").equalTo(Expression.value("21344"))))));
+              query.execute().then((resultSet) {
+                resultSet.toList().forEach((result) {
+                  print(result);
+                });
+              });
             },
           ),
         ),
