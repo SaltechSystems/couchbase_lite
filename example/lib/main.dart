@@ -15,6 +15,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _documentCount = 'Initializing';
   Database database;
+  final String dbName = "MyNewCouchbaseDB";
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class _MyAppState extends State<MyApp> {
     String result;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      database = await Database.initWithName("MyNewCouchbaseDB");
+      database = await Database.initWithName(dbName);
       await database.saveDocumentWithId("test", Document({}));
       int count = await database.count;
       result = "Document Count: $count";
@@ -53,7 +54,12 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text(_documentCount),
+          child: RaisedButton(
+            child: Text(_documentCount),
+            onPressed: () {
+              _queryData();
+            },
+          ),
         ),
       ),
     );
@@ -66,5 +72,33 @@ class _MyAppState extends State<MyApp> {
       map["index"] = i;
       database.saveDocumentWithId(i.toString(), Document(map));
     }
+  }
+
+  void _queryData() {
+    VariableExpression assignedToVariableExpression =
+    ArrayExpression.variable("assigned_to");
+    //a variable to represent every element in the assigned_to array
+    Expression assignedToArrayExpression =
+    Expression.property("forms.primary_form.formData.assigned_to");
+    Expression assignedToIdExpression =
+    ArrayExpression.variable("assigned_to.id");
+    Expression assignedToTypeExpression =
+    ArrayExpression.variable("assigned_to.type");
+
+    Query query = QueryBuilder.select([SelectResult.all()]).from(dbName).where(
+        Expression.property("DOCUMENT_TYPE")
+            .equalTo(Expression.string("assignedToDocumentType"))
+            .and(Expression.property("facilityId")
+            .iN(List<Expression>()
+          ..add(Expression.value(1))))
+            .or(ArrayExpression.any(assignedToVariableExpression)
+            .inA(assignedToArrayExpression)
+            .satisfies(assignedToIdExpression
+            .equalTo(Expression.value("Shree").and(
+            Expression.property("name").equalTo(Expression.value("Shree")))))));
+
+    query.execute().then((data) {
+      print("Query executed");
+    });
   }
 }

@@ -33,16 +33,17 @@ class QuantifiedExpression extends Object with Expression {
   QuantifiedExpression(
       this.type, this.variable, this.inExpression, this.expression) {
     _internalExpressionStack.addAll(variable.internalExpressionStack);
-    _internalExpressionStack.add({type: inExpression.internalExpressionStack});
-    _internalExpressionStack.add({"satisfies": expression.internalExpressionStack});
+    _internalExpressionStack.add({
+      type: inExpression.internalExpressionStack,
+      "satisfies": expression.internalExpressionStack
+    });
   }
 
   QuantifiedExpression._clone(QuantifiedExpression expression)
       : type = expression.type,
         this.variable = expression.variable,
         this.inExpression = expression.inExpression {
-    _internalExpressionStack
-      ..addAll(expression.internalExpressionStack);
+    _internalExpressionStack..addAll(expression.internalExpressionStack);
   }
 
   String type;

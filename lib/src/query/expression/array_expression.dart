@@ -26,20 +26,20 @@ class ArrayExpression extends Object with Expression {
 //      .and(assignedToTypeExpression.equalTo(Expression.string
 //  ("USERS"))))));
 
-  static const String quantifiesTypeAny = "arrayInAny";
+  static const String _quantifiesTypeAny = "arrayInAny";
 
   static ArrayExpressionIn any(VariableExpression variableExpression) {
     if (variableExpression == null) {
       throw Exception("variable cannot be null.");
     }
-    return ArrayExpressionIn(quantifiesTypeAny, variableExpression);
+    return ArrayExpressionIn(_quantifiesTypeAny, variableExpression);
   }
 
   static VariableExpression variable(String name) {
     if (name == null) {
       throw Exception("name cannnot be null.");
     }
-    return VariableExpression({"value": name});
+    return VariableExpression({"arrayVariable": name});
   }
 
   @override
