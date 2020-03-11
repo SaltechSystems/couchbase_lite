@@ -73,32 +73,4 @@ class _MyAppState extends State<MyApp> {
       database.saveDocumentWithId(i.toString(), Document(map));
     }
   }
-
-  void _queryData() {
-    VariableExpression assignedToVariableExpression =
-    ArrayExpression.variable("assigned_to");
-    //a variable to represent every element in the assigned_to array
-    Expression assignedToArrayExpression =
-    Expression.property("forms.primary_form.formData.assigned_to");
-    Expression assignedToIdExpression =
-    ArrayExpression.variable("assigned_to.id");
-    Expression assignedToTypeExpression =
-    ArrayExpression.variable("assigned_to.type");
-
-    Query query = QueryBuilder.select([SelectResult.all()]).from(dbName).where(
-        Expression.property("DOCUMENT_TYPE")
-            .equalTo(Expression.string("assignedToDocumentType"))
-            .and(Expression.property("facilityId")
-            .iN(List<Expression>()
-          ..add(Expression.value(1))))
-            .or(ArrayExpression.any(assignedToVariableExpression)
-            .inA(assignedToArrayExpression)
-            .satisfies(assignedToIdExpression
-            .equalTo(Expression.value("Shree").and(
-            Expression.property("name").equalTo(Expression.value("Shree")))))));
-
-    query.execute().then((data) {
-      print("Query executed");
-    });
-  }
 }
