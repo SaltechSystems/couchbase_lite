@@ -393,7 +393,7 @@ public class QueryJson {
                  case ("arrayInAny",let value):
                     let arrayInAny = QueryMap.getListOfMapFromGenericList(objectList: value)
                     let satisfiesArray = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["satisfies"] ?? [])
-                    returnExpression = ArrayExpression.any( returnExpression as!
+                    returnExpression = ArrayExpression.any( existingExpression as!
                     VariableExpressionProtocol).in(inflateExpressionFromArray(expressionParametersArray: arrayInAny))
                                             .satisfies(inflateExpressionFromArray(expressionParametersArray: satisfiesArray));
 
