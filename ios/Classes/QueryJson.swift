@@ -383,6 +383,20 @@ public class QueryJson {
                         .subtract(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
                         )
+                case ("in",let value):
+                    let inArray = QueryMap.getListOfMapFromGenericList(objectList: value)
+                    var inExpression = [ExpressionProtocol]();
+                    for data in inArray{
+                         inExpression.append(inflateExpressionFromArray(expressionParametersArray:[data]))
+                    }
+                    returnExpression = existingExpression.in(inExpression)
+                 case ("arrayInAny",let value):
+                    let arrayInAny = QueryMap.getListOfMapFromGenericList(objectList: value)
+                    let satisfiesArray = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["satisfies"] ?? [])
+                    returnExpression = ArrayExpression.any( returnExpression as!
+                    VariableExpressionProtocol).in(inflateExpressionFromArray(expressionParametersArray: arrayInAny))
+                                            .satisfies(inflateExpressionFromArray(expressionParametersArray: satisfiesArray));
+
                 default:
                     break
                 }
@@ -412,6 +426,8 @@ public class QueryJson {
                     returnExpression = Expression.string(value)
                 case ("value", let value):
                     returnExpression = Expression.value(value)
+                case ("arrayVariable",let value):
+                                    returnExpression = ArrayExpression.variable(value as! String);
                 default:
                     break
                 }
