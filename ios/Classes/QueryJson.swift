@@ -390,12 +390,12 @@ public class QueryJson {
                          inExpression.append(inflateExpressionFromArray(expressionParametersArray:[data]))
                     }
                     returnExpression = existingExpression.in(inExpression)
-                 case ("arrayInAny",let value):
-                    let arrayInAny = QueryMap.getListOfMapFromGenericList(objectList: value)
+                 case ("arrayInAny",_),("satisfies",_):
+                    let arrayInAny = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["arrayInAny"] ?? [])
                     let satisfiesArray = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["satisfies"] ?? [])
-                    returnExpression = ArrayExpression.any( existingExpression as!
+                    returnExpression = ArrayExpression.any(existingExpression as!
                     VariableExpressionProtocol).in(inflateExpressionFromArray(expressionParametersArray: arrayInAny))
-                                            .satisfies(inflateExpressionFromArray(expressionParametersArray: satisfiesArray));
+                    .satisfies(inflateExpressionFromArray(expressionParametersArray: satisfiesArray));
 
                 default:
                     break
