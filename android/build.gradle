@@ -48,6 +48,6 @@ android {
         disable 'InvalidPackage'
     }
     dependencies {
-        implementation 'com.couchbase.lite:couchbase-lite-android:2.6.2'
+        implementation 'com.couchbase.lite:couchbase-lite-android:2.7.0'
     }
 }

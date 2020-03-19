@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       database = await Database.initWithName("MyNewCouchbaseDB");
-      await database.saveDocumentWithId("test", Document({}));
+      await database.saveDocument(MutableDocument(id: "test"));
       int count = await database.count;
       result = "Document Count: $count";
     } on PlatformException catch (e) {

@@ -6,7 +6,7 @@ class Database {
   Database._internal(this.name);
 
   static const MethodChannel _methodChannel =
-      const MethodChannel('com.saltechsystems.couchbase_lite/database');
+      MethodChannel('com.saltechsystems.couchbase_lite/database');
 
   /// Initializes a Couchbase Lite database with the given [dbName].
   static Future<Database> initWithName(String dbName) async {
@@ -26,16 +26,20 @@ class Database {
       _methodChannel.invokeMethod(
           'deleteDatabaseWithName', <String, dynamic>{'database': dbName});
 
-  /// Gets a Document object with the given [id]
-  Future<Document> document(String id) async {
+  /// Gets a Document object [withId]
+  Future<Document> document(String withId) async {
     Map<dynamic, dynamic> _docResult = await _methodChannel.invokeMethod(
-        'getDocumentWithId', <String, dynamic>{'database': name, 'id': id});
+        'getDocumentWithId', <String, dynamic>{'database': name, 'id': withId});
 
     if (_docResult["doc"] == null) {
       return null;
     } else {
       return Document._init(
-          _docResult["doc"], _docResult["id"], name, _docResult["sequence"]);
+          _docResult["doc"],
+          _docResult["id"],
+          name,
+          _docResult["sequence"]
+      );
     }
   }
 
@@ -109,13 +113,31 @@ class Database {
     }
   }
 
-  /// Deletes document with [id] from the database.
-  Future<bool> deleteDocument(String id) async {
+  /// Deletes document [withId] from the database.
+  Future<bool> deleteDocument(String withId) async {
+    await _methodChannel.invokeMethod(
+        'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': withId});
+
+    return true;
+  }
+
+  /// Creates an index [withName] which could be a value index or a full-text search index.
+  /// The name can be used for deleting the index. Creating a new different index with an existing index
+  /// name will replace the old index; creating the same index with the same name will be no-ops.
+  /*Future<bool> createIndex(String index, {@required String withName}) async {
     await _methodChannel.invokeMethod(
         'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': id});
 
     return true;
-  }
+  }*/
+
+  /// Deletes index [withName] from the database.
+  /*Future<void> deleteIndex({@required String withName}) async {
+    await _methodChannel.invokeMethod(
+        'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': id});
+
+    return true;
+  }*/
 
   /// Closes database.
   Future<void> close() => _methodChannel.invokeMethod(

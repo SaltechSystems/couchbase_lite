@@ -24,7 +24,7 @@ part 'serializers.g.dart';
 /// types needed transitively via fields.
 ///
 /// You usually only need to do this once per project.
-@SerializersFor(const [ReplicatedDocument, DocumentReplication])
+@SerializersFor([ReplicatedDocument, DocumentReplication])
 Serializers serializers = _$serializers;
 
 Serializers standardSerializers =

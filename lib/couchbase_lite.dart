@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
 import 'src/document_replication.dart';
-import 'src/replicated_document.dart';
 
 export 'src/document_replication.dart';
 export 'src/replicated_document.dart';

@@ -157,7 +157,7 @@ void main() {
     expect(doc.id, "documentid");
     await database.saveDocument(doc);
     expect(doc.id, "documentid");
-    await database.documentWithId("myid");
+    await database.document("myid");
   });
 
   test('testQuery', () async {

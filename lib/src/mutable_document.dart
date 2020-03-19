@@ -93,13 +93,13 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The UTC DateTime value.
   ///   - key: The Document object.
-  MutableDocument _setDate(String key, DateTime value) {
+  /*MutableDocument _setDate(String key, DateTime value) {
     if (!(value?.isUtc ?? true)) {
       throw ArgumentError.value(value, 'value', 'Must be in utc time.');
     }
 
     return setValue(key, value?.toIso8601String());
-  }
+  }*/
 
   /// Removes a given key and its value.
   ///

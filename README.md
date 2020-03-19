@@ -18,7 +18,7 @@ In your flutter project add the dependency:
 
 ```yaml
 dependencies:
-  couchbase_lite: ^2.5.1
+  couchbase_lite: ^2.7.0
   
   flutter:
       sdk: flutter
@@ -100,11 +100,13 @@ class AppDatabase {
 
   Future<void> logout() async {
     await Future.wait(pendingListeners);
-    replicator.removeChangeListener(_replicatorListenerToken);
+    await replicator.removeChangeListener(_replicatorListenerToken);
     _replicatorListenerToken =
         replicator.addChangeListener((ReplicatorChange event) async {
       if (event.status.activity == ReplicatorActivityLevel.stopped) {
         await database.close();
+        // Change listeners will be
+        //replicator.removeChangeListener(_replicatorListenerToken);
         await replicator.dispose();
         _replicatorListenerToken = null;
       }
@@ -112,14 +114,16 @@ class AppDatabase {
     await replicator.stop();
   }
 
-  Future<Map<String, dynamic>> createDocument(Map<String, dynamic> map) async {
+  Future<Document> createDocument(Map<String, dynamic> map) async {
     var id = "mydocument::${Uuid().v1()}";
 
     try {
-      String documentId = await database.saveDocumentWithId(id, Document(map));
-      var newDoc = Map.from(map);
-      newDoc["id"] = documentId;
-      return newDoc;
+      var doc = MutableDocument(id: id, data: map);
+      if (await database.saveDocument(doc)) {
+        return doc;
+      } else {
+        return null;
+      }
     } on PlatformException {
       return null;
     }
@@ -130,7 +134,7 @@ class AppDatabase {
     // Execute a query and then post results and all changes to the stream
 
     final Query query = QueryBuilder.select([
-      SelectResult.expression(Meta.id.from("mydocs")).As("id"),
+      SelectResult.expression(Meta.id.from("mydocs")).as("id"),
       SelectResult.expression(Expression.property("foo").from("mydocs")),
       SelectResult.expression(Expression.property("bar").from("mydocs")),
     ])
@@ -185,17 +189,71 @@ class AppDatabase {
 ```
 
 ```dart
-class ObservableResponse<T> {
-  ObservableResponse(this.result, this.onDispose);
+class ObservableResponse<T> implements StreamController<T> {
+  ObservableResponse(this._result, [this._onDispose]);
 
-  final Observable<T> result;
-  final VoidFunc onDispose;
+  final Subject<T> _result;
+  final VoidCallback _onDispose;
 
-  void dispose() {
-    if (onDispose != null) {
+  @override
+  void add(data) => _result?.add(data);
+
+  @override
+  ControllerCallback get onCancel => throw UnsupportedError('ObservableResponses do not support cancel callbacks');
+
+  @override
+  ControllerCallback get onListen => throw UnsupportedError('ObservableResponses do not support listen callbacks');
+
+  @override
+  ControllerCallback get onPause => throw UnsupportedError('ObservableResponses do not support pause callbacks');
+
+  @override
+  ControllerCallback get onResume => throw UnsupportedError('ObservableResponses do not support resume callbacks');
+
+  @override
+  void addError(Object error, [StackTrace stackTrace]) => throw UnsupportedError('ObservableResponses do not support adding errors');
+
+  @override
+  Future addStream(Stream<T> source, {bool cancelOnError}) => throw UnsupportedError('ObservableResponses do not support adding streams');
+
+  @override
+  Future get done => _result?.done ?? true;
+
+  @override
+  bool get hasListener => _result?.hasListener ?? false;
+
+  @override
+  bool get isClosed => _result?.isClosed ?? true;
+
+  @override
+  bool get isPaused => _result?.isPaused ?? false;
+
+  @override
+  StreamSink<T> get sink => _result?.sink;
+
+  @override
+  Stream<T> get stream => _result?.stream;
+
+  @override
+  Future<dynamic> close() {
+    if (_onDispose != null) {
       // Do operations here like closing streams and removing listeners
-      onDispose();
+      _onDispose();
     }
+
+    return _result?.close();
   }
+
+  @override
+  set onCancel(Function() onCancelHandler) => throw UnsupportedError('ObservableResponses do not support cancel callbacks');
+
+  @override
+  set onListen(void Function() onListenHandler) => throw UnsupportedError('ObservableResponses do not support listen callbacks');
+
+  @override
+  set onPause(void Function() onPauseHandler) => throw UnsupportedError('ObservableResponses do not support pause callbacks');
+
+  @override
+  set onResume(void Function() onResumeHandler) => throw UnsupportedError('ObservableResponses do not support resume callbacks');
 }
 ```

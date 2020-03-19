@@ -2,7 +2,7 @@ part of couchbase_lite;
 
 class Having extends Query {
   Limit limit(Expression expression, {Expression offset}) {
-    var resultQuery = new Limit();
+    var resultQuery = Limit();
     resultQuery._options = this.options;
     if (offset != null) {
       resultQuery._options["limit"] = [expression, offset];
@@ -13,7 +13,7 @@ class Having extends Query {
   }
 
   OrderBy orderBy(List<Ordering> orderingList) {
-    var resultQuery = new OrderBy();
+    var resultQuery = OrderBy();
     resultQuery._options = this.options;
     resultQuery._options["orderBy"] = orderingList;
     return resultQuery;

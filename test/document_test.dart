@@ -6,7 +6,7 @@ void main() {
   Document document;
   MutableDocument mutableDocument;
   setUp(() {
-    initializer = new Map();
+    initializer = Map();
     initializer['string'] = "string";
     initializer['double'] = 3.14;
     initializer['int'] = 12;
@@ -58,6 +58,7 @@ void main() {
     expect(document.getMap("boolInt"), null);
   });
   test("Document: invalid map", () {
+    // ignore: deprecated_member_use_from_same_package
     expect(document.getArray("boolInt"), null);
   });
   test("Document: getting getKeys", () {
@@ -83,6 +84,7 @@ void main() {
     expect(mutableDocument.getMap('map'), {"test": true});
   });
   test("mutableDocument: setting list", () {
+    // ignore: deprecated_member_use_from_same_package
     mutableDocument.setArray('list', List<int>());
     expect(mutableDocument.getList('list'), []);
   });

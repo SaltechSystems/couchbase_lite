@@ -1,6 +1,7 @@
 package com.saltechsystems.couchbase_lite;
 
 import android.content.res.AssetManager;
+import android.os.Debug;
 
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.ConcurrencyControl;
@@ -8,12 +9,14 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.IndexBuilder;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.ValueIndexItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -21,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.flutter.Log;
 
 class CBManager {
     private HashMap<String, Database> mDatabase = new HashMap<>();
@@ -202,6 +207,10 @@ class CBManager {
         if (!mDatabase.containsKey(_name)) {
             Database database = new Database(_name, mDBConfig);
             mDatabase.put(_name, database);
+            //database.createIndex("TypeIndex", IndexBuilder.valueIndex(ValueIndexItem.property("type"),ValueIndexItem.property("deletedAt"),ValueIndexItem.property("createdAt")));
+            //database.createIndex("SheetIDTypeIndex", IndexBuilder.valueIndex(ValueIndexItem.property("sheetID"),ValueIndexItem.property("type")));
+            //database.createIndex("CellIDTypeIndex", IndexBuilder.valueIndex(ValueIndexItem.property("cellID"),ValueIndexItem.property("type")));
+            //Log.d("TESTING","CHANGED 2");
             return database;
         }
 

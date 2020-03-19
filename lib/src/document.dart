@@ -142,10 +142,10 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The DateTime object in UTC or null.
-  DateTime _getDate(String key, DateTime value) {
+  /*DateTime _getDate(String key, DateTime value) {
     Object _result = getValue(key);
     return _result is String ? DateTime.parse(_result).toUtc() : null;
-  }
+  }*/
 
   /// Gets a property's value. The value types are Blob, ArrayObject,
   /// DictionaryObject, Number, or String based on the underlying data type; or null
