@@ -11,10 +11,10 @@ class Replicator {
   static const MethodChannel _methodChannel =
       MethodChannel('com.saltechsystems.couchbase_lite/replicator');
   static const JSONMethodCodec _jsonMethod = JSONMethodCodec();
-  static const MethodChannel _jsonChannel = MethodChannel(
-      'com.saltechsystems.couchbase_lite/json', _jsonMethod);
-  static const EventChannel _replicationEventChannel = EventChannel(
-      "com.saltechsystems.couchbase_lite/replicationEventChannel");
+  static const MethodChannel _jsonChannel =
+      MethodChannel('com.saltechsystems.couchbase_lite/json', _jsonMethod);
+  static const EventChannel _replicationEventChannel =
+      EventChannel("com.saltechsystems.couchbase_lite/replicationEventChannel");
   static final Stream _replicationStream =
       _replicationEventChannel.receiveBroadcastStream();
 

@@ -35,11 +35,7 @@ class Database {
       return null;
     } else {
       return Document._init(
-          _docResult["doc"],
-          _docResult["id"],
-          name,
-          _docResult["sequence"]
-      );
+          _docResult["doc"], _docResult["id"], name, _docResult["sequence"]);
     }
   }
 
@@ -115,8 +111,8 @@ class Database {
 
   /// Deletes document [withId] from the database.
   Future<bool> deleteDocument(String withId) async {
-    await _methodChannel.invokeMethod(
-        'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': withId});
+    await _methodChannel.invokeMethod('deleteDocumentWithId',
+        <String, dynamic>{'database': name, 'id': withId});
 
     return true;
   }
