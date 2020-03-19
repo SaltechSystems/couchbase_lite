@@ -10,6 +10,8 @@ void main() {
   const MethodChannel jsonChannel = MethodChannel(
       'com.saltechsystems.couchbase_lite/json', JSONMethodCodec());
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUp(() {
     databaseChannel.setMockMethodCallHandler((MethodCall methodCall) async {
       Map<dynamic, dynamic> arguments = methodCall.arguments;
