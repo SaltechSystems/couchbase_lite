@@ -48,3 +48,9 @@
 # 2.5.1+8
 
 * Fixed a bug on Android which results in an error for not posting results on the UI Thread
+
+## 2.7.0
+
+* Updated Coubchbase Lite libraries to version 2.7.0
+* Migrated to Android X
+* Added concurrency control
