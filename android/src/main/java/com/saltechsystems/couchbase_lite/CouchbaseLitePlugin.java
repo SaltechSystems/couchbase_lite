@@ -299,6 +299,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             result.error("errQuery", "Error generating query", null);
             return;
           }
+          Log.d("cocuchbaselite","couchbase lite Query:-"+queryFromJson.toString());
 
           final Query query = queryFromJson;
           AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {

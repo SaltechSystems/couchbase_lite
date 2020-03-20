@@ -67,24 +67,13 @@ class _MyAppState extends State<MyApp> {
                   "assigned_to.id");
 
               Query query = QueryBuilder
-                  .select([SelectResult.all()])
+                  .select([SelectResult.property("index"),SelectResult.property("value"),SelectResult.expression(Functions.count(Expression.string("*")))])
                   .from(dbName)
-                  .where(Expression.property("valueas")
-                  .greaterThan(Expression.intValue(2))
-                  .and(Expression.property("index")
-                  .iN(List<Expression>()
-                ..add(Expression.intValue(1))..add(Expression.intValue(8))..add(
-                    Expression.intValue(5)))
-                  .and(Expression.property("name")
-                  .equalTo(Expression.string("StringValue"))).and(
-                  ArrayExpression.any(assignedToVariableExpression).inA(
-                      assignedToArrayExpression)
-                      .satisfies(
-                      assignedToIdExpression.equalTo(Expression.string
-                        ("Shree"))).or(Expression.property("later").equalTo(Expression.value("21344"))))));
+                  .groupBy(List<Expression>()..add(Expression.property("index")));
               query.execute().then((resultSet) {
-                resultSet.toList().forEach((result) {
-                  print(result);
+                print(resultSet.allResults().length);
+                resultSet.allResults().forEach((result) {
+                  print(" result ooo ${result.getInt(key:"index")}");
                 });
               });
             },
@@ -98,7 +87,8 @@ class _MyAppState extends State<MyApp> {
     for (int i = 0; i < 10; i++) {
       HashMap<String, dynamic> map = HashMap();
       map["name"] = i.toString();
-      map["index"] = i;
+      map["index"] = i%2;
+      print("Dummy data index${i%2}");
       database.saveDocumentWithId(i.toString(), Document(map));
     }
   }

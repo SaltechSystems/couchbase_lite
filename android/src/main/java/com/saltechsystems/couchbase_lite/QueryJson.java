@@ -6,6 +6,7 @@ import com.couchbase.lite.ArrayExpression;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
+import com.couchbase.lite.Function;
 import com.couchbase.lite.GroupBy;
 import com.couchbase.lite.Join;
 import com.couchbase.lite.Joins;
@@ -328,6 +329,9 @@ class QueryJson {
                     case ("arrayVariable"):
                         returnExpression = ArrayExpression.variable(String.valueOf(currentExpression.get("arrayVariable")));
                         break;
+                    case ("count")://SelectResult.expression(Functions.count(Expression.string("*")))
+                        returnExpression = Function.count(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("count"))));
+                        break;
                 }
             } else {
                 switch (currentExpression.keySet().iterator().next()) {
@@ -480,7 +484,7 @@ class QueryMap {
         List<?> tempList = (List<?>) queryMap.get(key);
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Object listObject : tempList) {
-            for (Object innerMap : (List<?>)listObject) {
+            for (Object innerMap : (List<?>) listObject) {
                 if (innerMap instanceof Map<?, ?>) {
                     resultList.add(getMapFromGenericMap(innerMap));
                 }
