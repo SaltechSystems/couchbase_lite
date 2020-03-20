@@ -71,11 +71,11 @@ class QueryJson {
         if (queryMap.hasWhere) {
             inflateWhere();
         }
-        if (queryMap.hasOrderBy) {
-            inflateOrderBy();
-        }
         if (queryMap.hasGroupBy) {
             inflateGroupBy();
+        }
+        if (queryMap.hasOrderBy) {
+            inflateOrderBy();
         }
         if (queryMap.hasLimit) {
             inflateLimit();
@@ -145,6 +145,9 @@ class QueryJson {
             query = ((Joins) query).orderBy(inflateOrdering(orderByArray));
         } else if (query instanceof Where) {
             query = ((Where) query).orderBy(inflateOrdering(orderByArray));
+        }else if (query instanceof GroupBy){
+            query = ((GroupBy) query).orderBy(inflateOrdering(orderByArray));
+
         }
     }
 
