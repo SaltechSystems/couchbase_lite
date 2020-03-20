@@ -103,6 +103,7 @@ void main() {
     expect(mutableDocument.getMap("null"), null);
   });
   test("mutableDocument: null list", () {
+    // ignore: deprecated_member_use_from_same_package
     expect(mutableDocument.getArray("null"), null);
     expect(mutableDocument.getList("null"), null);
   });
@@ -134,7 +135,7 @@ void main() {
   test("Blob", () async {
     Blob blob = Blob.data("application/octet-stream", Uint8List(0));
     mutableDocument.setBlob("blob", blob);
-    expect(await mutableDocument.getBlob("blob").content,await blob.content);
+    expect(await mutableDocument.getBlob("blob").content, await blob.content);
   });
   test("NullDocument", () {
     expect(MutableDocument(id: "test").toMap(), {});

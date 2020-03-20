@@ -167,7 +167,9 @@ void main() {
     expect(testDoc.id, "myid");
     expect(await database.deleteDocument("myid"), true);
     // Code Coverage for deprecate functions
+    // ignore: deprecated_member_use_from_same_package
     await database.documentWithId("myid");
+    // ignore: deprecated_member_use_from_same_package
     await database.save(MutableDocument());
     await database.indexes;
     await database.compact();
@@ -220,7 +222,7 @@ void main() {
     Replicator replicator = Replicator(config);
 
     await replicator.addChangeListener((change) {});
-    await replicator.addDocumentReplicationListener((replication){});
+    await replicator.addDocumentReplicationListener((replication) {});
     await replicator.start();
     await replicator.stop();
     await replicator.resetCheckpoint();
