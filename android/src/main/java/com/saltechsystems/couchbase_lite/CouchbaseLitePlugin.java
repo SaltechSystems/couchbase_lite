@@ -7,13 +7,22 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.couchbase.lite.Array;
+import com.couchbase.lite.Blob;
 import com.couchbase.lite.BuildConfig;
+import com.couchbase.lite.ConcurrencyControl;
+import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
+import com.couchbase.lite.Document;
+import com.couchbase.lite.DocumentFlag;
+import com.couchbase.lite.DocumentReplication;
+import com.couchbase.lite.DocumentReplicationListener;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryChange;
 import com.couchbase.lite.QueryChangeListener;
+import com.couchbase.lite.ReplicatedDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
@@ -22,6 +31,8 @@ import com.couchbase.lite.ResultSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +82,8 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
     mRegistrar = registrar;
 
+    CouchbaseLite.init(this.getContext());
+
     if (BuildConfig.DEBUG) {
       mCBManager = new CBManager(this,true);
     } else {
@@ -104,6 +117,17 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
       String dbname = call.argument("database");
       Database database = mCBManager.getDatabase(dbname);
       String _id;
+      ConcurrencyControl _concurrencyControl = null;
+      if (call.hasArgument("concurrencyControl")) {
+        String arg = call.argument("concurrencyControl");
+        switch (arg) {
+          case "failOnConflict":
+            _concurrencyControl = ConcurrencyControl.FAIL_ON_CONFLICT;
+          default:
+            _concurrencyControl = ConcurrencyControl.LAST_WRITE_WINS;
+        }
+      }
+
       switch (call.method) {
         case ("initDatabaseWithName"):
           try {
@@ -126,22 +150,22 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             result.error("errClose", "error closing database with name " + dbname, e.toString());
           }
           break;
-        case ("deleteDatabaseWithName"):
-          try {
-            mCBManager.deleteDatabaseWithName(dbname);
-            result.success(null);
-          } catch (Exception e) {
-            result.error("errDelete", "error deleting database with name " + dbname, e.toString());
-          }
-          break;
-        case ("delete"):
+        case ("compactDatabaseWithName"):
           if (database == null) {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);
             return;
           }
 
           try {
-            database.delete();
+            database.compact();
+            result.success(null);
+          } catch (Exception e) {
+            result.error("errCompact", "error compacting database with name " + dbname, e.toString());
+          }
+          break;
+        case ("deleteDatabaseWithName"):
+          try {
+            mCBManager.deleteDatabaseWithName(dbname);
             result.success(null);
           } catch (Exception e) {
             result.error("errDelete", "error deleting database with name " + dbname, e.toString());
@@ -153,11 +177,11 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             return;
           }
 
-          if (call.hasArgument("map")) {
+          if (_concurrencyControl != null && call.hasArgument("map")) {
             Map<String, Object> _document = call.argument("map");
             try {
-              String returnedId = mCBManager.saveDocument(database, _document);
-              result.success(returnedId);
+              Map<String,Object> saveResult = mCBManager.saveDocument(database, _document, _concurrencyControl);
+              result.success(saveResult);
             } catch (CouchbaseLiteException e) {
               result.error("errSave", "error saving document", e.toString());
             }
@@ -171,12 +195,30 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             return;
           }
 
-          if (call.hasArgument("id") && call.hasArgument("map")) {
+          if (call.hasArgument("id") &&  _concurrencyControl != null && call.hasArgument("map")) {
             _id = call.argument("id");
+
             Map<String, Object> _map = call.argument("map");
             try {
-              String returnedId = mCBManager.saveDocumentWithId(database, _id, _map);
-              result.success(returnedId);
+              Map<String,Object> saveResult;
+
+              Long sequence = null;
+              if (call.hasArgument("sequence")) {
+                Object sObj = call.argument("sequence");
+
+                if (sObj instanceof Integer) {
+                  sequence = Long.valueOf((Integer) sObj);
+                } else if (sObj instanceof Long) {
+                  sequence = (Long) sObj;
+                }
+              }
+
+              if (sequence != null) {
+                saveResult = mCBManager.saveDocumentWithId(database, _id, sequence, _map, _concurrencyControl);
+              } else {
+                saveResult = mCBManager.saveDocumentWithId(database, _id, _map, _concurrencyControl);
+              }
+              result.success(saveResult);
             } catch (CouchbaseLiteException e) {
               result.error("errSave", "error saving document with id " + _id, e.toString());
             }
@@ -191,11 +233,39 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           }
 
           if (!call.hasArgument("id")) {
-            result.error("errArgs", "Query Error: Invalid Arguments", call.arguments.toString());
+            result.error("errArgs", "Database Error: Invalid Arguments", call.arguments.toString());
+            return;
           }
 
           _id = call.argument("id");
           result.success(mCBManager.getDocumentWithId(database, _id));
+          break;
+        case ("getBlobContentFromDocumentWithId"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (!call.hasArgument("id") || !call.hasArgument("key") || !call.hasArgument("digest")) {
+            result.error("errArgs", "Database Error: Invalid Arguments", call.arguments.toString());
+            return;
+          }
+
+          _id = call.argument("id");
+          String _key = call.argument("key");
+          String _digest = call.argument("digest");
+          Document document = database.getDocument(_id);
+          byte[] content = null;
+
+          // Don't load the content if it isn't found or the digest doesn't match anymore
+          if (document != null) {
+            Blob _blob = document.getBlob(_key);
+            if (_blob != null && _blob.digest().equals(_digest)) {
+              content = _blob.getContent();
+            }
+          }
+
+          result.success(content);
           break;
         case ("deleteDocumentWithId"):
           if (database == null) {
@@ -204,7 +274,8 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           }
 
           if (!call.hasArgument("id")) {
-            result.error("errArgs", "Query Error: Invalid Arguments", call.arguments.toString());
+            result.error("errArgs", "Database Error: Invalid Arguments", call.arguments.toString());
+            return;
           }
 
           _id = call.argument("id");
@@ -223,6 +294,19 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           }
 
           result.success(database.getCount());
+          break;
+        case ("getIndexes"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          try {
+            result.success(database.getIndexes());
+          } catch (CouchbaseLiteException e) {
+            result.error("errIndexes", "error getting indexes for" + dbname, null);
+          }
+
           break;
         default:
           result.notImplemented();
@@ -395,6 +479,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
               public void changed(ReplicatorChange change) {
                 HashMap<String,Object> json = new HashMap<String,Object>();
                 json.put("replicator",id);
+                json.put("type","ReplicatorChange");
 
                 final EventChannel.EventSink mEventSink = mReplicationEventListener.mEventSink;
                 if (mEventSink == null) {
@@ -428,7 +513,46 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
               }
             });
 
-            mCBManager.addReplicator(id, replicator, mListenerToken);
+            ListenerToken mDocumentReplicationListenerToken = replicator.addDocumentReplicationListener(new DocumentReplicationListener() {
+              @Override
+              public void replication(DocumentReplication replication) {
+                HashMap<String,Object> json = new HashMap<>();
+                json.put("replicator",id);
+                json.put("type","DocumentReplication");
+
+                final EventChannel.EventSink mEventSink = mReplicationEventListener.mEventSink;
+                if (mEventSink == null) {
+                  return;
+                }
+
+                json.put("isPush",replication.isPush());
+
+                ArrayList<HashMap<String,Object>> documents = new ArrayList<>();
+                for (ReplicatedDocument document : replication.getDocuments()) {
+                  HashMap<String,Object> documentReplication = new HashMap<>();
+                  documentReplication.put("document",document.getID());
+                  CouchbaseLiteException error = document.getError();
+                  if (error != null) {
+                    documentReplication.put("error",error.getLocalizedMessage());
+                  }
+
+                  int flags = 0;
+                  for (DocumentFlag flag : document.flags()) {
+                    flags += flag.rawValue();
+                  }
+
+                  documentReplication.put("flags",flags);
+                  documents.add(documentReplication);
+                }
+
+                json.put("documents", documents);
+
+                mEventSink.success(json);
+              }
+            });
+
+            ListenerToken[] tokens = {mListenerToken, mDocumentReplicationListenerToken};
+            mCBManager.addReplicator(id, replicator, tokens);
           } else {
             result.error("errReplicator", "Replicator Error: Failed to initialize replicator", null);
           }

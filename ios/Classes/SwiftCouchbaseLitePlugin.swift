@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import CouchbaseLiteSwift
 
 public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegate {
     weak var mRegistrar: FlutterPluginRegistrar?
@@ -63,6 +64,18 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             } catch {
                 result(FlutterError.init(code: "errClose", message: "Error closing database with name \(dbname)", details: error.localizedDescription))
             }
+        case "compactDatabaseWithName":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            
+            do {
+                try database.compact()
+                result(nil)
+            } catch {
+                result(FlutterError.init(code: "errCompact", message: "Error compacting database with name \(dbname)", details: error.localizedDescription))
+            }
         case "deleteDatabaseWithName":
             do {
                 try mCBManager.deleteDatabaseWithName(name: dbname)
@@ -70,32 +83,28 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             } catch {
                 result(FlutterError.init(code: "errDelete", message: "Error deleting database with name \(dbname)", details: error.localizedDescription))
             }
-        case "delete":
+        case "saveDocument":
             guard let database = mCBManager.getDatabase(name: dbname) else {
                 result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
                 return
             }
             
-            do {
-                try database.delete();
-                result(nil)
-            } catch {
-                result(FlutterError.init(code: "errDelete", message: "Error deleting database with name \(dbname)", details: error.localizedDescription))
-            }
-        case "saveDocument":
-            guard let document = DataConverter.convertSETDictionary(arguments["map"] as? [String:Any]) else {
+            guard let concurrencyControlArg = arguments["concurrencyControl"] as? String, let document = arguments["map"] as? [String:Any] else {
                 result(FlutterError.init(code: "errSave", message: "Error saving document", details: nil))
                 return
             }
             
-            guard let database = mCBManager.getDatabase(name: dbname) else {
-                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
-                return
+            let concurrencyControl: ConcurrencyControl
+            switch(concurrencyControlArg) {
+            case "failOnConflict":
+                concurrencyControl = ConcurrencyControl.failOnConflict
+            default:
+                concurrencyControl = ConcurrencyControl.lastWriteWins
             }
             
             do {
-                let returnedId = try mCBManager.saveDocument(database: database,map: document)
-                result(returnedId!)
+                let saveResult = try mCBManager.saveDocument(database: database,map: document,concurrencyControl: concurrencyControl)
+                result(saveResult)
             } catch {
                 result(FlutterError.init(code: "errSave", message: "Error saving document", details: error.localizedDescription))
             }
@@ -105,14 +114,40 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                 return
             }
             
-            guard let id = arguments["id"] as? String, let map = DataConverter.convertSETDictionary(arguments["map"] as? [String:Any]) else {
-                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+            guard let id = arguments["id"] as? String, let concurrencyControlArg = arguments["concurrencyControl"] as? String, let map = arguments["map"] as? [String:Any] else {
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
             
+            let concurrencyControl: ConcurrencyControl
+            switch(concurrencyControlArg) {
+            case "failOnConflict":
+                concurrencyControl = ConcurrencyControl.failOnConflict
+            default:
+                concurrencyControl = ConcurrencyControl.lastWriteWins
+            }
+            
             do {
-                let returnedId = try mCBManager.saveDocumentWithId(database: database, id: id, map: map)
-                result(returnedId)
+                let sequenceValue: UInt64?
+                switch(arguments["sequence"]) {
+                case let value as NSNumber:
+                    sequenceValue = value.uint64Value
+                case let value as Int:
+                    sequenceValue = UInt64(value)
+                case let value as UInt64:
+                    sequenceValue = value
+                default:
+                    sequenceValue = nil
+                }
+                
+                let saveResult: NSMutableDictionary
+                if let sequence = sequenceValue {
+                    saveResult = try mCBManager.saveDocumentWithId(database: database, id: id, sequence: sequence, map: map, concurrencyControl: concurrencyControl)
+                }else {
+                    saveResult = try mCBManager.saveDocumentWithId(database: database, id: id, map: map, concurrencyControl: concurrencyControl)
+                }
+                
+                result(saveResult)
             } catch {
                 result(FlutterError.init(code: "errSave", message: "Error saving document with id \(id)", details: error.localizedDescription))
             }
@@ -123,7 +158,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             }
             
             guard let id = arguments["id"] as? String else {
-                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
             
@@ -140,12 +175,32 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             }
             
             guard let id = arguments["id"] as? String else {
-                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
             
             if let returnMap = mCBManager.getDocumentWithId(database: database, id: id) {
                 result(NSDictionary(dictionary: returnMap))
+            } else {
+                result(nil)
+            }
+        case "getBlobContentFromDocumentWithId":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            
+            guard let id = arguments["id"] as? String, let key = arguments["key"] as? String, let digest = arguments["digest"] as? String else {
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+            
+            // Don't load the content if it isn't found or the digest doesn't match anymore
+            if let document = database.document(withID: id),
+                let blob = document.blob(forKey: key),
+                blob.digest == digest,
+                let data = blob.content {
+                result(FlutterStandardTypedData(bytes: data))
             } else {
                 result(nil)
             }
@@ -156,6 +211,13 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             }
             
             result(database.count)
+        case "getIndexes":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            
+            result(database.indexes)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -270,8 +332,8 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             
             do {
                 let replicator = try mCBManager.inflateReplicator(json: json)
-                let token = replicator.addChangeListener { [weak self] change in
-                    var map = ["replicator":replicatorId]
+                let changeToken = replicator.addChangeListener { [weak self] change in
+                    var map = ["replicator":replicatorId,"type":"ReplicatorChange"]
                     if let error = change.status.error {
                         map["error"] = error.localizedDescription
                     }
@@ -292,7 +354,26 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                     self?.mReplicatorEventListener.mEventSink?(map)
                 }
                 
-                mCBManager.addReplicator(replicationId: replicatorId, replicator: replicator, listenerToken: token)
+                let documentToken = replicator.addDocumentReplicationListener { [weak self] replication in
+                    let map = NSMutableDictionary.init(dictionary: ["replicator":replicatorId,"type":"DocumentReplication"])
+                    map["isPush"] = replication.isPush
+                    
+                    let documents = NSMutableArray()
+                    replication.documents.forEach { (document) in
+                        let documentReplication = NSMutableDictionary.init(dictionary: ["document":document.id])
+                        if let error = document.error {
+                            documentReplication["error"] = error.localizedDescription
+                        }
+                        documentReplication["flags"] = document.flags.rawValue
+                        documents.add(documentReplication)
+                    }
+                    
+                    map["documents"] = documents
+                    
+                    self?.mReplicatorEventListener.mEventSink?(map)
+                }
+                
+                mCBManager.addReplicator(replicationId: replicatorId, replicator: replicator, listenerTokens: [changeToken,documentToken])
                 result(nil)
             } catch {
                 result(FlutterError(code: "errReplicator", message: "Replicator Error: Invalid Arguments", details: error.localizedDescription))

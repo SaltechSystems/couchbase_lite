@@ -9,10 +9,10 @@ class Query {
 
   Map<String, dynamic> get options => Map.from(_options);
 
-  static const JSONMethodCodec _jsonMethod = const JSONMethodCodec();
-  static const MethodChannel _channel = const MethodChannel(
-      'com.saltechsystems.couchbase_lite/json', _jsonMethod);
-  static const EventChannel _queryEventChannel = const EventChannel(
+  static const JSONMethodCodec _jsonMethod = JSONMethodCodec();
+  static const MethodChannel _channel =
+      MethodChannel('com.saltechsystems.couchbase_lite/json', _jsonMethod);
+  static const EventChannel _queryEventChannel = EventChannel(
       "com.saltechsystems.couchbase_lite/queryEventChannel", _jsonMethod);
   static final Stream _stream = _queryEventChannel.receiveBroadcastStream();
 

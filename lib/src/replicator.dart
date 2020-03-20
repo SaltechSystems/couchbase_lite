@@ -4,16 +4,17 @@ enum ReplicatorActivityLevel { busy, idle, offline, stopped, connecting }
 
 class Replicator {
   Replicator(this.config) {
+    //this.config._isLocked = true;
     _storingReplicator = _jsonChannel.invokeMethod('storeReplicator', this);
   }
 
   static const MethodChannel _methodChannel =
-      const MethodChannel('com.saltechsystems.couchbase_lite/replicator');
-  static const JSONMethodCodec _jsonMethod = const JSONMethodCodec();
-  static const MethodChannel _jsonChannel = const MethodChannel(
-      'com.saltechsystems.couchbase_lite/json', _jsonMethod);
-  static const EventChannel _replicationEventChannel = const EventChannel(
-      "com.saltechsystems.couchbase_lite/replicationEventChannel");
+      MethodChannel('com.saltechsystems.couchbase_lite/replicator');
+  static const JSONMethodCodec _jsonMethod = JSONMethodCodec();
+  static const MethodChannel _jsonChannel =
+      MethodChannel('com.saltechsystems.couchbase_lite/json', _jsonMethod);
+  static const EventChannel _replicationEventChannel =
+      EventChannel("com.saltechsystems.couchbase_lite/replicationEventChannel");
   static final Stream _replicationStream =
       _replicationEventChannel.receiveBroadcastStream();
 
@@ -59,7 +60,8 @@ class Replicator {
   ListenerToken addChangeListener(Function(ReplicatorChange) callback) {
     var token = ListenerToken();
     tokens[token] = _replicationStream
-        .where((data) => data["replicator"] == replicatorId)
+        .where((data) => (data["replicator"] == replicatorId &&
+            data["type"] == "ReplicatorChange"))
         .listen((data) {
       var activity = ReplicatorStatus.activityFromString(data["activity"]);
       String error;
@@ -69,6 +71,22 @@ class Replicator {
 
       callback(
           ReplicatorChange(this, ReplicatorStatus._internal(activity, error)));
+    });
+    return token;
+  }
+
+  /// Adds a document replicator change listener.
+  ///
+  /// Returns the listener token object for removing the listener.
+  ListenerToken addDocumentReplicationListener(
+      Function(DocumentReplication) callback) {
+    var token = ListenerToken();
+    tokens[token] = _replicationStream
+        .where((data) => ((data["replicator"] == replicatorId &&
+            data["type"] == "DocumentReplication")))
+        .listen((data) {
+      callback(DocumentReplication.fromMap(data)
+          .rebuild((b) => b..replicator = this));
     });
     return token;
   }

@@ -10,6 +10,8 @@ void main() {
   const MethodChannel jsonChannel = MethodChannel(
       'com.saltechsystems.couchbase_lite/json', JSONMethodCodec());
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUp(() {
     databaseChannel.setMockMethodCallHandler((MethodCall methodCall) async {
       Map<dynamic, dynamic> arguments = methodCall.arguments;
@@ -35,15 +37,25 @@ void main() {
           break;
         case ("saveDocument"):
           if (arguments.containsKey("map")) {
-            return 'documentid';
+            return {
+              "id": "documentid",
+              "sequence": 1,
+              "success": true,
+              "doc": arguments["map"]
+            };
           } else {
             return PlatformException(
                 code: "errArgs", message: "invalid arguments", details: null);
           }
           break;
         case ("saveDocumentWithId"):
-          if (arguments.containsKey("id") && arguments.containsKey("map")) {
-            return arguments["id"];
+          if (arguments.containsKey("map") && arguments.containsKey("id")) {
+            return {
+              "id": arguments["id"],
+              "sequence": 1,
+              "success": true,
+              "doc": arguments["map"]
+            };
           } else {
             return PlatformException(
                 code: "errArgs", message: "invalid arguments", details: null);
@@ -65,7 +77,7 @@ void main() {
           break;
         case ("deleteDocumentWithId"):
           if (arguments.containsKey("id")) {
-            return null;
+            return true;
           } else {
             return PlatformException(
                 code: "errArgs",
@@ -75,6 +87,10 @@ void main() {
           break;
         case ("getDocumentCount"):
           return 1;
+        case ("compactDatabaseWithName"):
+          return null;
+        case ("getIndexes"):
+          return [];
         default:
           return UnimplementedError();
       }
@@ -131,6 +147,7 @@ void main() {
 
   tearDown(() {
     databaseChannel.setMethodCallHandler(null);
+    replicatorChannel.setMethodCallHandler(null);
     jsonChannel.setMockMethodCallHandler(null);
   });
 
@@ -139,16 +156,25 @@ void main() {
     await database.close();
     await database.deleteDocument("docid");
     expect(await database.count, 1);
-    expect(await database.saveDocument(Document({})), "documentid");
-    expect(await database.saveDocument(Document({}, "docid")), "docid");
-    expect(await database.saveDocumentWithId("docid", Document({})), "docid");
-    MutableDocument doc = MutableDocument({});
-    await database.save(doc);
+    expect(await database.saveDocument(MutableDocument()), true);
+    expect(await database.saveDocument(MutableDocument(id: "docid")), true);
+    MutableDocument doc = MutableDocument();
+    await database.saveDocument(doc);
     expect(doc.id, "documentid");
-    doc.id = "test";
-    await database.save(doc);
-    expect(doc.id, "test");
+    await database.saveDocument(doc);
+    expect(doc.id, "documentid");
+    var testDoc = await database.document("myid");
+    expect(testDoc.id, "myid");
+    expect(await database.deleteDocument("myid"), true);
+    // Code Coverage for deprecate functions
+    // ignore: deprecated_member_use_from_same_package
     await database.documentWithId("myid");
+    // ignore: deprecated_member_use_from_same_package
+    await database.save(MutableDocument());
+    await database.indexes;
+    await database.compact();
+    await database.delete();
+    await Database.deleteWithName("testdb");
   });
 
   test('testQuery', () async {
@@ -196,6 +222,7 @@ void main() {
     Replicator replicator = Replicator(config);
 
     await replicator.addChangeListener((change) {});
+    await replicator.addDocumentReplicationListener((replication) {});
     await replicator.start();
     await replicator.stop();
     await replicator.resetCheckpoint();

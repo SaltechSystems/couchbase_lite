@@ -1,17 +1,22 @@
 package com.saltechsystems.couchbase_lite;
 
 import android.content.res.AssetManager;
+import android.os.Debug;
 
+import com.couchbase.lite.Blob;
+import com.couchbase.lite.ConcurrencyControl;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.IndexBuilder;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.ValueIndexItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,18 +25,20 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.flutter.Log;
+
 class CBManager {
     private HashMap<String, Database> mDatabase = new HashMap<>();
     private HashMap<String, Query> mQueries = new HashMap<>();
     private HashMap<String, ListenerToken> mQueryListenerTokens = new HashMap<>();
     private HashMap<String, Replicator> mReplicators = new HashMap<>();
-    private HashMap<String, ListenerToken> mReplicatorListenerTokens = new HashMap<>();
+    private HashMap<String, ListenerToken[]> mReplicatorListenerTokens = new HashMap<>();
     private DatabaseConfiguration mDBConfig;
     private CBManagerDelegate mDelegate;
 
     CBManager(CBManagerDelegate delegate, boolean enableLogging) {
         mDelegate = delegate;
-        mDBConfig = new DatabaseConfiguration(mDelegate.getContext());
+        mDBConfig = new DatabaseConfiguration();
 
         if (enableLogging) {
             final File path = mDelegate.getContext().getCacheDir();
@@ -47,16 +54,107 @@ class CBManager {
         return null;
     }
 
-    String saveDocument(Database database, Map<String, Object> _map) throws CouchbaseLiteException {
-        MutableDocument mutableDoc = new MutableDocument(_map);
-        database.save(mutableDoc);
-        return mutableDoc.getId();
+    Map<String, Object> saveDocument(Database database, Map<String, Object> _map, ConcurrencyControl concurrencyControl) throws CouchbaseLiteException {
+        MutableDocument mutableDoc = new MutableDocument(getParsedMap(_map, null));
+        boolean success = database.save(mutableDoc, concurrencyControl);
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("success", success);
+        if (success) {
+            resultMap.put("id", mutableDoc.getId());
+            resultMap.put("sequence", mutableDoc.getSequence());
+            resultMap.put("doc", getJSONMap(mutableDoc.toMap()));
+        }
+        return resultMap;
     }
 
-    String saveDocumentWithId(Database database, String _id, Map<String, Object> _map) throws CouchbaseLiteException {
-        MutableDocument mutableDoc = new MutableDocument(_id, _map);
-        database.save(mutableDoc);
-        return mutableDoc.getId();
+    Map<String, Object> saveDocumentWithId(Database database, String _id, Map<String, Object> _map, ConcurrencyControl concurrencyControl) throws CouchbaseLiteException {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        MutableDocument mutableDoc = new MutableDocument(_id, getParsedMap(_map, null));
+
+        boolean success = database.save(mutableDoc, concurrencyControl);
+
+        resultMap.put("success", success);
+        if (success) {
+            resultMap.put("id", mutableDoc.getId());
+            resultMap.put("sequence", mutableDoc.getSequence());
+            resultMap.put("doc", getJSONMap(mutableDoc.toMap()));
+        }
+
+        return resultMap;
+    }
+
+    Map<String, Object> saveDocumentWithId(Database database, String _id, long sequence, Map<String, Object> _map, ConcurrencyControl concurrencyControl) throws CouchbaseLiteException {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        Document document = database.getDocument(_id);
+
+        if (document != null && document.getSequence() != sequence) {
+            resultMap.put("success", false);
+            return resultMap;
+        }
+
+        MutableDocument mutableDoc;
+        if (document == null) {
+            mutableDoc = new MutableDocument(_id);
+        } else {
+            mutableDoc = document.toMutable();
+        }
+
+        mutableDoc.setData(getParsedMap(_map, document.toMap()));
+
+        boolean success = database.save(mutableDoc, concurrencyControl);
+
+        resultMap.put("success", success);
+        if (success) {
+            resultMap.put("id", mutableDoc.getId());
+            resultMap.put("sequence", mutableDoc.getSequence());
+            resultMap.put("doc", getJSONMap(mutableDoc.toMap()));
+        }
+        return resultMap;
+    }
+
+    private Map<String, Object> getParsedMap(Map<String, Object> _map, Map<String, Object> doc) {
+        HashMap<String,Object> parsed = new HashMap<>();
+        for (Map.Entry<String,Object> entry: _map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map<?, ?>) {
+                Map<String, Object> parsedMap;
+                Object originValue = doc == null ? null : doc.get(entry.getKey());
+
+                if (originValue instanceof Map<?,?>) {
+                    parsedMap = getParsedMap(getMapFromGenericMap(value), getMapFromGenericMap(originValue));
+                } else {
+                    parsedMap = getParsedMap(getMapFromGenericMap(value), null);
+                }
+
+                if (parsedMap.get("@type") instanceof String && ((String) parsedMap.get("@type")).equals("blob")) {
+                    if (parsedMap.get("data") instanceof byte[] && parsedMap.get("contentType") instanceof String) {
+                        String contentType = (String) parsedMap.get("contentType");
+                        byte[] content = (byte[]) parsedMap.get("data");
+                        parsed.put(entry.getKey(), new Blob(contentType,content));
+                    } else if (originValue instanceof Blob) {
+                        // Prevent blob from being deleted since the data isn't passed
+                        parsed.put(entry.getKey(), originValue);
+                    }
+                } else {
+                    parsed.put(entry.getKey(), parsedMap);
+                }
+            } else {
+                parsed.put(entry.getKey(),value);
+            }
+        }
+
+        return parsed;
+    }
+
+    private Map<String, Object> getMapFromGenericMap(Object objectMap) {
+        Map<String, Object> resultMap = new HashMap<>();
+        if (objectMap instanceof Map<?, ?>) {
+            Map<?,?> genericMap = (Map<?,?>) objectMap;
+            for (Map.Entry<?, ?> entry : genericMap.entrySet()) {
+                resultMap.put((String) entry.getKey(), entry.getValue());
+            }
+        }
+        return resultMap;
     }
 
     Map<String, Object> getDocumentWithId(Database database, String _id) {
@@ -64,14 +162,35 @@ class CBManager {
 
         Document document = database.getDocument(_id);
         if (document != null) {
-            resultMap.put("doc", document.toMap());
-            resultMap.put("id", _id);
+            resultMap.put("doc", getJSONMap(document.toMap()));
+            resultMap.put("id", document.getId());
+            resultMap.put("sequence", document.getSequence());
         } else {
             resultMap.put("doc", null);
             resultMap.put("id", _id);
         }
 
         return resultMap;
+    }
+
+    private Map<String, Object> getJSONMap(Map<String, Object> _map) {
+        HashMap<String,Object> parsed = new HashMap<>();
+        for (Map.Entry<String,Object> entry: _map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Blob) {
+                Blob blob = (Blob) value;
+                HashMap<String,Object> json = new HashMap<>();
+                json.put("contentType", blob.getContentType());
+                json.put("digest", blob.digest());
+                json.put("length", blob.length());
+                json.put("@type","blob");
+                parsed.put(entry.getKey(),json);
+            } else {
+                parsed.put(entry.getKey(),entry.getValue());
+            }
+        }
+
+        return parsed;
     }
 
     void deleteDocumentWithId(Database database, String _id) throws CouchbaseLiteException {
@@ -95,7 +214,12 @@ class CBManager {
     }
 
     void deleteDatabaseWithName(String _name) throws CouchbaseLiteException {
-        Database.delete(_name,new File(mDBConfig.getDirectory()));
+        Database _db = mDatabase.remove(_name);
+        if (_db != null) {
+            _db.delete();
+        } else {
+            Database.delete(_name, new File(mDBConfig.getDirectory()));
+        }
     }
 
     void closeDatabaseWithName(String _name) throws CouchbaseLiteException {
@@ -124,9 +248,9 @@ class CBManager {
         return query;
     }
 
-    void addReplicator(String replicatorId, Replicator replicator, ListenerToken token) {
+    void addReplicator(String replicatorId, Replicator replicator, ListenerToken[] tokens) {
         mReplicators.put(replicatorId,replicator);
-        mReplicatorListenerTokens.put(replicatorId,token);
+        mReplicatorListenerTokens.put(replicatorId,tokens);
     }
 
     Replicator getReplicator(String replicatorId) {
@@ -135,9 +259,11 @@ class CBManager {
 
     Replicator removeReplicator(String replicatorId) {
         Replicator replicator = mReplicators.remove(replicatorId);
-        ListenerToken token = mReplicatorListenerTokens.remove(replicatorId);
-        if (replicator != null && token != null) {
-            replicator.removeChangeListener(token);
+        ListenerToken[] tokens = mReplicatorListenerTokens.remove(replicatorId);
+        if (replicator != null && tokens != null) {
+            for (ListenerToken token : tokens) {
+                replicator.removeChangeListener(token);
+            }
         }
 
         return replicator;

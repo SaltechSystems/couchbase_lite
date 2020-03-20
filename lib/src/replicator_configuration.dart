@@ -12,6 +12,28 @@ class ReplicatorConfiguration {
   String pinnedServerCertificate;
   Authenticator authenticator;
 
+  /*bool Function(Document, int) _pushFilter;
+  bool Function(Document, int) get pushFilter => _pushFilter;
+  void set pushFilter(bool Function(Document, int) callback) {
+    if (_isLocked) {
+      throw StateError("Push Filter is in use by a replicator");
+    } else {
+      _pushFilter = callback;
+    }
+  }
+
+  bool Function(Document, int) _pullFilter;
+  bool Function(Document, int) get pullFilter => _pullFilter;
+  void set pullFilter(bool Function(Document, int) callback) {
+    if (_isLocked) {
+      throw StateError("Pull Filter is in use by a replicator");
+    } else {
+      _pullFilter = callback;
+    }
+  }
+
+  bool _isLocked = false;*/
+
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = {"database": database.name, "target": target};
 
@@ -38,6 +60,9 @@ class ReplicatorConfiguration {
     if (continuous != null) {
       map["continuous"] = continuous;
     }
+
+    //map["hasPushFilter"] = pushFilter != null;
+    //map["hasPullFilter"] = pullFilter != null;
 
     return map;
   }

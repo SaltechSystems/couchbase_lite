@@ -1,4 +1,5 @@
 //import 'dart:async';
+//import 'dart:html';
 //import 'package:flutter/services.dart';
 //import 'package:rxdart/rxdart.dart';
 //import 'package:uuid/uuid.dart';
@@ -50,7 +51,7 @@
 //
 //  Future<void> logout() async {
 //    await Future.wait(pendingListeners);
-//    replicator.removeChangeListener(_replicatorListenerToken);
+//    await replicator.removeChangeListener(_replicatorListenerToken);
 //    _replicatorListenerToken =
 //        replicator.addChangeListener((ReplicatorChange event) async {
 //      if (event.status.activity == ReplicatorActivityLevel.stopped) {
@@ -64,14 +65,16 @@
 //    await replicator.stop();
 //  }
 //
-//  Future<Map<String, dynamic>> createDocument(Map<String, dynamic> map) async {
+//  Future<Document> createDocument(Map<String, dynamic> map) async {
 //    var id = "mydocument::${Uuid().v1()}";
 //
 //    try {
-//      String documentId = await database.saveDocumentWithId(id, Document(map));
-//      var newDoc = Map.from(map);
-//      newDoc["id"] = documentId;
-//      return newDoc;
+//      var doc = MutableDocument(id: id, data: map);
+//      if (await database.saveDocument(doc)) {
+//        return doc;
+//      } else {
+//        return null;
+//      }
 //    } on PlatformException {
 //      return null;
 //    }

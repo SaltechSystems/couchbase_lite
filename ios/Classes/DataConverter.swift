@@ -5,13 +5,29 @@
 //
 
 import Foundation
-
+import CouchbaseLiteSwift
+import Flutter
 
 class DataConverter {
-    static func convertSETValue(_ value: Any?) -> Any? {
+    static func convertSETValue(_ value: Any?, origin: Any? = nil) -> Any? {
         switch value {
         case let dict as Dictionary<String, Any>:
-            return convertSETDictionary(dict)
+            let result = convertSETDictionary(dict, origin: nil)
+            
+            guard let type = result?["@type"] as? String, type == "blob" else {
+                return result
+            }
+            
+            guard let contentType = result?["contentType"] as? String, let data = result?["data"] as? Data else {
+                // Preserve the original blob
+                if let blob = origin as? Blob {
+                    return blob
+                } else {
+                    return result
+                }
+            }
+            
+            return Blob(contentType: contentType, data: data)
         case let array as Array<Any>:
             return convertSETArray(array)
         case let bool as NSNumber:
@@ -20,24 +36,27 @@ class DataConverter {
             } else {
                 return value
             }
+        case let flutterData as FlutterStandardTypedData:
+            return flutterData.data
         default:
             return value
         }
     }
     
-    static func convertSETDictionary(_ dictionary: [String: Any]?) -> [String: Any]? {
+    static func convertSETDictionary(_ dictionary: [String: Any]?, origin: [String: Any]? = nil) -> [String: Any]? {
         guard let dict = dictionary else {
             return nil
         }
         
         var result: [String: Any] = [:]
         for (key, value) in dict {
-            result[key] = DataConverter.convertSETValue(value)
+            result[key] = DataConverter.convertSETValue(value, origin: origin?[key])
         }
+        
         return result
     }
     
-    static func convertSETArray(_ array: [Any]?) -> [Any]? {
+    static func convertSETArray(_ array: [Any]?, origin: [Any]? = nil) -> [Any]? {
         guard let a = array else {
             return nil
         }

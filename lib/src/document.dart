@@ -2,21 +2,18 @@ part of couchbase_lite;
 
 /// Couchbase Lite document. The Document is immutable.
 class Document {
-  Document([Map<dynamic, dynamic> data, String id]) {
-    if (data != null) {
-      _data = _stringMapFromDynamic(data);
-    } else {
-      _data = Map<String, dynamic>();
-    }
-
-    _id = id;
+  Document._init(
+      [Map<dynamic, dynamic> data, this._id, this._dbname, this._sequence]) {
+    _data = _stringMapFromDynamic(data ?? {});
   }
 
   Map<dynamic, dynamic> _data;
+  String _dbname;
   String _id;
+  int _sequence;
 
-  /// The document's ID.
   String get id => _id;
+  int get sequence => _sequence;
 
   Map<String, dynamic> _stringMapFromDynamic(Map<dynamic, dynamic> _map) {
     return Map.castFrom<dynamic, dynamic, String, dynamic>(_map);
@@ -29,11 +26,7 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: True of the property exists, otherwise false.
   bool contains(String key) {
-    if (_data != null && _data.isNotEmpty && _data.containsKey(key)) {
-      return true;
-    } else {
-      return false;
-    }
+    return _data.containsKey(key);
   }
 
   /// The number of properties in the document.
@@ -90,13 +83,36 @@ class Document {
     }
   }
 
+  ///  Get a property’s value as a Blob object without the data.
+  ///  Returns nil if the property doesn’t exist, or its value is not a blob.
+  ///  The blob content will not be stored in the blob, it will be fetched when accessed
+  ///  and the content will return null when there is a discrepancy in the digest,
+  ///  this can happen if the file updated since the last time the document was fetched.
+  ///
+  /// - Parameter key: The key.
+  /// - Returns: The Blob object or null.
+  Blob getBlob(String key) {
+    Map<String, dynamic> _result = getMap(key);
+    if (_result is Map && _result["@type"] == "blob") {
+      if (_result.containsKey("data")) {
+        return Blob.data(_result["contentType"], _result["data"]);
+      } else {
+        var _blob = Blob._fromMap(_result);
+        _blob._dbname = _dbname;
+        _blob._documentID = _id;
+        _blob._documentKey = key;
+        _blob._shouldLoadData = true;
+
+        return _blob;
+      }
+    } else {
+      return null;
+    }
+  }
+
   /// An array containing all keys, or an empty array if the document has no properties.
   List<String> getKeys() {
-    if (_data != null) {
-      return _data.keys.toList();
-    } else {
-      return List<String>();
-    }
+    return _data.keys.toList();
   }
 
   ///  Gets a property's value as a string.
@@ -108,6 +124,16 @@ class Document {
     Object _result = getValue(key);
     return _result is String ? _result : null;
   }
+
+  ///  Gets a property's value as a date.
+  ///  Returns null if the property doesn't exist, or its value is not a date.
+  ///
+  /// - Parameter key: The key.
+  /// - Returns: The DateTime object in UTC or null.
+  /*DateTime _getDate(String key, DateTime value) {
+    Object _result = getValue(key);
+    return _result is String ? DateTime.parse(_result).toUtc() : null;
+  }*/
 
   /// Gets a property's value. The value types are Blob, ArrayObject,
   /// DictionaryObject, Number, or String based on the underlying data type; or null
@@ -142,6 +168,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The List Object object or null.
+  @Deprecated('Use `getList`.')
   List<T> getArray<T>(String key) => getList(key);
 
   /// Get a property's value as a Map Object, which is a mapping object of
@@ -170,6 +197,6 @@ class Document {
   ///
   /// - Returns: The MutableDocument object.
   MutableDocument toMutable() {
-    return MutableDocument(_data, id);
+    return MutableDocument._init(_data, id, _dbname, sequence);
   }
 }
