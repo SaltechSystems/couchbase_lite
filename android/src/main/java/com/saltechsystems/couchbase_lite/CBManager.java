@@ -207,10 +207,6 @@ class CBManager {
         if (!mDatabase.containsKey(_name)) {
             Database database = new Database(_name, mDBConfig);
             mDatabase.put(_name, database);
-            //database.createIndex("TypeIndex", IndexBuilder.valueIndex(ValueIndexItem.property("type"),ValueIndexItem.property("deletedAt"),ValueIndexItem.property("createdAt")));
-            //database.createIndex("SheetIDTypeIndex", IndexBuilder.valueIndex(ValueIndexItem.property("sheetID"),ValueIndexItem.property("type")));
-            //database.createIndex("CellIDTypeIndex", IndexBuilder.valueIndex(ValueIndexItem.property("cellID"),ValueIndexItem.property("type")));
-            //Log.d("TESTING","CHANGED 2");
             return database;
         }
 
