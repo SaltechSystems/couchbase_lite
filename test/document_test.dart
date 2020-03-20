@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:couchbase_lite/couchbase_lite.dart';
 
@@ -26,6 +28,7 @@ void main() {
   });
   test("Document: getting double", () {
     expect(document.getDouble('double'), 3.14);
+    expect(document.getInt('double'), 3.14.toInt());
   });
   test("Document: getting int", () {
     expect(document.getInt('int'), 12);
@@ -37,6 +40,8 @@ void main() {
     expect(document.getMap('map'), {});
   });
   test("Document: getting list", () {
+    // ignore: deprecated_member_use_from_same_package
+    expect(document.getArray('list'), []);
     expect(document.getList('list'), []);
   });
   test("Document: to map", () {
@@ -51,10 +56,12 @@ void main() {
   test("Document: null list", () {
     expect(document.getMap("null"), null);
   });
-  test("Document: null map", () {
+  test("Document: null list", () {
+    // ignore: deprecated_member_use_from_same_package
+    expect(document.getArray("null"), null);
     expect(document.getList("null"), null);
   });
-  test("Document: invalid list", () {
+  test("Document: invalid map", () {
     expect(document.getMap("boolInt"), null);
   });
   test("Document: invalid map", () {
@@ -74,6 +81,7 @@ void main() {
   test("mutableDocument: setting double", () {
     mutableDocument.setDouble('double', 3.14);
     expect(mutableDocument.getDouble('double'), 3.14);
+    expect(mutableDocument.getInt('double'), 3.14.toInt());
   });
   test("mutableDocument: setting int", () {
     mutableDocument.setInt('int', 12);
@@ -86,12 +94,16 @@ void main() {
   test("mutableDocument: setting list", () {
     // ignore: deprecated_member_use_from_same_package
     mutableDocument.setArray('list', List<int>());
+    // ignore: deprecated_member_use_from_same_package
+    expect(mutableDocument.getArray('list'), []);
+    mutableDocument.setList('list', List<int>());
     expect(mutableDocument.getList('list'), []);
   });
-  test("mutableDocument: null list", () {
+  test("mutableDocument: null map", () {
     expect(mutableDocument.getMap("null"), null);
   });
-  test("mutableDocument: null map", () {
+  test("mutableDocument: null list", () {
+    expect(mutableDocument.getArray("null"), null);
     expect(mutableDocument.getList("null"), null);
   });
   test("mutableDocument: invalid list", () {
@@ -109,6 +121,20 @@ void main() {
   test("mutableDocument: getting bool", () {
     mutableDocument.setBoolean("bool", true);
     expect(document.getBoolean("bool"), true);
+  });
+  test("mutableDocument: setting data / toMutable", () {
+    var map = mutableDocument.toMap();
+    mutableDocument.setData(null);
+    expect(mutableDocument.toMap(), {});
+    expect(mutableDocument.getKeys(), []);
+    mutableDocument.setData(map);
+    expect(mutableDocument.toMap(), map);
+    expect(mutableDocument.toMutable().toMap(), map);
+  });
+  test("Blob", () async {
+    Blob blob = Blob.data("application/octet-stream", Uint8List(0));
+    mutableDocument.setBlob("blob", blob);
+    expect(await mutableDocument.getBlob("blob").content,await blob.content);
   });
   test("NullDocument", () {
     expect(MutableDocument(id: "test").toMap(), {});

@@ -118,11 +118,7 @@ class MutableDocument extends Document {
   ///   - value: The DateTime value.
   ///   - key: The Document object.
   MutableDocument setData(Map<String, dynamic> data) {
-    if (data != null) {
-      _data = _stringMapFromDynamic(data);
-    } else {
-      _data = Map<String, dynamic>();
-    }
+    super._data = _stringMapFromDynamic(data ?? {});
 
     return this;
   }

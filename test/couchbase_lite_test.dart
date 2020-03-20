@@ -87,6 +87,10 @@ void main() {
           break;
         case ("getDocumentCount"):
           return 1;
+        case ("compactDatabaseWithName"):
+          return null;
+        case ("getIndexes"):
+          return [];
         default:
           return UnimplementedError();
       }
@@ -159,7 +163,16 @@ void main() {
     expect(doc.id, "documentid");
     await database.saveDocument(doc);
     expect(doc.id, "documentid");
-    await database.document("myid");
+    var testDoc = await database.document("myid");
+    expect(testDoc.id, "myid");
+    expect(await database.deleteDocument("myid"), true);
+    // Code Coverage for deprecate functions
+    await database.documentWithId("myid");
+    await database.save(MutableDocument());
+    await database.indexes;
+    await database.compact();
+    await database.delete();
+    await Database.deleteWithName("testdb");
   });
 
   test('testQuery', () async {
@@ -207,6 +220,7 @@ void main() {
     Replicator replicator = Replicator(config);
 
     await replicator.addChangeListener((change) {});
+    await replicator.addDocumentReplicationListener((replication){});
     await replicator.start();
     await replicator.stop();
     await replicator.resetCheckpoint();

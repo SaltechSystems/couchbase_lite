@@ -4,11 +4,7 @@ part of couchbase_lite;
 class Document {
   Document._init(
       [Map<dynamic, dynamic> data, this._id, this._dbname, this._sequence]) {
-    if (data != null) {
-      _data = _stringMapFromDynamic(data);
-    } else {
-      _data = Map<String, dynamic>();
-    }
+    _data = _stringMapFromDynamic(data ?? {});
   }
 
   Map<dynamic, dynamic> _data;
@@ -30,11 +26,7 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: True of the property exists, otherwise false.
   bool contains(String key) {
-    if (_data != null && _data.isNotEmpty && _data.containsKey(key)) {
-      return true;
-    } else {
-      return false;
-    }
+    return _data.containsKey(key);
   }
 
   /// The number of properties in the document.
@@ -120,11 +112,7 @@ class Document {
 
   /// An array containing all keys, or an empty array if the document has no properties.
   List<String> getKeys() {
-    if (_data != null) {
-      return _data.keys.toList();
-    } else {
-      return List<String>();
-    }
+    return _data.keys.toList();
   }
 
   ///  Gets a property's value as a string.
