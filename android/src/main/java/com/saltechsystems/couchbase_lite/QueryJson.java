@@ -463,7 +463,7 @@ class QueryMap {
         }
         if (queryMap.containsKey("groupBy")) {
             this.hasGroupBy = true;
-            this.groupBy = getList("groupBy");
+            this.groupBy = getGroupByList("groupBy");
         }
         if (queryMap.containsKey("orderBy")) {
             this.hasOrderBy = true;
@@ -474,6 +474,19 @@ class QueryMap {
             this.limit = getListofList("limit");
         }
 
+    }
+
+    private List<Map<String, Object>> getGroupByList(String key) {
+        List<?> tempList = (List<?>) queryMap.get(key);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (Object listObject : tempList) {
+            for (Object innerMap : (List<?>)listObject) {
+                if (innerMap instanceof Map<?, ?>) {
+                    resultList.add(getMapFromGenericMap(innerMap));
+                }
+            }
+        }
+        return resultList;
     }
 
     static List<Map<String, Object>> getListOfMapFromGenericList(Object objectList) {
