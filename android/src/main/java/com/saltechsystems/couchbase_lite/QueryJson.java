@@ -26,7 +26,6 @@ import com.couchbase.lite.Where;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -334,6 +333,9 @@ class QueryJson {
                         break;
                     case ("count")://SelectResult.expression(Functions.count(Expression.string("*")))
                         returnExpression = Function.count(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("count"))));
+                        break;
+                    case ("lower"):
+                        returnExpression= Function.count(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("lower"))));
                         break;
                 }
             } else {
