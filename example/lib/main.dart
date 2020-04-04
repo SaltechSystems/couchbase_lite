@@ -58,22 +58,32 @@ class _MyAppState extends State<MyApp> {
           child: RaisedButton(
             onPressed: () {
               //a variable to represent an element in the forms.primary_form.formData.assigned_to array
-              VariableExpression assignedToVariableExpression = ArrayExpression
-                  .variable("assigned_to");
+              VariableExpression assignedToVariableExpression =
+                  ArrayExpression.variable("assigned_to");
               //a variable to represent every element in the assigned_to array
               Expression assignedToArrayExpression = Expression.property(
                   "forms.primary_form.formData.assigned_to");
-              Expression assignedToIdExpression = ArrayExpression.variable(
-                  "assigned_to.id");
+              Expression assignedToIdExpression =
+                  ArrayExpression.variable("assigned_to.id");
 
-              Query query = QueryBuilder
-                  .select([SelectResult.property("index"),SelectResult.property("value"),SelectResult.expression(Functions.count(Expression.string("*")))])
+              Query query = QueryBuilder.select([
+                SelectResult.property("index"),
+                SelectResult.property("value"),
+                SelectResult.expression(Functions.count(Expression.string("*")))
+                    .as("_myCount")
+              ])
                   .from(dbName)
-                  .groupBy(List<Expression>()..add(Expression.property("index")));
+                  .where(Expression.property("deleted")
+                      .equalTo(Expression.string("0")).and(Functions.lower(Expression.property("value")).like(Expression.string("value"))))
+                  .groupBy(
+                      List<Expression>()..add(Expression.property("index")))
+                  .orderBy(List()
+                    ..add(Ordering.expression(Expression.property("index"))
+                        .descending()));
               query.execute().then((resultSet) {
                 print(resultSet.allResults().length);
                 resultSet.allResults().forEach((result) {
-                  print(" result ooo ${result.getInt(key:"index")}");
+                  print(" result ooo ${result.getValue(key: "_myCount")}");
                 });
               });
             },
@@ -87,8 +97,8 @@ class _MyAppState extends State<MyApp> {
     for (int i = 0; i < 10; i++) {
       HashMap<String, dynamic> map = HashMap();
       map["name"] = i.toString();
-      map["index"] = i%2;
-      print("Dummy data index${i%2}");
+      map["index"] = i % 2;
+      print("Dummy data index${i % 2}");
       database.saveDocumentWithId(i.toString(), Document(map));
     }
   }

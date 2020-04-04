@@ -42,11 +42,12 @@ public class QueryJson {
         if (queryMap.hasWhere) {
             inflateWhere()
         }
-        if (queryMap.hasOrderBy) {
-            inflateOrderBy()
-        }
+
         if (queryMap.hasGroupBy) {
             inflateGroupBy()
+        }
+        if (queryMap.hasOrderBy) {
+            inflateOrderBy()
         }
         if (queryMap.hasLimit) {
             inflateLimit()
@@ -126,6 +127,8 @@ public class QueryJson {
             query = _joins.orderBy(inflateOrdering(orderByArray: orderByArray))
         case let _where as Where:
             query = _where.orderBy(inflateOrdering(orderByArray: orderByArray))
+        case let _groupBy as GroupBy:
+        query = _groupBy.orderBy(inflateOrdering(orderByArray: orderByArray))
         default:
             break
         }
@@ -428,6 +431,10 @@ public class QueryJson {
                     returnExpression = Expression.value(value)
                 case ("arrayVariable",let value):
                                     returnExpression = ArrayExpression.variable(value as! String);
+                case ("count", let value):
+                    returnExpression = Function.count(inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("lower", let value):
+                                   returnExpression = Function.lower(inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: value)));
                 default:
                     break
                 }
@@ -488,6 +495,7 @@ private class QueryMap {
         if let _ = queryMap["groupBy"] {
             self.hasGroupBy = true
             self.groupBy = getList(key: "groupBy")
+            self.groupBy = getGroupByList(key: "groupBy")
         }
         if let _ = queryMap["having"] {
             self.hasHaving = true
@@ -502,6 +510,22 @@ private class QueryMap {
             self.limit = getListofList(key: "limit")
         }
     }
+    
+    func getGroupByList(key:String)->[[String:Any]] {
+        var resultList = [[String:Any]]() ;
+        if let tempList = self.queryMap[key] as? [[Any]]{
+      
+        for listObject in tempList {
+            for  innerMap in listObject {
+                if let innerMap = innerMap as? [String:Any] {
+                    resultList.append(QueryMap.getMapFromGenericMap(objectMap: innerMap));
+                }
+            }
+            }
+        }
+        return resultList;
+    }
+    
     
     static func getListOfMapFromGenericList(objectList: Any) -> Array<Dictionary<String, Any>> {
         var resultList: Array<Dictionary<String, Any>> = []
