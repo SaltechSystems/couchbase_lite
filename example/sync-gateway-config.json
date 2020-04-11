@@ -1,0 +1,28 @@
+{
+  "log": ["*"],
+  "databases": {
+    "beer-sample": {
+      "server": "http://localhost:8091",
+      "bucket": "beer-sample",
+      "username": "sync_gateway", 
+      "password": "password",
+      "enable_shared_bucket_access": true, 
+      "import_docs": true,
+      "num_index_replicas": 0, 
+      "users": {
+        "GUEST": { "disabled": false, "admin_channels": ["*"] },
+        "foo": {
+          "password": "bar",
+          "admin_channels": ["*"],
+          "admin_roles": [],
+          "disabled": false
+        }
+      },
+      "sync": `function (doc, oldDoc) {
+        if (doc.sdk) {
+          channel(doc.sdk);
+        }
+      }`
+    }
+  }
+}

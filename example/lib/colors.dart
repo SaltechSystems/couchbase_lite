@@ -1,4 +1,4 @@
-// Copyright 2020-present the Saltech Systems authors. All Rights Reserved.
+// Copyright 2018-present the Flutter authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
 // limitations under the License.
 
 import 'package:flutter/material.dart';
-import 'package:couchbase_lite_example/app.dart';
 
-void main() => runApp(MyApp(AppMode.production));
+const kPrimaryColor = Color(0xFF05538E);
+const kAccentColor = Color(0xFF17A4E6);
+const kErrorRed = Color(0xFFC5032B);
+const kSurfaceWhite = Color(0xFFFFFBFA);
+const kBackgroundWhite = Colors.white;
