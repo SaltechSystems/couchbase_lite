@@ -26,12 +26,12 @@ class BeerListItem extends StatelessWidget {
     return beer == null
         ? ListTile(title: Center(child: CircularProgressIndicator()))
         : ListTile(
-          key: ObjectKey(beer),
-          title: Text(
-            beer.name,
-            overflow: TextOverflow.ellipsis,
-          ),
-          onTap: onTap,
-        );
+            key: ObjectKey(beer),
+            title: Text(
+              beer.name,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: onTap,
+          );
   }
 }

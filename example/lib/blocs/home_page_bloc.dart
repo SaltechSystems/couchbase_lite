@@ -51,7 +51,7 @@ class HomePageBloc {
   ///
   ObservableResponse<BuiltList<Beer>> _beerResponse;
   bool _isDescending = true;
-  
+
   final perPage = 20;
   int currentPage = 0;
   PageCategory _category;
@@ -98,15 +98,14 @@ class HomePageBloc {
     _beerResponse = null;
 
     // Add some buffer to the current page so the user doesn't have to see it loading
-    var offset = pageIndex > 0
-        ? (pageIndex - 1) * perPage
-        : pageIndex * perPage;
+    var offset =
+        pageIndex > 0 ? (pageIndex - 1) * perPage : pageIndex * perPage;
 
     // Save the observable response so we can properly dispose of it
     switch (_category) {
       case PageCategory.beer:
-        _beerResponse = Repository.instance
-            .getBeer(perPage * 3, offset, _isDescending);
+        _beerResponse =
+            Repository.instance.getBeer(perPage * 3, offset, _isDescending);
 
         // If the results change this will propagate the changes to the UI and will
         // also initialize it with the first result set
@@ -152,10 +151,9 @@ class PageState {
   PageState();
   factory PageState._beerData(
           BuiltMap<int, Beer> beerMap, int lastIndex, bool hasReachedEnd) =
-  BeerDataState;
-  factory PageState._breweryData(
-      BuiltMap<int, Brewery> breweryMap, int lastIndex, bool hasReachedEnd) =
-  BreweryDataState;
+      BeerDataState;
+  factory PageState._breweryData(BuiltMap<int, Brewery> breweryMap,
+      int lastIndex, bool hasReachedEnd) = BreweryDataState;
   factory PageState._sheetsLoading() = LoadingState;
 }
 

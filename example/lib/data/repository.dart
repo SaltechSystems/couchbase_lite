@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import 'dart:async';
-import 'dart:io';
 
 import 'package:built_collection/src/list.dart';
 import 'package:couchbase_lite_example/data/observable_response.dart';
@@ -30,7 +29,13 @@ export 'database.dart';
 
 enum Environment { development, production }
 enum LoginResult { unauthorized, authorized, disconnected, error }
-enum LogoutMethod { normal, apiCredentialsError, dbCredentialsError, validationError, sessionDeleted }
+enum LogoutMethod {
+  normal,
+  apiCredentialsError,
+  dbCredentialsError,
+  validationError,
+  sessionDeleted
+}
 
 enum ResponseCode {
   success,
@@ -58,9 +63,9 @@ class RepoResponse<T> {
 class ReceivedNotification {
   ReceivedNotification(
       {@required this.id,
-        @required this.title,
-        @required this.body,
-        @required this.payload});
+      @required this.title,
+      @required this.body,
+      @required this.payload});
 
   final int id;
   final String title;
@@ -77,17 +82,20 @@ class Repository {
 
   static final Repository instance = Repository._internal();
   final _isLoggedInSubject = BehaviorSubject<bool>.seeded(false);
-  final _lastLogoutMethodSubject = BehaviorSubject<LogoutMethod>.seeded(LogoutMethod.normal);
+  final _lastLogoutMethodSubject =
+      BehaviorSubject<LogoutMethod>.seeded(LogoutMethod.normal);
 
   Stream<bool> get isLoggedIn => _isLoggedInSubject.stream;
   Stream<LogoutMethod> get lastLogoutMethod => _lastLogoutMethodSubject.stream;
 
-  Future<void> login(Environment environment, String username, String password, Function(LoginResult) callback) async {
+  Future<void> login(Environment environment, String username, String password,
+      Function(LoginResult) callback) async {
     try {
-      var response = await ApiProvider.instance.login(username, password, onLogout: logout);
+      var response = await ApiProvider.instance
+          .login(username, password, onLogout: logout);
 
       if (response.statusCode == 200) {
-        var success = await _database.login(username, password, onLogout: logout);
+        var success = await _database.login(username, password);
         if (success) {
           callback(LoginResult.authorized);
           _isLoggedInSubject.add(true);
@@ -117,11 +125,7 @@ class Repository {
     await _lastLogoutMethodSubject.close();
   }
 
-  ObservableResponse<BuiltList<Beer>> getBeer(int limit, int offset, bool isDescending) => _database.getBeer(limit, offset, isDescending);
-}
-
-extension FileExtention on FileSystemEntity{
-  String get name {
-    return this?.path?.split("/")?.last ?? "noname";
-  }
+  ObservableResponse<BuiltList<Beer>> getBeer(
+          int limit, int offset, bool isDescending) =>
+      _database.getBeer(limit, offset, isDescending);
 }

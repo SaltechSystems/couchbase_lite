@@ -6,7 +6,6 @@ library serializers;
 
 import 'package:built_value/serializer.dart';
 import 'package:built_value/iso_8601_date_time_serializer.dart';
-import 'package:built_collection/built_collection.dart';
 import 'package:built_value/standard_json_plugin.dart';
 
 import 'package:couchbase_lite_example/models/serializers/boolean_serializer.dart';
@@ -26,10 +25,7 @@ part 'serializers.g.dart';
 /// types needed transitively via fields.
 ///
 /// You usually only need to do this once per project.
-@SerializersFor([
-  Beer,
-  Brewery
-])
+@SerializersFor([Beer, Brewery])
 Serializers serializers = _$serializers;
 
 Serializers standardSerializers = (serializers.toBuilder()

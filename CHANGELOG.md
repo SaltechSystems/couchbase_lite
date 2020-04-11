@@ -54,3 +54,11 @@
 * Updated Coubchbase Lite libraries to version 2.7.0
 * Migrated to Android X
 * Added concurrency control
+
+## 2.7.0+1
+
+* Updated Examples to use bloc pattern
+
+## 2.7.0+2
+
+* Updated documentation

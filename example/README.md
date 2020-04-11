@@ -15,7 +15,7 @@ For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials, 
 samples, guidance on mobile development, and a full API reference.
 
-## Server Setup
+## Local Server Setup
 
 Download and setup Couchbase Server / Sync Gateway Community Editions on your local machine the following link
 - [Sync Gatway Getting Started](https://docs.couchbase.com/sync-gateway/current/getting-started.html)
@@ -31,4 +31,4 @@ Start Sync Gateway:
 
 ~/Downloads/couchbase-sync-gateway/bin/sync_gateway ~/path/to/sync-gateway-config.json
 
-Note: Included in this example is sync-gateway-config.json (Login => u: foo, p: bar)
+*Note*: Included in this example is sync-gateway-config.json (Login => u: foo, p: bar)

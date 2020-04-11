@@ -20,8 +20,7 @@ import 'repository.dart';
 class ApiProvider {
   ApiProvider(this.client);
 
-  static final ApiProvider instance =
-      ApiProvider(http.Client());
+  static final ApiProvider instance = ApiProvider(http.Client());
 
   final http.Client client;
   final String devUrl = "https://dev.example.com";
@@ -66,7 +65,8 @@ class ApiProvider {
   @visibleForTesting
   Environment environment = Environment.production;
 
-  Future<http.Response> login(String username, String password, {LogoutCallback onLogout}) async {
+  Future<http.Response> login(String username, String password,
+      {LogoutCallback onLogout}) async {
     _onLogout = onLogout;
 
     /*final response = await client.post(authEndpoint, body: {
@@ -78,12 +78,11 @@ class ApiProvider {
     });*/
 
     final tokenPreResponse = TokenResponse((b) => b
-      ..accessToken="accessToken"
-      ..tokenType="bearer"
-      ..refreshToken="refreshToken"
-      ..expiresIn=3600
-      ..scope=""
-    );
+      ..accessToken = "accessToken"
+      ..tokenType = "bearer"
+      ..refreshToken = "refreshToken"
+      ..expiresIn = 3600
+      ..scope = "");
 
     final response = http.Response(tokenPreResponse.toJson(), 200);
 

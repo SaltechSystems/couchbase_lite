@@ -16,12 +16,10 @@ import 'dart:async';
 import 'package:couchbase_lite_example/models/database/beer.dart';
 import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/uuid.dart';
 import 'package:couchbase_lite/couchbase_lite.dart';
 import 'package:built_collection/built_collection.dart';
 
 import 'package:couchbase_lite_example/data/observable_response.dart';
-import 'package:couchbase_lite_example/data/repository.dart';
 
 typedef ResultSetCallback = void Function(ResultSet results);
 
@@ -36,7 +34,7 @@ class AppDatabase {
   Database database;
   Replicator replicator;
 
-  Future<bool> login(String username, String password, {LogoutCallback onLogout}) async {
+  Future<bool> login(String username, String password) async {
     try {
       database = await Database.initWithName(dbName);
       // Note wss://10.0.2.2:4984/my-database is for the android simulator on your local machine's couchbase database
@@ -80,13 +78,10 @@ class AppDatabase {
     await replicator.stop();
   }
 
-  String getNewDocumentID(String prefix) {
-    return "$prefix${Uuid().v1()}";
-  }
-
-  Future<Document> createDocumentIfNotExists(String id, Map<String, dynamic> map) async {
+  Future<Document> createDocumentIfNotExists(
+      String id, Map<String, dynamic> map) async {
     try {
-      var oldDoc =  await database.document(id);
+      var oldDoc = await database.document(id);
       if (oldDoc != null) return oldDoc;
 
       var newDoc = MutableDocument(id: id, data: map);
@@ -121,7 +116,8 @@ class AppDatabase {
     return _buildObservableQueryResponse(stream, query, processResults);
   }
 
-  ObservableResponse<BuiltList<Beer>> getBeer(int limit, int offset, bool isDescending) {
+  ObservableResponse<BuiltList<Beer>> getBeer(
+      int limit, int offset, bool isDescending) {
     final beerMapSubject = BehaviorSubject<BuiltList<Beer>>();
     // Here we would do the query and maybe add a change listener to post the
     // results to the stream
@@ -132,14 +128,14 @@ class AppDatabase {
     ])
         .from(dbName, as: "beer")
         .where(Expression.property("type")
-        .from("beer")
-        .equalTo(Expression.string("beer")))
+            .from("beer")
+            .equalTo(Expression.string("beer")))
         .orderBy([
       isDescending
           ? Ordering.expression(Expression.property("name").from("beer"))
-          .descending()
+              .descending()
           : Ordering.expression(Expression.property("name").from("beer"))
-          .ascending()
+              .ascending()
     ]).limit(Expression.intValue(limit), offset: Expression.intValue(offset));
 
     final processResults = (ResultSet results) {

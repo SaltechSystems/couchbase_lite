@@ -45,17 +45,41 @@ For help getting started with Flutter, view the
 
 ## API References
 
-[Swift SDK API References](https://docs.couchbase.com/mobile/2.5.0/couchbase-lite-swift/)
+[Swift SDK API References](https://docs.couchbase.com/mobile/2.7.0/couchbase-lite-swift/)
 
-[Java SDK API References](http://docs.couchbase.com/mobile/2.5.0/couchbase-lite-java)
+[Java SDK API References](http://docs.couchbase.com/mobile/2.7.0/couchbase-lite-java)
 
 *Note*: Syntax follows the Swift SDK but these are the SDKs used for the platform code.
 
+## Local Server Setup
+
+Download and setup Couchbase Server / Sync Gateway Community Editions on your local machine the following link
+- [Sync Gatway Getting Started](https://docs.couchbase.com/sync-gateway/current/getting-started.html)
+- [Couchbase Downloads](https://www.couchbase.com/downloads)
+
+Setup beer-sample database [Local Couchbase Server](http://127.0.0.1:8091/):
+
+- Add the beer-sample bucket: Settings > Sample Buckets
+- Create a sync_gateway user in the Couchbase Server under Security
+- Give sync_gateway access to the beer-sample
+
+Start Sync Gateway:
+
+~/Downloads/couchbase-sync-gateway/bin/sync_gateway ~/path/to/sync-gateway-config.json
+
+*Note*: Included in this example is sync-gateway-config.json (Login => u: foo, p: bar)
+
+
 ## Usage example
 
-Below is an example for the database using the BLoC pattern ( View <-> BLoC <-> Repository <-> Database )
+*Note*: The protocol ws and not wss is used in the example. The easy way to implement this is to use this attribute to your AndroidManifest.xml where you allow all http for all requests:
 
-The files can also be found in the plugin example but are not used in the main.dart.  The example will be revised in the near future to use the BLoC pattern.
+```xml
+<application android:usesCleartextTraffic="true">
+</application>
+```
+
+Below is an example for the database using the BLoC pattern ( View <-> BLoC <-> Repository <-> Database )
 
 ```dart
 class AppDatabase {
@@ -74,12 +98,12 @@ class AppDatabase {
       database = await Database.initWithName(dbName);
       // Note wss://10.0.2.2:4984/my-database is for the android simulator on your local machine's couchbase database
       ReplicatorConfiguration config =
-          ReplicatorConfiguration(database, "wss://10.0.2.2:4984/my-database");
+          ReplicatorConfiguration(database, "ws://10.0.2.2:4984/beer-sample");
       config.replicatorType = ReplicatorType.pushAndPull;
       config.continuous = true;
 
       // Using self signed certificate
-      config.pinnedServerCertificate = "assets/cert-android.cer";
+      //config.pinnedServerCertificate = "assets/cert-android.cer";
       config.authenticator = BasicAuthenticator(username, password);
       replicator = Replicator(config);
 
@@ -105,8 +129,7 @@ class AppDatabase {
         replicator.addChangeListener((ReplicatorChange event) async {
       if (event.status.activity == ReplicatorActivityLevel.stopped) {
         await database.close();
-        // Change listeners will be
-        //replicator.removeChangeListener(_replicatorListenerToken);
+        await replicator.removeChangeListener(_replicatorListenerToken);
         await replicator.dispose();
         _replicatorListenerToken = null;
       }
@@ -114,13 +137,14 @@ class AppDatabase {
     await replicator.stop();
   }
 
-  Future<Document> createDocument(Map<String, dynamic> map) async {
-    var id = "mydocument::${Uuid().v1()}";
-
+  Future<Document> createDocumentIfNotExists(String id, Map<String, dynamic> map) async {
     try {
-      var doc = MutableDocument(id: id, data: map);
-      if (await database.saveDocument(doc)) {
-        return doc;
+      var oldDoc =  await database.document(id);
+      if (oldDoc != null) return oldDoc;
+
+      var newDoc = MutableDocument(id: id, data: map);
+      if (await database.saveDocument(newDoc)) {
+        return newDoc;
       } else {
         return null;
       }
@@ -180,7 +204,7 @@ class AppDatabase {
       rethrow;
     }
 
-    return ObservableResponse<T>(subject.debounce(Duration(seconds: 1)), () {
+    return ObservableResponse<T>(subject, () {
       removeListener();
       subject.close();
     });

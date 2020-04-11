@@ -38,6 +38,7 @@ class BooleanSerializer implements PrimitiveSerializer<bool> {
       }
     }
 
-    throw ArgumentError.value(serialized, 'serialized', 'Must be true, false, 0, or 1.');
+    throw ArgumentError.value(
+        serialized, 'serialized', 'Must be true, false, 0, or 1.');
   }
 }

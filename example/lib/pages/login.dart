@@ -224,12 +224,12 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                     padding: EdgeInsets.only(bottom: 10.0),
                     child: Center(
-                      child: InkWell(
-                          child: Text('Saltech Systems',
-                              style: TextStyle(
-                                  color: Colors.blue,
-                                  decoration: TextDecoration.underline)),
-                          onTap: () => launch('https://saltechsystems.com'),
+                        child: InkWell(
+                      child: Text('Saltech Systems',
+                          style: TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline)),
+                      onTap: () => launch('https://saltechsystems.com'),
                     ))),
                 Center(
                     child: Text(

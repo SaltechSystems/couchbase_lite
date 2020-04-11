@@ -26,12 +26,12 @@ class BreweryListItem extends StatelessWidget {
     return brewery == null
         ? ListTile(title: Center(child: CircularProgressIndicator()))
         : ListTile(
-          key: ObjectKey(brewery),
-          title: Text(
-            brewery.name,
-            overflow: TextOverflow.ellipsis,
-          ),
-          onTap: onTap,
-        );
+            key: ObjectKey(brewery),
+            title: Text(
+              brewery.name,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: onTap,
+          );
   }
 }

@@ -45,33 +45,34 @@ class _HomePageState extends State<HomePage> {
           appBar: _buildAppBar(),
           body: Container(
               child: Column(
-                children: <Widget>[
-                  _buildCategoryHeader(),
-                  Expanded(
-                    child: StreamBuilder<PageState>(
-                      stream: _pageBloc.state,
-                      initialData: InitState(),
-                      builder: (context, snapshot) {
-                        switch (snapshot.data.runtimeType) {
-                          case InitState:
-                            return _buildInit();
-                          case LoadingState:
-                            return _buildLoading();
-                          case BeerDataState:
-                            BeerDataState state = snapshot.data;
-                            return _buildBeerContent(state.beerMap, state.lastIndex + 1,
-                                state.hasReachedEnd);
-                          case BreweryDataState:
-                            BreweryDataState state = snapshot.data;
-                            return _buildBreweryContent(state.breweryMap, state.lastIndex + 1, state.hasReachedEnd);
-                        }
-
+            children: <Widget>[
+              _buildCategoryHeader(),
+              Expanded(
+                child: StreamBuilder<PageState>(
+                  stream: _pageBloc.state,
+                  initialData: InitState(),
+                  builder: (context, snapshot) {
+                    switch (snapshot.data.runtimeType) {
+                      case InitState:
                         return _buildInit();
-                      },
-                    ),
-                  ),
-                ],
-              )),
+                      case LoadingState:
+                        return _buildLoading();
+                      case BeerDataState:
+                        BeerDataState state = snapshot.data;
+                        return _buildBeerContent(state.beerMap,
+                            state.lastIndex + 1, state.hasReachedEnd);
+                      case BreweryDataState:
+                        BreweryDataState state = snapshot.data;
+                        return _buildBreweryContent(state.breweryMap,
+                            state.lastIndex + 1, state.hasReachedEnd);
+                    }
+
+                    return _buildInit();
+                  },
+                ),
+              ),
+            ],
+          )),
           drawer: _buildMenu(),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _openCreateDialog(),
@@ -148,58 +149,58 @@ class _HomePageState extends State<HomePage> {
   Drawer _buildMenu() {
     return Drawer(
         child: Column(
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text("Saltech Systems"),
-              accountEmail: Text("cs@saltechsystems.com"),
-              currentAccountPicture: CircleAvatar(
-                child: Text(
-                  "SS",
-                  style: TextStyle(fontSize: 40.0),
-                ),
-              ),
+      children: <Widget>[
+        UserAccountsDrawerHeader(
+          accountName: Text("Saltech Systems"),
+          accountEmail: Text("cs@saltechsystems.com"),
+          currentAccountPicture: CircleAvatar(
+            child: Text(
+              "SS",
+              style: TextStyle(fontSize: 40.0),
             ),
-            Expanded(
-                child: Scrollbar(
-                    child: ListView(
-                      physics: ClampingScrollPhysics(),
-                      children: <Widget>[
-                        ListTile(
-                          leading: Icon(Icons.shopping_cart),
-                          title: Text("Beer"),
-                          onTap: () {
-                            setState(() {
-                              _pageBloc.setCategory(PageCategory.beer);
-                            });
+          ),
+        ),
+        Expanded(
+            child: Scrollbar(
+                child: ListView(
+          physics: ClampingScrollPhysics(),
+          children: <Widget>[
+            ListTile(
+              leading: Icon(Icons.shopping_cart),
+              title: Text("Beer"),
+              onTap: () {
+                setState(() {
+                  _pageBloc.setCategory(PageCategory.beer);
+                });
 
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.home),
-                          title: Text("Brewery: TODO"),
-                          onTap: () {
-                            setState(() {
-                              _pageBloc.setCategory(PageCategory.brewery);
-                            });
+                Navigator.of(context).pop();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text("Brewery: TODO"),
+              onTap: () {
+                setState(() {
+                  _pageBloc.setCategory(PageCategory.brewery);
+                });
 
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                        ListTile(
-                          title: Text("Account"),
-                        ),
-                        ListTile(
-                          leading: Icon(Icons.person),
-                          title: Text("Log Out"),
-                          onTap: () async {
-                            await _pageBloc.logout();
-                          },
-                        ),
-                      ],
-                    ))),
+                Navigator.of(context).pop();
+              },
+            ),
+            ListTile(
+              title: Text("Account"),
+            ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text("Log Out"),
+              onTap: () async {
+                await _pageBloc.logout();
+              },
+            ),
           ],
-        ));
+        ))),
+      ],
+    ));
   }
 
   Widget _buildCategoryHeader() {
@@ -239,7 +240,8 @@ class _HomePageState extends State<HomePage> {
   Widget _buildCategoryIcon(PageCategory selectedCategory) {
     switch (selectedCategory) {
       case PageCategory.beer:
-        return Icon(Icons.add_shopping_cart, color: Theme.of(context).primaryColor);
+        return Icon(Icons.add_shopping_cart,
+            color: Theme.of(context).primaryColor);
       case PageCategory.brewery:
         return Icon(Icons.home, color: Theme.of(context).primaryColor);
       case PageCategory.search:
@@ -287,7 +289,8 @@ class _HomePageState extends State<HomePage> {
               ),
               FlatButton(
                 child: Text('CREATE'),
-                onPressed: () => Navigator.of(context).pop(_textFieldController.text),
+                onPressed: () =>
+                    Navigator.of(context).pop(_textFieldController.text),
               )
             ],
           );
