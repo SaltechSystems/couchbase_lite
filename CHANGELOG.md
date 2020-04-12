@@ -62,3 +62,7 @@
 ## 2.7.0+2
 
 * Updated documentation
+
+## 2.7.0+3
+
+* Giving a simplified example and advanced example
