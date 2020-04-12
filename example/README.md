@@ -32,3 +32,10 @@ Start Sync Gateway:
 ~/Downloads/couchbase-sync-gateway/bin/sync_gateway ~/path/to/sync-gateway-config.json
 
 *Note*: Included in this example is sync-gateway-config.json (Login credentials u: foo / p: bar)
+
+As of Android Pie, version 9, API 28, cleartext support is disabled, by default. Although wss: protocol URLs are not affected, in order to use the ws: protocol, applications must target API 27 or lower, or must configure application network security as described [here](https://developer.android.com/training/articles/security-config#CleartextTrafficPermitted).
+
+```xml
+<application android:usesCleartextTraffic="true">
+</application>
+```
