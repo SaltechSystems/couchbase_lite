@@ -22,16 +22,16 @@ import 'package:couchbase_lite_example/pages/login.dart';
 
 enum AppMode { production, development }
 
-class MyApp extends StatefulWidget {
-  MyApp(this.mode);
+class BeerSampleApp extends StatefulWidget {
+  BeerSampleApp(this.mode);
 
   final AppMode mode;
 
   @override
-  _MyAppState createState() => _MyAppState();
+  _BeerSampleAppState createState() => _BeerSampleAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _BeerSampleAppState extends State<BeerSampleApp> {
   @override
   void initState() {
     super.initState();

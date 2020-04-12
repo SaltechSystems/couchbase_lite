@@ -31,4 +31,4 @@ Start Sync Gateway:
 
 ~/Downloads/couchbase-sync-gateway/bin/sync_gateway ~/path/to/sync-gateway-config.json
 
-*Note*: Included in this example is sync-gateway-config.json (Login => u: foo, p: bar)
+*Note*: Included in this example is sync-gateway-config.json (Login credentials u: foo / p: bar)

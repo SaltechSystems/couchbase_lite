@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:couchbase_lite_example/app.dart';
+import 'package:couchbase_lite_example/beer_sample_app.dart';
 import 'package:couchbase_lite_example/data/repository.dart';
 
 class LoginPage extends StatefulWidget {
