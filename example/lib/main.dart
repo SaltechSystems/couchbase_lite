@@ -34,19 +34,20 @@ class _ExampleAppState extends State<ExampleApp> {
     }
 
     // Create a new document (i.e. a record) in the database.
-    var mutableDoc = MutableDocument()
-        .setDouble("version", 2.0)
-        .setString("type", "SDK");
+    var mutableDoc =
+        MutableDocument().setDouble("version", 2.0).setString("type", "SDK");
 
     // Save it to the database.
-    try{
+    try {
       await database.saveDocument(mutableDoc);
     } on PlatformException {
       return "Error saving document";
     }
 
     // Update a document.
-    mutableDoc = (await database.document(mutableDoc.id))?.toMutable()?.setString("language", "Dart");
+    mutableDoc = (await database.document(mutableDoc.id))
+        ?.toMutable()
+        ?.setString("language", "Dart");
 
     if (mutableDoc != null) {
       // Save it to the database.
@@ -65,10 +66,11 @@ class _ExampleAppState extends State<ExampleApp> {
     }
 
     // Create a query to fetch documents of type SDK.
-    var query = QueryBuilder
-        .select([SelectResult.all().from("mydocs")])
+    var query = QueryBuilder.select([SelectResult.all().from("mydocs")])
         .from("gettingStarted", as: "mydocs")
-        .where(Expression.property("type").from("mydocs").equalTo(Expression.string("SDK")));
+        .where(Expression.property("type")
+            .from("mydocs")
+            .equalTo(Expression.string("SDK")));
 
     // Run the query.
     try {
@@ -81,7 +83,7 @@ class _ExampleAppState extends State<ExampleApp> {
     // Note wss://10.0.2.2:4984/my-database is for the android simulator on your local machine's couchbase database
     // Create replicators to push and pull changes to and from the cloud.
     ReplicatorConfiguration config =
-    ReplicatorConfiguration(database, "ws://10.0.2.2:4984/beer-sample");
+        ReplicatorConfiguration(database, "ws://10.0.2.2:4984/beer-sample");
     config.replicatorType = ReplicatorType.pushAndPull;
     config.continuous = true;
 
