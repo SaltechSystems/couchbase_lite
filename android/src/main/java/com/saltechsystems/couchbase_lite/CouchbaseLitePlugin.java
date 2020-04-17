@@ -277,7 +277,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     @Override
     public void onMethodCall(MethodCall call, final Result result) {
       final JSONObject json = call.arguments();
-      Log.d("couchbaselite","channel input json:-"+json.toString());
+//       Log.d("couchbaselite","channel input json:-"+json.toString());
 
       final String id;
       Query queryFromJson;
