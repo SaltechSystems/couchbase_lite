@@ -135,8 +135,8 @@ class HomePageBloc {
     // TODO
   }
 
-  void logout() async {
-    await Repository.instance.logout(LogoutMethod.normal);
+  void logout() {
+    Repository.instance.triggerLogout(LogoutMethod.normal);
   }
 
   void dispose() {
@@ -144,6 +144,9 @@ class HomePageBloc {
     _beerResponse?.close();
     _sortSubject.close();
     _stateSubject.close();
+
+    // This is called after all streams / listeners have been disposed
+    Repository.instance.logout();
   }
 }
 

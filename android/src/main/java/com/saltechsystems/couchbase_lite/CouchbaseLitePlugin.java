@@ -19,6 +19,7 @@ import com.couchbase.lite.DocumentFlag;
 import com.couchbase.lite.DocumentReplication;
 import com.couchbase.lite.DocumentReplicationListener;
 import com.couchbase.lite.ListenerToken;
+import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryChange;
 import com.couchbase.lite.QueryChangeListener;
@@ -85,9 +86,9 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     CouchbaseLite.init(this.getContext());
 
     if (BuildConfig.DEBUG) {
-      mCBManager = new CBManager(this,true);
+      mCBManager = new CBManager(this, LogLevel.DEBUG);
     } else {
-      mCBManager = new CBManager(this,false);
+      mCBManager = new CBManager(this, LogLevel.ERROR);
     }
   }
 

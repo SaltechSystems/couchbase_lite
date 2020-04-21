@@ -110,7 +110,5 @@ public class QueryManager {
             String _whereClause = _internalMap.get("where");
             Expression _expression = QueryManager.getExpressionFromString(_whereClause);
         }
-
-
     }
 }
