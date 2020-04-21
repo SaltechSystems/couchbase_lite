@@ -68,8 +68,7 @@ class _ExampleAppState extends State<ExampleApp> {
     // Create a query to fetch documents of type SDK.
     var query = QueryBuilder.select([SelectResult.all()])
         .from("gettingStarted")
-        .where(Expression.property("type")
-            .equalTo(Expression.string("SDK")));
+        .where(Expression.property("type").equalTo(Expression.string("SDK")));
 
     // Run the query.
     try {
