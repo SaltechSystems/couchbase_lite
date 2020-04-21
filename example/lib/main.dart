@@ -66,10 +66,9 @@ class _ExampleAppState extends State<ExampleApp> {
     }
 
     // Create a query to fetch documents of type SDK.
-    var query = QueryBuilder.select([SelectResult.all().from("mydocs")])
-        .from("gettingStarted", as: "mydocs")
+    var query = QueryBuilder.select([SelectResult.all()])
+        .from("gettingStarted")
         .where(Expression.property("type")
-            .from("mydocs")
             .equalTo(Expression.string("SDK")));
 
     // Run the query.
@@ -137,10 +136,10 @@ class _ExampleAppState extends State<ExampleApp> {
 
   @override
   void dispose() async {
-    await replicator.removeChangeListener(_listenerToken);
-    await replicator.stop();
-    await replicator.dispose();
-    await database.close();
+    await replicator?.removeChangeListener(_listenerToken);
+    await replicator?.stop();
+    await replicator?.dispose();
+    await database?.close();
 
     super.dispose();
   }

@@ -36,15 +36,11 @@ class CBManager {
     private DatabaseConfiguration mDBConfig;
     private CBManagerDelegate mDelegate;
 
-    CBManager(CBManagerDelegate delegate, boolean enableLogging) {
+    CBManager(CBManagerDelegate delegate, LogLevel logLevel) {
         mDelegate = delegate;
         mDBConfig = new DatabaseConfiguration();
 
-        if (enableLogging) {
-            final File path = mDelegate.getContext().getCacheDir();
-            Database.log.getFile().setConfig(new LogFileConfiguration(path.toString()));
-            Database.log.getFile().setLevel(LogLevel.INFO);
-        }
+        Database.log.getConsole().setLevel(logLevel);
     }
 
     Database getDatabase(String name) {

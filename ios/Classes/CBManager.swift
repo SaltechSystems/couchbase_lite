@@ -31,16 +31,9 @@ class CBManager {
     private var mDBConfig = DatabaseConfiguration();
     private weak var mDelegate: CBManagerDelegate?
     
-    init(delegate: CBManagerDelegate, enableLogging: Bool) {
+    init(delegate: CBManagerDelegate, logLevel: LogLevel) {
         mDelegate = delegate
-        
-        guard enableLogging else {
-            return
-        }
-        
-        let tempFolder = NSTemporaryDirectory().appending("cbllog")
-        Database.log.file.config = LogFileConfiguration(directory: tempFolder)
-        Database.log.file.level = .info
+        Database.log.console.level = logLevel
     }
     
     func getDatabase(name : String) -> Database? {

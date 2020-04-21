@@ -9,9 +9,9 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
     let databaseDispatchQueue = DispatchQueue(label: "DatabaseDispatchQueue", qos: .background)
     
     #if DEBUG
-    lazy var mCBManager = CBManager(delegate: self, enableLogging: true)
+    lazy var mCBManager = CBManager(delegate: self, logLevel: .debug)
     #else
-    lazy var mCBManager = CBManager(delegate: self, enableLogging: false)
+    lazy var mCBManager = CBManager(delegate: self, logLevel: .error)
     #endif
     
     public static func register(with registrar: FlutterPluginRegistrar) {

@@ -193,9 +193,7 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: Icon(Icons.person),
               title: Text("Log Out"),
-              onTap: () async {
-                await _pageBloc.logout();
-              },
+              onTap: _pageBloc.logout,
             ),
           ],
         ))),

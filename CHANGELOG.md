@@ -66,3 +66,10 @@
 ## 2.7.0+3
 
 * Giving a simplified example and advanced example
+
+## 2.7.1
+
+* Update libraries to version 2.7.1
+* Fixed example for logging out
+* Updated console logging to Debug for debug mode / Error for everything else
+* Removed file logging

@@ -92,7 +92,7 @@ class Repository {
       Function(LoginResult) callback) async {
     try {
       var response = await ApiProvider.instance
-          .login(username, password, onLogout: logout);
+          .login(username, password, onLogout: triggerLogout);
 
       if (response.statusCode == 200) {
         var success = await _database.login(username, password);
@@ -113,10 +113,13 @@ class Repository {
     }
   }
 
-  Future<void> logout(LogoutMethod method) async {
+  void triggerLogout(LogoutMethod method) {
     _isLoggedInSubject.add(false);
     _lastLogoutMethodSubject.add(method);
+  }
 
+  // Call this once all streams / listeners have been cleaned up ( Your homepage )
+  Future<void> logout() async {
     await _database.logout();
   }
 
