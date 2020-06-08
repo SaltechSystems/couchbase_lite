@@ -282,23 +282,23 @@ class CBManager {
     }
     
     func inflateAuthenticator(json: Any?) throws -> Authenticator? {
-        guard let map = json as? Dictionary<String,String> else {
+        guard let map = json as? Dictionary<String,Any> else {
             return nil
         }
         
-        switch map["method"] {
+        switch map["method"] as! String {
         case "basic":
-            guard let username = map["username"], let password = map["password"] else {
+            guard let username = map["username"] as? String, let password = map["password"] as? String else {
                 throw CBManagerError.MissingArgument
             }
             
             return BasicAuthenticator(username: username, password: password)
         case "session":
-            guard let sessionId = map["sessionId"] else {
+            guard let sessionId = map["sessionId"] as? String else {
                 throw CBManagerError.MissingArgument
             }
             
-            return SessionAuthenticator(sessionID: sessionId, cookieName: map["cookieName"])
+            return SessionAuthenticator(sessionID: sessionId, cookieName: map["cookieName"] as? String)
         default:
             throw CBManagerError.IllegalArgument
         }
