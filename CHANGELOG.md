@@ -73,3 +73,7 @@
 * Fixed example for logging out
 * Updated console logging to Debug for debug mode / Error for everything else
 * Removed file logging
+
+## 2.7.1+1
+
+* Fixed issue with optional Session cookieName
