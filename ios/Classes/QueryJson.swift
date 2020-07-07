@@ -57,7 +57,7 @@ public class QueryJson {
     private func inflateLimit() {
         let limitArray = queryMap.limit
         if (limitArray.count == 1) {
-            let limitExpression = inflateExpressionFromArray(expressionParametersArray: limitArray[0])
+            let limitExpression = QueryJson.inflateExpressionFromArray(expressionParametersArray: limitArray[0])
             switch query {
             case let _from as From:
                 query = _from.limit(limitExpression)
@@ -73,8 +73,8 @@ public class QueryJson {
                 break
             }
         } else if (limitArray.count == 2) {
-            let limitExpression = inflateExpressionFromArray(expressionParametersArray:limitArray[0])
-            let offsetExpression = inflateExpressionFromArray(expressionParametersArray:limitArray[1])
+            let limitExpression = QueryJson.self.inflateExpressionFromArray(expressionParametersArray:limitArray[0])
+            let offsetExpression = QueryJson.inflateExpressionFromArray(expressionParametersArray:limitArray[1])
             
             switch query {
             case let _from as From:
@@ -110,7 +110,7 @@ public class QueryJson {
         var groupingArray: Array<ExpressionProtocol> = []
         
         for currentGroupByExpression in groupByArray {
-            groupingArray.append(inflateExpressionFromArray(expressionParametersArray: [currentGroupByExpression]))
+            groupingArray.append(QueryJson.inflateExpressionFromArray(expressionParametersArray: [currentGroupByExpression]))
         }
         
         return groupingArray
@@ -135,7 +135,7 @@ public class QueryJson {
         var resultOrdering: Array<OrderingProtocol> = []
         
         for currentOrderByArgument in orderByArray {
-            let expression = inflateExpressionFromArray(expressionParametersArray: currentOrderByArgument)
+            let expression = QueryJson.inflateExpressionFromArray(expressionParametersArray: currentOrderByArgument)
             let ordering = Ordering.expression(expression)
             
             if let orderingSortOrder = currentOrderByArgument.last?["orderingSortOrder"] as? String  {
@@ -190,7 +190,7 @@ public class QueryJson {
             if joinsArray.count == 1 {
                 query = _from.join(joinCallback(checkedDatasource))
             } else if let joinOn = joinsArray.last?["on"] {
-                let onExpression = inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: joinOn))
+                let onExpression = QueryJson.inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: joinOn))
                 query = _from.join((joinCallback(checkedDatasource) as! JoinOnProtocol).on(onExpression))
             }
         }
@@ -255,7 +255,7 @@ public class QueryJson {
     }
     
     private func inflateSelectResult(selectResultParametersArray: Array<Dictionary<String, Any>> ) -> SelectResultProtocol {
-        let result = SelectResult.expression(inflateExpressionFromArray(expressionParametersArray: selectResultParametersArray))
+        let result = SelectResult.expression(QueryJson.inflateExpressionFromArray(expressionParametersArray: selectResultParametersArray))
         
         if let alias = selectResultParametersArray.last?["as"] as? String {
             return result.as(alias)
@@ -268,13 +268,13 @@ public class QueryJson {
         let whereObject = queryMap.mWhere
         
         if let _from = query as? From {
-            query = _from.where(inflateExpressionFromArray(expressionParametersArray: whereObject))
+            query = _from.where(QueryJson.inflateExpressionFromArray(expressionParametersArray: whereObject))
         } else if let _joins = query as? Joins {
-            query = _joins.where(inflateExpressionFromArray(expressionParametersArray: whereObject))
+            query = _joins.where(QueryJson.inflateExpressionFromArray(expressionParametersArray: whereObject))
         }
     }
     
-    private func inflateExpressionFromArray(expressionParametersArray: Array<Dictionary<String, Any>> ) -> ExpressionProtocol {
+    static func inflateExpressionFromArray(expressionParametersArray: Array<Dictionary<String, Any>> ) -> ExpressionProtocol {
         var returnExpression: ExpressionProtocol? = nil
         for currentExpression in expressionParametersArray {
             guard let (currentKey, currentValue) = currentExpression.first else {

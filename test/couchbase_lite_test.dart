@@ -91,6 +91,17 @@ void main() {
           return null;
         case ("getIndexes"):
           return [];
+        case ("createIndex"):
+          if (arguments.containsKey("index") &&
+              arguments.containsKey("withName")) {
+            return true;
+          } else {
+            return PlatformException(
+                code: "errArgs",
+                message: "Query Error: Invalid Arguments",
+                details: arguments.toString());
+          }
+          break;
         default:
           return UnimplementedError();
       }
@@ -135,6 +146,9 @@ void main() {
         case "removeQuery":
           return true;
           break;
+        case "explainQuery":
+          return "query explained! Should not contain SCAN TABLE";
+          break;
         case "storeReplicator":
           return null;
           break;
@@ -171,6 +185,26 @@ void main() {
     await database.documentWithId("myid");
     // ignore: deprecated_member_use_from_same_package
     await database.save(MutableDocument());
+
+    var index = IndexBuilder.valueIndex(items: [
+      ValueIndexItem.property("type"),
+      ValueIndexItem.property("name"),
+      ValueIndexItem.expression(Expression.property('owner'))
+    ]);
+
+    List<Map<String, dynamic>> expected = [
+      {"property": "type"},
+      {"property": "name"},
+      {
+        "expression": [
+          {"property": "owner"}
+        ]
+      },
+    ];
+
+    expect(index.toJson(), expected);
+    await database.createIndex(index, withName: "MyIndex");
+
     await database.indexes;
     await database.compact();
     await database.delete();
@@ -182,6 +216,7 @@ void main() {
         QueryBuilder.select([SelectResult.all()]).from("test", as: "sheets");
     await query.execute();
     //expect(await query.parameters, throwsUnimplementedError);
+    expect(await query.explain(), isNotNull);
   });
 
   test('testQueryChangeListener', () async {

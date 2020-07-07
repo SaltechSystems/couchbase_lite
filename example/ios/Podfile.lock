@@ -1,8 +1,8 @@
 PODS:
   - couchbase_lite (0.0.1):
-    - CouchbaseLite-Swift (~> 2.7.0)
+    - CouchbaseLite-Swift (~> 2.7.1)
     - Flutter
-  - CouchbaseLite-Swift (2.7.0)
+  - CouchbaseLite-Swift (2.7.1)
   - Flutter (1.0.0)
   - package_info (0.0.1):
     - Flutter
@@ -40,11 +40,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
-  couchbase_lite: 1e52b370772d124e99600ffacb9adbc30383d8b4
-  CouchbaseLite-Swift: fc942af766946a7b1efbee2cc9b72ae04ec632e1
+  couchbase_lite: bb50e514b1dc8ef3a1eccd3c8e7d4d4920b7dddc
+  CouchbaseLite-Swift: 02012c1d5715106b349fb16fbcf88266d8f457c4
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  package_info: 48b108e75b8802c2d5e126f208ef540561c98aef
-  url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
+  package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
+  url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
   url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313
   url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c
 

@@ -57,6 +57,20 @@ class AppDatabase {
       });
 
       await replicator.start();
+
+      const indexName = "TypeNameIndex";
+      var indices = await database.indexes;
+      if (!indices.contains(indexName)) {
+        var index = IndexBuilder.valueIndex(items: [
+          ValueIndexItem.property("type"),
+          ValueIndexItem.expression(Expression.property("name"))
+        ]);
+        await database.createIndex(index, withName: indexName);
+      } else {
+        var query = _buildBeerQuery(100, 0, false);
+        print(await query.explain());
+      }
+
       return true;
     } on PlatformException {
       return false;
@@ -122,7 +136,23 @@ class AppDatabase {
     // Here we would do the query and maybe add a change listener to post the
     // results to the stream
 
-    final Query query = QueryBuilder.select([
+    final query = _buildBeerQuery(limit, offset, isDescending);
+
+    final processResults = (ResultSet results) {
+      final model = results.map((result) {
+        return Beer.fromMap(result.toMap());
+      }).toList();
+
+      if (!beerMapSubject.isClosed) {
+        beerMapSubject.add(BuiltList(model));
+      }
+    };
+
+    return _buildObservableQueryResponse(beerMapSubject, query, processResults);
+  }
+
+  Query _buildBeerQuery(int limit, int offset, bool isDescending) {
+    return QueryBuilder.select([
       SelectResult.expression(Meta.id.from("beer")).as("beerID"),
       SelectResult.expression(Expression.property("name").from("beer")),
     ])
@@ -137,18 +167,6 @@ class AppDatabase {
           : Ordering.expression(Expression.property("name").from("beer"))
               .ascending()
     ]).limit(Expression.intValue(limit), offset: Expression.intValue(offset));
-
-    final processResults = (ResultSet results) {
-      final model = results.map((result) {
-        return Beer.fromMap(result.toMap());
-      }).toList();
-
-      if (!beerMapSubject.isClosed) {
-        beerMapSubject.add(BuiltList(model));
-      }
-    };
-
-    return _buildObservableQueryResponse(beerMapSubject, query, processResults);
   }
 
   ObservableResponse<T> _buildObservableQueryResponse<T>(

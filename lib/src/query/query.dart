@@ -101,6 +101,24 @@ class Query {
     }
   }
 
+  /// Returns a string describing the implementation of the compiled query.
+  ///
+  /// This is intended to be read by a developer for purposes of optimizing the query,
+  /// especially to add database indexes. It’s not machine-readable and its format may change.
+  /// As currently implemented, the result is two or more lines separated by newline characters:
+  /// The first line is the SQLite SELECT statement.
+  /// The subsequent lines are the output of SQLite’s “EXPLAIN QUERY PLAN” command
+  /// applied to that statement;
+  /// for help interpreting this, see https://www.sqlite.org/eqp.html .
+  /// The most important thing to know is that if you see “SCAN TABLE”,
+  /// it means that SQLite is doing a slow linear scan of the documents instead of using an index.
+  ///
+  Future<String> explain() {
+    //Make sure the queryId is available when the toJson() method is called.
+    this._options["queryId"] = queryId;
+    return _channel.invokeMethod('explainQuery', this);
+  }
+
   Map<String, dynamic> toJson() => this.options;
 }
 

@@ -18,6 +18,8 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.DocumentFlag;
 import com.couchbase.lite.DocumentReplication;
 import com.couchbase.lite.DocumentReplicationListener;
+import com.couchbase.lite.Expression;
+import com.couchbase.lite.IndexBuilder;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.Query;
@@ -28,6 +30,8 @@ import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
 import com.couchbase.lite.ResultSet;
+import com.couchbase.lite.ValueIndex;
+import com.couchbase.lite.ValueIndexItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -107,9 +111,34 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     return mRegistrar.context();
   }
 
+  private ValueIndex inflateValueIndex(List<Map<String, Object>> items) {
+
+    List<ValueIndexItem> indices = new ArrayList<>();
+    for (int i=0; i < items.size(); ++i) {
+      Map<String, Object> item = items.get(i);
+      ValueIndexItem indexItem;
+      if (item.containsKey("expression")){
+
+        Expression expression = QueryJson.inflateExpressionFromArray((List<Map<String, Object>>) item.get("expression"));
+        indexItem = ValueIndexItem.expression(expression);
+
+      } else if (item.containsKey("property")) {
+        String property = (String) item.get("property");
+        indexItem = ValueIndexItem.property(property);
+      } else {
+        return null;
+      }
+
+      indices.add(indexItem);
+    }
+
+    ValueIndexItem[] array = indices.toArray(new ValueIndexItem[indices.size()]);
+    return IndexBuilder.valueIndex(array);
+  }
+
   private class DatabaseCallHander implements MethodCallHandler {
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(MethodCall call, final Result result) {
       if (!call.hasArgument("database")) {
         result.error("errArgs", "Error: Missing database", call.arguments.toString());
         return;
@@ -163,6 +192,46 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           } catch (Exception e) {
             result.error("errCompact", "error compacting database with name " + dbname, e.toString());
           }
+          break;
+        case ("createIndex"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (call.hasArgument("index") &&  call.hasArgument("withName")) {
+            final List<Map<String, Object>> items = call.argument("index");
+            final String indexName = call.argument("withName");
+
+            final Database db = database;
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+              @Override
+              public void run() {
+                try {
+                  ValueIndex valueIndex = inflateValueIndex(items);
+                  db.createIndex(indexName, valueIndex);
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.success(true);
+                    }
+                  });
+                } catch (final CouchbaseLiteException e) {
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.error("errIndex", "Error creating index", e.toString());
+                    }
+                  });
+                }
+              }
+            });
+
+
+          } else {
+            result.error("errArg", "invalid arguments", null);
+          }
+
           break;
         case ("deleteDatabaseWithName"):
           try {
@@ -465,6 +534,50 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           mCBManager.removeQuery(id);
           result.success(true);
           break;
+
+        case ("explainQuery"):
+          try {
+            id = json.getString("queryId");
+          } catch (JSONException e) {
+            result.error("errArg", "Query Error: Invalid Arguments", e);
+            return;
+          }
+
+          queryFromJson = mCBManager.getQuery(id);
+          if (queryFromJson == null) {
+            queryFromJson = new QueryJson(json,mCBManager).toCouchbaseQuery();
+          }
+
+          if (queryFromJson == null) {
+            result.error("errQuery", "Error generating query", null);
+            return;
+          }
+
+          final Query eQuery = queryFromJson;
+          AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                final String explanation = eQuery.explain();
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    result.success(explanation);
+                  }
+                });
+              } catch (final CouchbaseLiteException e) {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    result.error("errQuery", "Error explaining query", e.toString());
+                  }
+                });
+              }
+            }
+          });
+
+          break;
+
         case ("storeReplicator"):
           try {
             id = json.getString("replicatorId");
