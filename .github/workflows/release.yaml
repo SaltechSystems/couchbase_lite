@@ -2,8 +2,7 @@ name: Publish package to pub.dev
 
 on:
   release:
-    types:
-      - created
+    types: [ created,
 
 jobs:
 
@@ -33,9 +32,9 @@ jobs:
           EOF
       - name: Install dependencies
         run: flutter pub get
-      - name: Document package
+      - name: Document plugin
         run: |
-          export FLUTTER_ROOT="$FLUTTER_HOME"
-          dartdoc
-      - name: Publish package
+          pub global activate dartdoc
+          pub global run dartdoc
+      - name: Publish plugin
         run: flutter pub publish
