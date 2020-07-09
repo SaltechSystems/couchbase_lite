@@ -16,8 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v1
-          with:
-            channel: 'stable'
+        with:
+          channel: 'stable'
       - name: Setup credentials
         run: |
           mkdir -p ~/.pub-cache
