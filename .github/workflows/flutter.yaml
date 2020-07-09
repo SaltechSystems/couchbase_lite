@@ -23,10 +23,5 @@ jobs:
         run: flutter pub get
       - name: Run tests
         run: flutter test
-      - name: Document plugin
-        run: |
-          export FLUTTER_ROOT="$FLUTTER_HOME"
-          pub global activate dartdoc
-          pub global run dartdoc
       - name: Publish dry run
         run: flutter pub publish --dry-run
