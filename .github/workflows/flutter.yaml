@@ -22,6 +22,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Run tests
-        run: flutter pub run test
+        run: flutter test
       - name: Publish Dry Run
         run: flutter pub publish --dry-run
