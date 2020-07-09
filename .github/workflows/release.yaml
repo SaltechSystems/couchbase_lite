@@ -1,0 +1,41 @@
+name: Publish package to pub.dev
+
+on:
+  release:
+    types: [ created,
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image:  google/dart:latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v1
+          with:
+            channel: 'stable'
+      - name: Setup credentials
+        run: |
+          mkdir -p ~/.pub-cache
+          cat <<EOF > ~/.pub-cache/credentials.json
+          {
+            "accessToken":"${{ secrets.OAUTH_ACCESS_TOKEN }}",
+            "refreshToken":"${{ secrets.OAUTH_REFRESH_TOKEN }}",
+            "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
+            "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
+            "expiration": 1593616628458
+          }
+          EOF
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Document plugin
+        run: |
+          export FLUTTER_ROOT="$FLUTTER_HOME"
+          pub global activate dartdoc
+          pub global run dartdoc
+      - name: Publish plugin
+        run: flutter pub publish
