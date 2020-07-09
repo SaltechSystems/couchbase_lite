@@ -23,5 +23,7 @@ jobs:
         run: flutter pub get
       - name: Run tests
         run: flutter test
+      - name: Document package
+        run: dartdoc
       - name: Publish Dry Run
         run: flutter pub publish --dry-run
