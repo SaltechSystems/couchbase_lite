@@ -38,4 +38,4 @@ jobs:
           pub global activate dartdoc
           pub global run dartdoc
       - name: Publish plugin
-        run: flutter pub publish
+        run: flutter pub publish --force
