@@ -274,7 +274,7 @@ class QueryJson {
         }
     }
 
-    private Expression inflateExpressionFromArray(List<Map<String, Object>> expressionParametersArray) {
+    static Expression inflateExpressionFromArray(List<Map<String, Object>> expressionParametersArray) {
         Expression returnExpression = null;
         for (int i = 0; i <= expressionParametersArray.size() - 1; i++) {
             Map<String, Object> currentExpression = expressionParametersArray.get(i);

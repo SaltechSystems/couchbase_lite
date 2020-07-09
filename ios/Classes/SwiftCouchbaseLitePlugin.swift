@@ -43,6 +43,24 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
         return mRegistrar?.lookupKey(forAsset: assetKey)
     }
     
+    private func inflateValueIndex(items: [Dictionary<String, Any>] ) -> ValueIndex? {
+        
+        var indices: Array<ValueIndexItem> = [];
+        for item in items {
+            if let value = item["expression"], let array = value as? [Dictionary<String, Any>] {
+                let expression = QueryJson.inflateExpressionFromArray(expressionParametersArray: array);
+                indices.append(ValueIndexItem.expression(expression));
+            } else if let value = item["property"], let name = value as? String {
+                indices.append(ValueIndexItem.property(name))
+            } else {
+                return nil //Unsupported value index item
+            }
+        }
+        
+        return IndexBuilder.valueIndex(items: indices)
+        
+    }
+    
     public func handleDatabase(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let arguments = call.arguments as? [String:Any], let dbname = arguments["database"] as? String else {
             result(FlutterError(code: "errArgs", message: "Error: Missing database", details: call.arguments.debugDescription))
@@ -76,6 +94,35 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             } catch {
                 result(FlutterError.init(code: "errCompact", message: "Error compacting database with name \(dbname)", details: error.localizedDescription))
             }
+        case "createIndex":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            guard let indexName = arguments["withName"] as? String, let index = arguments["index"] as? [Dictionary<String, Any>] else {
+                result(FlutterError.init(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+            
+            guard let valueIndex = inflateValueIndex(items: index) else {
+                result(FlutterError.init(code: "errIndex", message: "Error creating index \(indexName)", details: "Failed to inflate valueIndex"))
+                return
+            }
+            
+            databaseDispatchQueue.async {
+                do {
+                    try database.createIndex(valueIndex, withName: indexName);
+                    DispatchQueue.main.async {
+                        result(true)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError.init(code: "errIndex", message: "Error creating index \(indexName)", details: error.localizedDescription))
+                    }
+                }
+            }
+            
+            
         case "deleteDatabaseWithName":
             do {
                 try mCBManager.deleteDatabaseWithName(name: dbname)
@@ -324,6 +371,33 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             
             let _ = mCBManager.removeQuery(queryId: queryId)
             result(true)
+        
+        case "explainQuery":
+            guard let options = call.arguments as? [String:Any], let queryId = options["queryId"] as? String else {
+                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+            
+            guard let query = mCBManager.getQuery(queryId: queryId) ?? QueryJson(json: options, manager: mCBManager).toCouchbaseQuery() else {
+                result(FlutterError(code: "errQuery", message: "Error generating query", details: nil))
+                return
+            }
+            
+            // This could be a time consuming task.
+            databaseDispatchQueue.async {
+                do {
+                    let explanation = try query.explain()
+                    DispatchQueue.main.async {
+                        result(explanation)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError(code: "errQuery", message: "Error explaining query", details: error.localizedDescription))
+                    }
+                }
+            }
+            
+            
         case "storeReplicator":
             guard let json = call.arguments as? [String:Any], let replicatorId = json["replicatorId"] as? String else {
                 result(FlutterError(code: "errArgs", message: "Replicator Error: Invalid Arguments", details: call.arguments.debugDescription))

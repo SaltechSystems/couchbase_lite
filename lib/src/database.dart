@@ -120,12 +120,13 @@ class Database {
   /// Creates an index [withName] which could be a value index or a full-text search index.
   /// The name can be used for deleting the index. Creating a new different index with an existing index
   /// name will replace the old index; creating the same index with the same name will be no-ops.
-  /*Future<bool> createIndex(String index, {@required String withName}) async {
-    await _methodChannel.invokeMethod(
-        'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': id});
-
-    return true;
-  }*/
+  Future<bool> createIndex(ValueIndex index, {@required String withName}) {
+    return _methodChannel.invokeMethod('createIndex', <String, dynamic>{
+      'database': name,
+      'index': index.toJson(),
+      'withName': withName
+    });
+  }
 
   /// Deletes index [withName] from the database.
   /*Future<void> deleteIndex({@required String withName}) async {

@@ -3,7 +3,7 @@ library couchbase_lite;
 import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
-
+import 'package:meta/meta.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,6 +20,7 @@ part 'src/listener_token.dart';
 part 'src/mutable_document.dart';
 part 'src/replicator.dart';
 part 'src/replicator_configuration.dart';
+part 'src/index.dart';
 
 part 'src/query/from.dart';
 part 'src/query/functions.dart';
