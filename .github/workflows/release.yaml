@@ -35,7 +35,7 @@ jobs:
         run: flutter pub get
       - name: Document package
         run: |
-          export FLUTTER_ROOT="$FLUTTERPATH"
+          export FLUTTER_ROOT="$FLUTTER_HOME"
           dartdoc
       - name: Publish package
         run: flutter pub publish

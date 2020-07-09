@@ -25,8 +25,8 @@ jobs:
         run: flutter test
       - name: Document package
         run: |
-          echo $PATH
-          export FLUTTER_ROOT="$FLUTTERPATH"
+          echo $FLUTTER_HOME
+          export FLUTTER_ROOT="$FLUTTER_HOME"
           dartdoc
       - name: Publish Dry Run
         run: flutter pub publish --dry-run
