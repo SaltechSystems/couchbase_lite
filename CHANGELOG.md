@@ -1,3 +1,7 @@
+## 2.7.1+3
+
+* Setting up plugin CI/CD
+
 ## 2.7.1+2
 
 * Added indexes
