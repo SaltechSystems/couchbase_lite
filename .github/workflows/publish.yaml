@@ -20,14 +20,14 @@ jobs:
           channel: 'stable'
       - name: Setup credentials
         run: |
-          mkdir -p ~/.pub-cache
-          cat <<EOF > ~/.pub-cache/credentials.json
+          mkdir -p $FLUTTER_HOME/.pub-cache
+          cat <<EOF > $FLUTTER_HOME/.pub-cache/credentials.json
           {
-            "accessToken":"${{ secrets.OAUTH_ACCESS_TOKEN }}",
-            "refreshToken":"${{ secrets.OAUTH_REFRESH_TOKEN }}",
-            "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
+            "accessToken":"${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}",
+            "refreshToken":"${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}",
+            "tokenEndpoint":"${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}",
             "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
-            "expiration": 1593616628458
+            "expiration": ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
           }
           EOF
       - name: Install dependencies
