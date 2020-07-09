@@ -34,6 +34,7 @@ jobs:
         run: flutter pub get
       - name: Document plugin
         run: |
+          export FLUTTER_ROOT="$FLUTTER_HOME"
           pub global activate dartdoc
           pub global run dartdoc
       - name: Publish plugin
