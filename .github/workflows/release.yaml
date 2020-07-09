@@ -34,6 +34,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Document package
-        run: dartdoc
+        run: |
+          export FLUTTER_ROOT="$FLUTTERPATH"
+          dartdoc
       - name: Publish package
         run: flutter pub publish
