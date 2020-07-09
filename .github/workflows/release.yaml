@@ -23,7 +23,7 @@ jobs:
           }
           EOF
       - name: Install dependencies
-        run: pub get
+        run: flutter pub get
       - name: Document package
         run: dartdoc
       - name: Publish package
