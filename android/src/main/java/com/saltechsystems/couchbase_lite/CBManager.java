@@ -33,6 +33,7 @@ class CBManager {
     private HashMap<String, ListenerToken> mQueryListenerTokens = new HashMap<>();
     private HashMap<String, Replicator> mReplicators = new HashMap<>();
     private HashMap<String, ListenerToken[]> mReplicatorListenerTokens = new HashMap<>();
+    private HashMap<String, ListenerToken> mDatabaseListenerTokens = new HashMap<>();
     private DatabaseConfiguration mDBConfig;
     private CBManagerDelegate mDelegate;
 
@@ -219,10 +220,27 @@ class CBManager {
     }
 
     void closeDatabaseWithName(String _name) throws CouchbaseLiteException {
+        removeDatabaseListenerToken(_name);
         Database _db = mDatabase.remove(_name);
         if (_db != null) {
             _db.close();
         }
+    }
+
+    ListenerToken getDatabaseListenerToken(String dbname) {
+        return mDatabaseListenerTokens.get(dbname);
+    }
+
+    void addDatabaseListenerToken(String dbname, ListenerToken token) {
+        mDatabaseListenerTokens.put(dbname, token);
+    }
+
+    void removeDatabaseListenerToken(String dbname) {
+        Database _db = mDatabase.get(dbname);
+        ListenerToken token = mDatabaseListenerTokens.remove(dbname);
+        if (_db != null && token != null) {
+            _db.removeChangeListener(token);
+        } 
     }
 
     void addQuery(String queryId, Query query, ListenerToken token) {

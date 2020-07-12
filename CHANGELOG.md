@@ -1,3 +1,9 @@
+## 2.7.1+4
+
+* Added Database addDocumentChangeListener 
+* Added Database addChangeListener 
+* Added Database removeChangeListener
+
 ## 2.7.1+3
 
 * Setting up plugin CI/CD

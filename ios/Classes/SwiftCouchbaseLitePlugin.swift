@@ -4,6 +4,7 @@ import CouchbaseLiteSwift
 
 public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegate {
     weak var mRegistrar: FlutterPluginRegistrar?
+    let mDatabaseEventListener = DatabaseEventListener()
     let mQueryEventListener = QueryEventListener();
     let mReplicatorEventListener = ReplicatorEventListener();
     let databaseDispatchQueue = DispatchQueue(label: "DatabaseDispatchQueue", qos: .background)
@@ -19,6 +20,9 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
         
         let databaseChannel = FlutterMethodChannel(name: "com.saltechsystems.couchbase_lite/database", binaryMessenger: registrar.messenger())
         databaseChannel.setMethodCallHandler(instance.handleDatabase(_:result:))
+        
+        let databaseEventChannel = FlutterEventChannel(name: "com.saltechsystems.couchbase_lite/databaseEventChannel", binaryMessenger: registrar.messenger())
+        databaseEventChannel.setStreamHandler(instance.mDatabaseEventListener as? FlutterStreamHandler & NSObjectProtocol)
         
         let replicatorChannel = FlutterMethodChannel(name: "com.saltechsystems.couchbase_lite/replicator", binaryMessenger: registrar.messenger())
         replicatorChannel.setMethodCallHandler(instance.handleReplicator(_:result:))
@@ -265,6 +269,44 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             }
             
             result(database.indexes)
+            
+        case "addChangeListener":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+           
+            guard let _ = mCBManager.getDatabaseListenerToken(dbname: dbname) else {
+                let token = database.addChangeListener(withQueue: databaseDispatchQueue, listener: { [weak self] change in
+                    var map = Dictionary<String,Any?>()
+                    map["type"] = "DatabaseChange"
+                    map["database"] = change.database.name
+                    map["documentIDs"] = change.documentIDs
+                    
+                    DispatchQueue.main.async {
+                        // Will only send events when there is something listening
+                        self?.mDatabaseEventListener.mEventSink?(map)
+                    }
+                })
+                
+                mCBManager.addDatabaseListenerToken(dbname: dbname, token: token)
+                result(true)
+                return
+            }
+            
+            
+            result(true)
+            
+        case "removeChangeListener":
+            
+            do {
+                try mCBManager.removeDatabaseListenerToken(dbname: dbname)
+                result(nil)
+            } catch {
+                 result(FlutterError(code: "errDatabase", message: "Error removing database listener token", details: nil))
+            }
+            
+           
         default:
             result(FlutterMethodNotImplemented)
         }

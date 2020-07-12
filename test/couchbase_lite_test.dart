@@ -102,6 +102,15 @@ void main() {
                 details: arguments.toString());
           }
           break;
+        case ("addDocumentChangeListener"):
+          return null;
+          break;
+        case ("addChangeListener"):
+          return null;
+          break;
+        case ("removeChangeListener"):
+          return null;
+          break;
         default:
           return UnimplementedError();
       }
@@ -185,6 +194,13 @@ void main() {
     await database.documentWithId("myid");
     // ignore: deprecated_member_use_from_same_package
     await database.save(MutableDocument());
+
+    var token = database.addChangeListener((dbChnage) => {});
+    token = await database.removeChangeListener(token);
+    expect(token, isNotNull);
+
+    token = database.addDocumentChangeListener("myid", (change) => {});
+    await database.removeChangeListener(token);
 
     var index = IndexBuilder.valueIndex(items: [
       ValueIndexItem.property("type"),

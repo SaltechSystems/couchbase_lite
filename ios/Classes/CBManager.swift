@@ -28,6 +28,7 @@ class CBManager {
     private var mQueryListenerTokens : Dictionary<String,ListenerToken> = Dictionary();
     private var mReplicators : Dictionary<String,Replicator> = Dictionary();
     private var mReplicatorListenerTokens : Dictionary<String,[ListenerToken]> = Dictionary();
+    private var mDatabaseListenerTokens : Dictionary<String, ListenerToken> = Dictionary();
     private var mDBConfig = DatabaseConfiguration();
     private weak var mDelegate: CBManagerDelegate?
     
@@ -183,9 +184,36 @@ class CBManager {
     
     func closeDatabaseWithName(name: String) throws {
         if let _db = mDatabase.removeValue(forKey: name) {
+        
+            if let token = mDatabaseListenerTokens[name] {
+                _db.removeChangeListener(withToken: token)
+                mDatabaseListenerTokens.removeValue(forKey: name)
+            }
+            
             try _db.close()
         }
     }
+    
+    func getDatabaseListenerToken(dbname: String) -> ListenerToken? {
+        return mDatabaseListenerTokens[dbname]
+    }
+    
+    func addDatabaseListenerToken(dbname: String, token: ListenerToken) {
+        mDatabaseListenerTokens[dbname] = token
+    }
+    
+    func removeDatabaseListenerToken(dbname: String) throws {
+        
+        guard let database = getDatabase(name: dbname) else {
+            throw CBManagerError.DatabaseNotFound
+        }
+        
+        if let token = mDatabaseListenerTokens[dbname] {
+            database.removeChangeListener(withToken: token)
+            mDatabaseListenerTokens.removeValue(forKey: dbname)
+        }
+    }
+    
     
     func addQuery(queryId: String, query: Query, listenerToken: ListenerToken) {
         mQueries[queryId] = query;

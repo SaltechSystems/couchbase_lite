@@ -8,6 +8,10 @@ class Database {
   static const MethodChannel _methodChannel =
       MethodChannel('com.saltechsystems.couchbase_lite/database');
 
+  static const EventChannel _eventChannel =
+      EventChannel('com.saltechsystems.couchbase_lite/databaseEventChannel');
+  static final Stream _stream = _eventChannel.receiveBroadcastStream();
+
   /// Initializes a Couchbase Lite database with the given [dbName].
   static Future<Database> initWithName(String dbName) async {
     await _methodChannel.invokeMethod(
@@ -16,6 +20,8 @@ class Database {
   }
 
   final String name;
+
+  Map<ListenerToken, StreamSubscription> tokens = {};
 
   /// The number of documents in the database
   Future<int> get count => _methodChannel
@@ -136,9 +142,79 @@ class Database {
     return true;
   }*/
 
+  /// Adds a database change listener on which changes will be posted
+  ///
+  /// Returns the listener token object for removing the listener.
+  ListenerToken addChangeListener(Function(DatabaseChange) callback) {
+    var token = ListenerToken();
+
+    tokens[token] = _stream
+        .where((data) =>
+            (data["database"] == name && data["type"] == "DatabaseChange"))
+        .listen((data) => callback(DatabaseChange(
+            this,
+            (data["documentIDs"] as List<dynamic>)
+                .map((id) => id as String)
+                .toList())));
+
+    // Caveat:  Do not call addChangeListener more than once.
+    if (tokens.length == 1) {
+      _methodChannel.invokeMethod(
+          "addChangeListener", <String, dynamic>{'database': name});
+    }
+
+    return token;
+  }
+
+  /// Adds a document change listener.
+  ///
+  /// Returns the listener token object for removing the listener.
+  ListenerToken addDocumentChangeListener(
+      String withId, Function(DocumentChange) callback) {
+    var token = ListenerToken();
+
+    tokens[token] = _stream
+        .where((data) =>
+            (data["database"] == name && data["type"] == "DatabaseChange") &&
+            (data["documentIDs"] as List<Object>).contains(withId))
+        .listen((data) {
+      callback(DocumentChange(this, withId));
+    });
+
+    // Caveat:  Do not call addChangeListener more than once.
+    if (tokens.length == 1) {
+      _methodChannel.invokeMethod(
+          "addChangeListener", <String, dynamic>{'database': name});
+    }
+
+    return token;
+  }
+
+  /// Removes a change listener with the given listener token.
+  Future<ListenerToken> removeChangeListener(ListenerToken token) async {
+    var subscription = tokens.remove(token);
+
+    if (subscription != null) {
+      await subscription.cancel();
+    }
+
+    if (tokens.isEmpty) {
+      await _methodChannel.invokeMethod(
+          'removeChangeListener', <String, dynamic>{'database': name});
+    }
+
+    return token;
+  }
+
   /// Closes database.
-  Future<void> close() => _methodChannel.invokeMethod(
-      'closeDatabaseWithName', <String, dynamic>{'database': name});
+  Future<void> close() async {
+    for (var token in List.from(tokens.keys)) {
+      await removeChangeListener(token);
+    }
+
+    await _methodChannel.invokeMethod(
+        'closeDatabaseWithName', <String, dynamic>{'database': name});
+  }
 
   //Not including this way of deleting for now because I remove the reference when we close the database
   Future<void> delete() => _methodChannel.invokeMethod(
@@ -149,4 +225,24 @@ class Database {
 
   Future<void> compact() => _methodChannel.invokeMethod(
       'compactDatabaseWithName', <String, dynamic>{'database': name});
+}
+
+class DocumentChange {
+  DocumentChange(this.database, this.documentID);
+
+  /// The database
+  final Database database;
+
+  /// The ID of the document that changed
+  final String documentID;
+}
+
+class DatabaseChange {
+  DatabaseChange(this.database, this.documentIDs);
+
+  /// The database
+  final Database database;
+
+  /// The IDs of the documents that changed.
+  final List<String> documentIDs;
 }
