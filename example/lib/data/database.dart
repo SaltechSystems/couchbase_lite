@@ -33,6 +33,8 @@ class AppDatabase {
   ListenerToken _replicatorListenerToken;
   Database database;
   Replicator replicator;
+  ListenerToken _docListenerToken;
+  ListenerToken _dbListenerToken;
 
   Future<bool> login(String username, String password) async {
     try {
@@ -68,8 +70,21 @@ class AppDatabase {
         await database.createIndex(index, withName: indexName);
       } else {
         var query = _buildBeerQuery(100, 0, false);
+        print('explanation:');
         print(await query.explain());
       }
+
+      var pref =
+          await createDocumentIfNotExists("MyPreference", {"theme": "dark"});
+      _docListenerToken = database.addDocumentChangeListener(pref.id, (change) {
+        print("Document change ${change.documentID}");
+      });
+
+      _dbListenerToken = database.addChangeListener((dbChange) {
+        for (var change in dbChange.documentIDs) {
+          print("change in id: $change");
+        }
+      });
 
       return true;
     } on PlatformException {
@@ -79,6 +94,12 @@ class AppDatabase {
 
   Future<void> logout() async {
     await Future.wait(pendingListeners);
+
+    await database.removeChangeListener(_docListenerToken);
+    await database.removeChangeListener(_dbListenerToken);
+    _docListenerToken = null;
+    _dbListenerToken = null;
+
     await replicator.removeChangeListener(_replicatorListenerToken);
     _replicatorListenerToken =
         replicator.addChangeListener((ReplicatorChange event) async {

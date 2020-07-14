@@ -14,6 +14,8 @@ import com.couchbase.lite.ConcurrencyControl;
 import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
+import com.couchbase.lite.DatabaseChange;
+import com.couchbase.lite.DatabaseChangeListener;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.DocumentFlag;
 import com.couchbase.lite.DocumentReplication;
@@ -55,6 +57,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
   private final Registrar mRegistrar;
   private final QueryEventListener mQueryEventListener = new QueryEventListener();
   private final ReplicationEventListener mReplicationEventListener = new ReplicationEventListener();
+  private final DatabaseEventListener mDatabaseEventListener = new DatabaseEventListener();
   private final CBManager mCBManager;
   private DatabaseCallHander databaseCallHander = new DatabaseCallHander();
   private ReplicatorCallHander replicatorCallHander = new ReplicatorCallHander();
@@ -80,6 +83,10 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
     final EventChannel queryEventChannel = new EventChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/queryEventChannel", JSONMethodCodec.INSTANCE);
     queryEventChannel.setStreamHandler(instance.mQueryEventListener);
+
+    final EventChannel databaseEventChannel = new EventChannel(registrar.messenger(),
+        "com.saltechsystems.couchbase_lite/databaseEventChannel");
+    databaseEventChannel.setStreamHandler(instance.mDatabaseEventListener);
   }
 
   public CouchbaseLitePlugin(Registrar registrar) {
@@ -378,6 +385,46 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           }
 
           break;
+        case ("addChangeListener"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (mCBManager.getDatabaseListenerToken(dbname) == null) {
+            ListenerToken token = database.addChangeListener(AsyncTask.THREAD_POOL_EXECUTOR,
+              new DatabaseChangeListener() {
+                @Override
+                public void changed(DatabaseChange change) {
+
+                  final HashMap<String, Object> map = new HashMap<String, Object>();
+                  map.put("type", "DatabaseChange");
+                  map.put("database", change.getDatabase().getName());
+                  map.put("documentIDs", change.getDocumentIDs());
+
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      final EventChannel.EventSink eventSink = mDatabaseEventListener.mEventSink;
+                      if (eventSink != null) {
+                        eventSink.success(map);
+                      }
+                    }
+                  });
+                }
+              });
+
+              mCBManager.addDatabaseListenerToken(dbname, token);
+              result.success(null);
+          }
+
+          
+          break;
+
+        case ("removeChangeListener"):
+          mCBManager.removeDatabaseListenerToken(dbname);
+          result.success(null);
+        break;
         default:
           result.notImplemented();
       }
