@@ -337,6 +337,9 @@ class QueryJson {
                     case ("lower"):
                         returnExpression= Function.lower(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("lower"))));
                         break;
+                    case ("length"):
+                        returnExpression= Function.length(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("length"))));
+                        break;
                 }
             } else {
                 switch (currentExpression.keySet().iterator().next()) {
