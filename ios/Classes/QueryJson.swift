@@ -435,6 +435,10 @@ public class QueryJson {
                     returnExpression = Function.count(inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: value)))
                 case ("lower", let value):
                                    returnExpression = Function.lower(inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: value)));
+                    case ("length", let value):
+                                                      returnExpression = Function.length(inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: value)));
+                    case ("arrayLength", let value):
+                                                      returnExpression = ArrayFunction.length(inflateExpressionFromArray(expressionParametersArray: QueryMap.getListOfMapFromGenericList(objectList: value)));
                 default:
                     break
                 }
