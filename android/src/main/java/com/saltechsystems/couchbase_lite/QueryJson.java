@@ -42,7 +42,6 @@ class QueryJson {
     QueryJson(JSONObject json, CBManager manager) {
         this.mCBManager = manager;
         this.queryMap = new QueryMap(json);
-        Log.d("couchbaselite", "QueryJSON map:-" + queryMap.toString());
     }
 
     static List<Map<String, Object>> resultsToJson(ResultSet results) {

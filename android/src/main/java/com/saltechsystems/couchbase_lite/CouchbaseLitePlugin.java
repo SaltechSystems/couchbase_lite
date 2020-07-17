@@ -277,7 +277,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     @Override
     public void onMethodCall(MethodCall call, final Result result) {
       final JSONObject json = call.arguments();
-      Log.d("couchbaselite","channel input json:-"+json.toString());
+//       Log.d("couchbaselite","channel input json:-"+json.toString());
 
       final String id;
       Query queryFromJson;
@@ -299,7 +299,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             result.error("errQuery", "Error generating query", null);
             return;
           }
-          Log.d("cocuchbaselite","couchbase lite Query:-"+queryFromJson.toString());
+          //Log.d("cocuchbaselite","couchbase lite Query:-"+queryFromJson.toString());
 
           final Query query = queryFromJson;
           AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
