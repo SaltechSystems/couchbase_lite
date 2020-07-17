@@ -10,7 +10,7 @@ class ArrayFunctions with Expression {
   }
 
   factory ArrayFunctions.length(Expression expression) {
-    return ArrayFunctions({"length": expression.internalExpressionStack});
+    return ArrayFunctions({"arrayLength": expression.internalExpressionStack});
   }
 
   @override

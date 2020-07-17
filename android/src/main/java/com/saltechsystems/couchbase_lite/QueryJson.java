@@ -3,6 +3,7 @@ package com.saltechsystems.couchbase_lite;
 import android.util.Log;
 
 import com.couchbase.lite.ArrayExpression;
+import com.couchbase.lite.ArrayFunction;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
@@ -339,6 +340,9 @@ class QueryJson {
                     case ("length"):
                         returnExpression= Function.length(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("length"))));
                         break;
+                    case ("arrayLength"):
+                        returnExpression= ArrayFunction.length(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("arrayLength"))));
+                        break;
                 }
             } else {
                 switch (currentExpression.keySet().iterator().next()) {
@@ -423,6 +427,7 @@ class QueryJson {
                                 .satisfies(inflateExpressionFromArray(satisfiesList));
 
                         break;
+
                 }
             }
         }
