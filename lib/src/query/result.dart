@@ -1,6 +1,12 @@
 part of couchbase_lite;
 
 class Result {
+  Result.fromMap(Map<String, dynamic> map) {
+    this._internalMap = map;
+  }
+
+  Result();
+
   Map<String, dynamic> _internalMap = {};
   List<dynamic> _internalList = [];
 
@@ -33,7 +39,14 @@ class Result {
     }
   }
 
-  //TODO: implement getBlob()
+  Blob getBlob({int index, String key}) {
+    var result = getValue(index: index, key: key);
+    if (null != result) {
+      return Blob._fromMap(result);
+    } else {
+      return null;
+    }
+  }
 
   bool getBoolean({int index, String key}) {
     var result = getValue(index: index, key: key);
