@@ -19,6 +19,14 @@ class Database {
     return Database._internal(dbName);
   }
 
+  /// Initializes a Couchbase Lite database with the given [dbName] and path.
+  static Future<Database> initWithNameAndPath(
+      String dbName, String path) async {
+    await _methodChannel.invokeMethod('initDatabaseWithNameAndPath',
+        <String, dynamic>{'database': dbName, 'path': path});
+    return Database._internal(dbName);
+  }
+
   final String name;
 
   Map<ListenerToken, StreamSubscription> tokens = {};

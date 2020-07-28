@@ -2,6 +2,18 @@ part of couchbase_lite;
 
 /// Couchbase Lite document. The Document is immutable.
 class Document {
+  Document.fromMap({
+    Map<dynamic, dynamic> data,
+    id,
+    dbname,
+    sequence,
+  }) {
+    _data = _stringMapFromDynamic(data ?? {});
+    _id = id;
+    _dbname = dbname;
+    _sequence = sequence;
+  }
+
   Document._init(
       [Map<dynamic, dynamic> data, this._id, this._dbname, this._sequence]) {
     _data = _stringMapFromDynamic(data ?? {});
@@ -14,6 +26,7 @@ class Document {
 
   String get id => _id;
   int get sequence => _sequence;
+  String get db => _dbname;
 
   Map<String, dynamic> _stringMapFromDynamic(Map<dynamic, dynamic> _map) {
     return Map.castFrom<dynamic, dynamic, String, dynamic>(_map);
@@ -95,15 +108,17 @@ class Document {
     Map<String, dynamic> _result = getMap(key);
     if (_result is Map && _result["@type"] == "blob") {
       if (_result.containsKey("data")) {
-        return Blob.data(_result["contentType"], _result["data"]);
+        return Blob.fromData(
+          _result["contentType"],
+          _result["data"],
+        );
       } else {
-        var _blob = Blob._fromMap(_result);
-        _blob._dbname = _dbname;
-        _blob._documentID = _id;
-        _blob._documentKey = key;
-        _blob._shouldLoadData = true;
-
-        return _blob;
+        return Blob.fromMap(
+          _result,
+          dbName: _dbname,
+          documentId: _id,
+          key: key,
+        );
       }
     } else {
       return null;

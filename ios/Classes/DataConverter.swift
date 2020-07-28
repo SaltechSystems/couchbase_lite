@@ -17,8 +17,8 @@ class DataConverter {
             guard let type = result?["@type"] as? String, type == "blob" else {
                 return result
             }
-            
-            guard let contentType = result?["contentType"] as? String, let data = result?["data"] as? Data else {
+
+            guard let contentType = result?["content_type"] as? String, let data = result?["data"] as? Data else {
                 // Preserve the original blob
                 if let blob = origin as? Blob {
                     return blob

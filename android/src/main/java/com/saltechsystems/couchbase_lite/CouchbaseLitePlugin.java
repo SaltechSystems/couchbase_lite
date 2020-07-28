@@ -174,6 +174,18 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             result.error("errInit", "error initializing database with name " + dbname, e.toString());
           }
           break;
+        case ("initDatabaseWithNameAndPath"):
+          try {
+            final String path = call.argument("path");
+            if (path != null)
+              database = mCBManager.initDatabaseWithNameAndPath(dbname, path);
+            else
+              database = mCBManager.initDatabaseWithName(dbname);
+            result.success(database.getName());
+          } catch (Exception e) {
+            result.error("errInit", "error initializing database with name " + dbname, e.toString());
+          }
+          break;
         case ("closeDatabaseWithName"):
           if (database == null) {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);
@@ -418,7 +430,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
               result.success(null);
           }
 
-          
+
           break;
 
         case ("removeChangeListener"):

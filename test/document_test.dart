@@ -133,7 +133,7 @@ void main() {
     expect(mutableDocument.toMutable().toMap(), map);
   });
   test("Blob", () async {
-    Blob blob = Blob.data("application/octet-stream", Uint8List(0));
+    Blob blob = Blob.fromData("application/octet-stream", Uint8List(0));
     mutableDocument.setBlob("blob", blob);
     expect(await mutableDocument.getBlob("blob").content, await blob.content);
   });

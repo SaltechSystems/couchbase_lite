@@ -124,10 +124,10 @@ class CBManager {
                 }
 
                 if (parsedMap.get("@type") instanceof String && ((String) parsedMap.get("@type")).equals("blob")) {
-                    if (parsedMap.get("data") instanceof byte[] && parsedMap.get("contentType") instanceof String) {
-                        String contentType = (String) parsedMap.get("contentType");
+                    if (parsedMap.get("data") instanceof byte[] && parsedMap.get("content_type") instanceof String) {
+                        String contentType = (String) parsedMap.get("content_type");
                         byte[] content = (byte[]) parsedMap.get("data");
-                        parsed.put(entry.getKey(), new Blob(contentType,content));
+                        parsed.put(entry.getKey(), new Blob(contentType, content));
                     } else if (originValue instanceof Blob) {
                         // Prevent blob from being deleted since the data isn't passed
                         parsed.put(entry.getKey(), originValue);
@@ -177,7 +177,7 @@ class CBManager {
             if (value instanceof Blob) {
                 Blob blob = (Blob) value;
                 HashMap<String,Object> json = new HashMap<>();
-                json.put("contentType", blob.getContentType());
+                json.put("content_type", blob.getContentType());
                 json.put("digest", blob.digest());
                 json.put("length", blob.length());
                 json.put("@type","blob");
@@ -202,6 +202,17 @@ class CBManager {
 
     Database initDatabaseWithName(String _name) throws CouchbaseLiteException {
         if (!mDatabase.containsKey(_name)) {
+            Database database = new Database(_name, mDBConfig);
+            mDatabase.put(_name, database);
+            return database;
+        }
+
+        return mDatabase.get(_name);
+    }
+
+    Database initDatabaseWithNameAndPath(String _name, String _path) throws CouchbaseLiteException {
+        if (!mDatabase.containsKey(_name)) {
+            mDBConfig.setDirectory(_path);
             Database database = new Database(_name, mDBConfig);
             mDatabase.put(_name, database);
             return database;
@@ -240,7 +251,7 @@ class CBManager {
         ListenerToken token = mDatabaseListenerTokens.remove(dbname);
         if (_db != null && token != null) {
             _db.removeChangeListener(token);
-        } 
+        }
     }
 
     void addQuery(String queryId, Query query, ListenerToken token) {
