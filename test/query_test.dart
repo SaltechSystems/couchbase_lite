@@ -451,7 +451,8 @@ void main() {
       "list": [],
       "double": 1.2,
       "string": "test",
-      "object": {}
+      "object": {},
+      "blob": {"content_type": "", "digest": "", "lenth": 0},
     };
     Map<dynamic, dynamic> result = {
       "map": map,
@@ -484,6 +485,10 @@ void main() {
 
     test("getInt()", () {
       expect(newResult.getInt(key: "int"), 1);
+    });
+
+    test("getBlob()", () {
+      expect(newResult.getBlob(key: "blob").runtimeType, Blob);
     });
 
     test("getKeys()", () {

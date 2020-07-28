@@ -26,6 +26,9 @@ void main() {
         case ("initDatabaseWithName"):
           return arguments["database"];
           break;
+        case ("initDatabaseWithNameAndPath"):
+          return arguments["database"];
+          break;
         case ("closeDatabaseWithName"):
           return null;
           break;
@@ -221,6 +224,12 @@ void main() {
     expect(index.toJson(), expected);
     await database.createIndex(index, withName: "MyIndex");
 
+    await database.indexes;
+    await database.compact();
+    await database.delete();
+    await Database.deleteWithName("testdb");
+
+    Database database1 = await Database.initWithNameAndPath("testdb", "/tmp");
     await database.indexes;
     await database.compact();
     await database.delete();

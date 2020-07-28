@@ -20,6 +20,25 @@ void main() {
     mutableDocument = MutableDocument();
   });
 
+  test("Document: fromMap", () {
+    var document = Document.fromMap(
+      data: initializer,
+      dbname: "test",
+      id: "123456789",
+      sequence: 10,
+    );
+    expect(document.id, "123456789");
+    expect(document.db, "test");
+    expect(document.sequence, 10);
+    expect(document.getString("string"), initializer['string']);
+    expect(document.getDouble("double"), initializer['double']);
+    expect(document.getInt("int"), initializer['int']);
+    expect(document.getMap("map"), {});
+    expect(document.getBoolean("bool"), initializer['bool']);
+    expect(document.getBoolean("boolint"), false);
+    expect(document.getList("list"), []);
+  });
+
   test("Document: getting string", () {
     expect(document.count(), initializer.length);
   });
