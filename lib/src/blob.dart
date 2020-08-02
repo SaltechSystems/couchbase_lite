@@ -5,9 +5,10 @@ class Blob {
   Blob.data(this._contentType, this._data);
 
   Blob._fromMap(Map<String, dynamic> map) {
-    this._contentType = map["contentType"];
+    this._contentType = map["content_type"];
     this._digest = map["digest"];
     this._length = map["length"];
+    this._length = map["data"];
   }
 
   String _dbname;
@@ -17,12 +18,12 @@ class Blob {
   String _digest;
   int _length;
   Uint8List _data;
-  bool _shouldLoadData = false;
+  bool _shouldLoadDataFromDocument = false;
   String get contentType => _contentType;
   String get digest => _digest;
   int get length => _length;
   Future<Uint8List> get content async {
-    if (_shouldLoadData) {
+    if (_shouldLoadDataFromDocument) {
       return await Database._methodChannel.invokeMethod(
           'getBlobContentFromDocumentWithId', <String, dynamic>{
         'database': _dbname,
@@ -39,6 +40,6 @@ class Blob {
   ///
   /// - Returns: The Dictionary representing the content of the current object.
   Map<String, dynamic> toMap() {
-    return {"contentType": _contentType, "data": _data, "@type": "blob"};
+    return {"content_type": _contentType, "data": _data, "@type": "blob"};
   }
 }

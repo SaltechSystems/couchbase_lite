@@ -95,13 +95,13 @@ class Document {
     Map<String, dynamic> _result = getMap(key);
     if (_result is Map && _result["@type"] == "blob") {
       if (_result.containsKey("data")) {
-        return Blob.data(_result["contentType"], _result["data"]);
+        return Blob.data(_result["content_type"], _result["data"]);
       } else {
         var _blob = Blob._fromMap(_result);
         _blob._dbname = _dbname;
         _blob._documentID = _id;
         _blob._documentKey = key;
-        _blob._shouldLoadData = true;
+        _blob._shouldLoadDataFromDocument = true;
 
         return _blob;
       }

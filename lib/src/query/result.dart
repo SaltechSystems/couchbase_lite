@@ -33,7 +33,14 @@ class Result {
     }
   }
 
-  //TODO: implement getBlob()
+  Blob getBlob({int index, String key}) {
+    var result = getValue(index: index, key: key);
+    if (result is Map && result["@type"] == "blob") {
+      return Blob._fromMap(result);
+    } else {
+      return null;
+    }
+  }
 
   bool getBoolean({int index, String key}) {
     var result = getValue(index: index, key: key);
