@@ -137,7 +137,7 @@ class CBManager {
             switch (value) {
             case let blob as Blob:
                 let blobJSON: [String: Any] = [
-                    "contentType": blob.contentType as Any,
+                    "content_type": blob.contentType as Any,
                     "digest": blob.digest as Any,
                     "length": blob.length,
                     "@type": "blob"

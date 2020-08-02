@@ -123,13 +123,16 @@ class CBManager {
                     parsedMap = getParsedMap(getMapFromGenericMap(value), null);
                 }
 
-                if (parsedMap.get("@type") instanceof String && ((String) parsedMap.get("@type")).equals("blob")) {
-                    if (parsedMap.get("data") instanceof byte[] && parsedMap.get("contentType") instanceof String) {
-                        String contentType = (String) parsedMap.get("contentType");
+                if (parsedMap.get("@type") instanceof String && parsedMap.get("@type").equals("blob")) {
+                    if (originValue instanceof Blob && parsedMap.get("digest") instanceof String && parsedMap.get("digest").equals(((Blob) originValue).digest())) {
+                        // Prevent blob from updating when it doesn't change
+                        parsed.put(entry.getKey(), originValue);
+                    } else if (parsedMap.get("data") instanceof byte[] && parsedMap.get("content_type") instanceof String) {
+                        String contentType = (String) parsedMap.get("content_type");
                         byte[] content = (byte[]) parsedMap.get("data");
                         parsed.put(entry.getKey(), new Blob(contentType,content));
-                    } else if (originValue instanceof Blob) {
-                        // Prevent blob from being deleted since the data isn't passed
+                    } else {
+                        // Preserve the original value
                         parsed.put(entry.getKey(), originValue);
                     }
                 } else {
@@ -177,7 +180,7 @@ class CBManager {
             if (value instanceof Blob) {
                 Blob blob = (Blob) value;
                 HashMap<String,Object> json = new HashMap<>();
-                json.put("contentType", blob.getContentType());
+                json.put("content_type", blob.getContentType());
                 json.put("digest", blob.digest());
                 json.put("length", blob.length());
                 json.put("@type","blob");
