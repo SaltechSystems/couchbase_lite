@@ -8,7 +8,7 @@ class Blob {
     this._contentType = map["content_type"];
     this._digest = map["digest"];
     this._length = map["length"];
-    this._length = map["data"];
+    this._data = map["data"];
   }
 
   String _contentType;
