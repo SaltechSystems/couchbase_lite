@@ -94,17 +94,26 @@ class Document {
   Blob getBlob(String key) {
     Map<String, dynamic> _result = getMap(key);
     if (_result is Map && _result["@type"] == "blob") {
-      if (_result.containsKey("data")) {
-        return Blob.data(_result["content_type"], _result["data"]);
-      } else {
-        var _blob = Blob._fromMap(_result);
-        _blob._dbname = _dbname;
-        _blob._documentID = _id;
-        _blob._documentKey = key;
-        _blob._shouldLoadDataFromDocument = true;
-
-        return _blob;
+      final _blob = Blob._fromMap(_result);
+      if (!_result.containsKey("data")) {
+        // Load the data if not included - this is an attempt to give more control of memory management and support larger Blobs
+        _blob._futureData = Database._methodChannel.invokeMethod(
+          'getBlobContentFromDocumentWithId', <String, dynamic>{
+          'database': _dbname,
+          'id': _id,
+          'key': key,
+          'digest': _blob.digest
+        });
+        
+        _blob._futureData.then((value) {
+          _blob._data = value;
+          _blob._futureData = null;
+        }, onError: () {
+          _blob._futureData = null;
+        });
       }
+
+      return _blob;
     } else {
       return null;
     }

@@ -11,29 +11,16 @@ class Blob {
     this._length = map["data"];
   }
 
-  String _dbname;
-  String _documentID;
-  String _documentKey;
   String _contentType;
   String _digest;
   int _length;
   Uint8List _data;
-  bool _shouldLoadDataFromDocument = false;
+  Future<Uint8List> _futureData;
   String get contentType => _contentType;
   String get digest => _digest;
   int get length => _length;
   Future<Uint8List> get content async {
-    if (_shouldLoadDataFromDocument) {
-      return await Database._methodChannel.invokeMethod(
-          'getBlobContentFromDocumentWithId', <String, dynamic>{
-        'database': _dbname,
-        'id': _documentID,
-        'key': _documentKey,
-        'digest': _digest
-      });
-    } else {
-      return _data;
-    }
+    return _data ?? _futureData;
   }
 
   /// Gets content of the current object as a Dictionary.
