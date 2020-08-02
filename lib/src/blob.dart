@@ -40,6 +40,6 @@ class Blob {
   ///
   /// - Returns: The Dictionary representing the content of the current object.
   Map<String, dynamic> toMap() {
-    return {"content_type": _contentType, "data": _data, "@type": "blob"};
+    return {"content_type": _contentType, "data": _data, "digest": _digest, "@type": "blob"};
   }
 }
