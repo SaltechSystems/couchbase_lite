@@ -21,47 +21,30 @@ public class QueryJson {
         var resultArr: Array<Dictionary<String,Any>> = []
         for result in results.allResults() {
             var value = Dictionary<String,Any>()
-            value["map"] = _dictionaryToJson(result.toDictionary())
-            value["list"] = _arrayToJson(result.toArray())
+            value["map"] = _resultToMap(result)
+            value["list"] = _resultToList(result)
             resultArr.append(value)
         }
         
         return NSArray(array: resultArr)
     }
     
-    private static func _dictionaryToJson(_ dict: [String: Any?]) -> [String: Any?] {
-        var result: [String: Any] = [:]
-        for (key, value) in dict {
-            result[key] = _valueToJson(value)
+    private static func _resultToMap(_ result: Result) -> [String: Any?] {
+        var rtnMap: [String: Any] = [:]
+        for key in result.keys {
+            rtnMap[key] = CBManager._valueToJson(result[key].value, withData: true)
         }
         
-        return result
+        return rtnMap
     }
     
-    private static func _arrayToJson(_ array: [Any?]) -> [Any?] {
-        var result: [Any?] = [];
-        for v in array {
-            result.append(_valueToJson(v))
+    private static func _resultToList(_ result: Result) -> [Any?] {
+        var rtnList: [Any?] = [];
+        for idx in 0..<result.count {
+            rtnList.append(CBManager._valueToJson(result[idx].value, withData: true))
         }
-        return result
-    }
-    
-    private static func _valueToJson(_ value: Any?) -> Any? {
-        switch (value) {
-        case let blob as Blob:
-            return [
-                "content_type": blob.contentType as Any,
-                "digest": blob.digest as Any,
-                "length": blob.length,
-                "@type": "blob"
-            ]
-        case let array as [Any?]:
-            return _arrayToJson(array)
-        case let dict as [String: Any?]:
-            return _dictionaryToJson(dict)
-        default:
-            return value
-        }
+        
+        return rtnList
     }
     
     func toCouchbaseQuery() -> Query? {

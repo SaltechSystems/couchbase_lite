@@ -3,11 +3,13 @@ package com.saltechsystems.couchbase_lite;
 import android.content.res.AssetManager;
 import android.os.Debug;
 
+import com.couchbase.lite.Array;
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.ConcurrencyControl;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
+import com.couchbase.lite.Dictionary;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.IndexBuilder;
 import com.couchbase.lite.ListenerToken;
@@ -22,7 +24,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.Log;
@@ -59,7 +63,7 @@ class CBManager {
         if (success) {
             resultMap.put("id", mutableDoc.getId());
             resultMap.put("sequence", mutableDoc.getSequence());
-            resultMap.put("doc", getJSONMap(mutableDoc.toMap()));
+            resultMap.put("doc", _documentToMap(mutableDoc));
         }
         return resultMap;
     }
@@ -74,7 +78,7 @@ class CBManager {
         if (success) {
             resultMap.put("id", mutableDoc.getId());
             resultMap.put("sequence", mutableDoc.getSequence());
-            resultMap.put("doc", getJSONMap(mutableDoc.toMap()));
+            resultMap.put("doc", _documentToMap(mutableDoc));
         }
 
         return resultMap;
@@ -104,7 +108,7 @@ class CBManager {
         if (success) {
             resultMap.put("id", mutableDoc.getId());
             resultMap.put("sequence", mutableDoc.getSequence());
-            resultMap.put("doc", getJSONMap(mutableDoc.toMap()));
+            resultMap.put("doc", _documentToMap(mutableDoc));
         }
         return resultMap;
     }
@@ -162,7 +166,7 @@ class CBManager {
 
         Document document = database.getDocument(_id);
         if (document != null) {
-            resultMap.put("doc", getJSONMap(document.toMap()));
+            resultMap.put("doc", _documentToMap(document));
             resultMap.put("id", document.getId());
             resultMap.put("sequence", document.getSequence());
         } else {
@@ -173,24 +177,52 @@ class CBManager {
         return resultMap;
     }
 
-    private Map<String, Object> getJSONMap(Map<String, Object> _map) {
+    private static Map<String, Object> _documentToMap(Document doc) {
         HashMap<String,Object> parsed = new HashMap<>();
-        for (Map.Entry<String,Object> entry: _map.entrySet()) {
-            Object value = entry.getValue();
-            if (value instanceof Blob) {
-                Blob blob = (Blob) value;
-                HashMap<String,Object> json = new HashMap<>();
-                json.put("content_type", blob.getContentType());
-                json.put("digest", blob.digest());
-                json.put("length", blob.length());
-                json.put("@type","blob");
-                parsed.put(entry.getKey(),json);
-            } else {
-                parsed.put(entry.getKey(),entry.getValue());
-            }
+        for (String key: doc.getKeys()) {
+            parsed.put(key,_valueToJson(doc.getValue(key), false));
         }
 
         return parsed;
+    }
+
+    protected static Map<String,Object> _dictionaryToJson(Dictionary dict) {
+        HashMap<String, Object> rtnMap = new HashMap<>();
+        for (String key: dict.getKeys()) {
+            rtnMap.put(key, _valueToJson(dict.getValue(key), true));
+        }
+
+        return rtnMap;
+    }
+
+    protected static List<Object> _arrayToJson(Array array) {
+        List<Object> rtnList = new ArrayList<>();
+        for (int idx = 0; idx < array.count(); idx++) {
+            rtnList.add(_valueToJson(array.getValue(idx), true));
+        }
+
+        return rtnList;
+    }
+
+    protected static Object _valueToJson(Object value, boolean includeData) {
+        if (value instanceof Blob) {
+            Blob blob = (Blob) value;
+            HashMap<String,Object> json = new HashMap<>();
+            json.put("content_type", blob.getContentType());
+            json.put("digest", blob.digest());
+            json.put("length", blob.length());
+            if (includeData) {
+                json.put("data", blob.getContent());
+            }
+            json.put("@type","blob");
+            return json;
+        } else if (value instanceof Dictionary){
+            return _dictionaryToJson((Dictionary) value);
+        } else if (value instanceof Array){
+            return _arrayToJson((Array) value);
+        } else {
+            return value;
+        }
     }
 
     void deleteDocumentWithId(Database database, String _id) throws CouchbaseLiteException {

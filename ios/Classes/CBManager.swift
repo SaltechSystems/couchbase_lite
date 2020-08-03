@@ -53,7 +53,7 @@ class CBManager {
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = getJSONMap(mutableDocument.toDictionary())
+            resultMap["doc"] = CBManager._documentToMap(mutableDocument)
         }
         return resultMap
     }
@@ -66,7 +66,7 @@ class CBManager {
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = getJSONMap(mutableDocument.toDictionary())
+            resultMap["doc"] = CBManager._documentToMap(mutableDocument)
         }
         return resultMap
     }
@@ -88,7 +88,7 @@ class CBManager {
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = getJSONMap(mutableDocument.toDictionary())
+            resultMap["doc"] = CBManager._documentToMap(mutableDocument)
         }
         return resultMap
     }
@@ -105,7 +105,7 @@ class CBManager {
             // It is a repetition due to implementation of Document Dart Class
             resultMap["id"] = document.id
             resultMap["sequence"] = document.sequence
-            resultMap["doc"] = NSDictionary.init(dictionary:getJSONMap(document.toDictionary()))
+            resultMap["doc"] = NSDictionary.init(dictionary:CBManager._documentToMap(document))
         } else {
             resultMap["id"] = id
             resultMap["doc"] = nil
@@ -114,55 +114,59 @@ class CBManager {
         return NSDictionary.init(dictionary: resultMap)
     }
     
-    /*func _documentToMap(_ document: Document) -> NSDictionary {
-        return NSDictionary.init(dictionary:getJSONMap(document.toDictionary()))
+    private static func _documentToMap(_ doc: Document) -> [String: Any] {
+        var parsed: [String: Any] = [:]
+        for key in doc.keys {
+            parsed[key] = _valueToJson(doc.value(forKey: key), withData: false)
+        }
+        
+        return parsed
     }
     
-    func _encodeValue(_ value: Any?) -> Any? {
-        switch value {
-        case let dict as Dictionary<String, Any>:
-            return _encodeDictionary(dict)
-        case let _ as Blob:
-            //return _encodeBlob(blob)
-            //May have memory issues if we pass the blob
-            return nil
-        default:
-            return value
+    static func _dictionaryToJson(_ dict: DictionaryObject) -> [String: Any?] {
+        var rtnMap: [String: Any] = [:]
+        for key in dict.keys {
+            rtnMap[key] = _valueToJson(dict[key].value, withData: true)
         }
-    }*/
+        
+        return rtnMap
+    }
     
-    func getJSONMap(_ dictionary: [String: Any]) -> [String: Any] {
-        var result: [String: Any] = [:]
-        for (key, value) in dictionary {
-            switch (value) {
-            case let blob as Blob:
-                let blobJSON: [String: Any] = [
+    static func _arrayToJson(_ array: ArrayObject) -> [Any?] {
+        var rtnList: [Any?] = [];
+        for idx in 0..<array.count {
+            rtnList.append(_valueToJson(array[idx].value, withData: true))
+        }
+        return rtnList
+    }
+    
+    static func _valueToJson(_ value: Any?, withData: Bool) -> Any? {
+        switch (value) {
+        case let blob as Blob:
+            if (withData) {
+                return [
+                    "content_type": blob.contentType as Any,
+                    "digest": blob.digest as Any,
+                    "length": blob.length,
+                    "data": blob.content as Any,
+                    "@type": "blob"
+                ]
+            } else {
+                return [
                     "content_type": blob.contentType as Any,
                     "digest": blob.digest as Any,
                     "length": blob.length,
                     "@type": "blob"
                 ]
-                result[key] = blobJSON
-                break
-            default:
-                result[key] = value
             }
+        case let dict as DictionaryObject:
+            return _dictionaryToJson(dict)
+        case let array as ArrayObject:
+            return _arrayToJson(array)
+        default:
+            return value
         }
-        
-        return result
     }
-    
-    /*func _encodeBlob(_ blob: Blob) -> [String: Any]? {
-        var result: [String: Any] = [:]
-        result["contentType"] = blob.contentType
-        if let data = blob.content {
-            result["data"] = FlutterStandardTypedData(bytes: data)
-        } else {
-            result["data"] = nil
-        }
-        
-        return result
-    }*/
     
     func initDatabaseWithName(name: String) throws -> Database {
         if let database = mDatabase[name] {
