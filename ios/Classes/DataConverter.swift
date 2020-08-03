@@ -18,14 +18,14 @@ class DataConverter {
                 return result
             }
             
-            guard let contentType = result?["content_type"] as? String, let data = result?["data"] as? Data else {
-                // Preserve the original value
-                return origin
-            }
-            
             if let blob = origin as? Blob, let digest = result?["digest"] as? String, digest == blob.digest {
                 // Prevent blob from updating when it doesn't change
                 return blob
+            }
+            
+            guard let contentType = result?["content_type"] as? String, let data = result?["data"] as? Data else {
+                // Preserve the map value
+                return result
             }
             
             return Blob(contentType: contentType, data: data)

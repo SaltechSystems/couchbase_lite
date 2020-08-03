@@ -132,8 +132,8 @@ class CBManager {
                         byte[] content = (byte[]) parsedMap.get("data");
                         parsed.put(entry.getKey(), new Blob(contentType,content));
                     } else {
-                        // Preserve the original value
-                        parsed.put(entry.getKey(), originValue);
+                        // Preserve the map value
+                        parsed.put(entry.getKey(), parsedMap);
                     }
                 } else {
                     parsed.put(entry.getKey(), parsedMap);
