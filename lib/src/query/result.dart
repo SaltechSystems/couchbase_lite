@@ -3,6 +3,7 @@ part of couchbase_lite;
 class Result {
   Map<String, dynamic> _internalMap = {};
   List<dynamic> _internalList = [];
+  List<String> _keys = [];
 
   bool contains(String key) {
     if (_internalMap != null) {
@@ -72,11 +73,7 @@ class Result {
   }
 
   List<String> getKeys() {
-    if (null != _internalMap && _internalMap.isNotEmpty) {
-      return List.unmodifiable(_internalMap.keys);
-    } else {
-      return null;
-    }
+    return _keys;
   }
 
   String getString({int index, String key}) {
@@ -121,5 +118,10 @@ class Result {
   void setList(List<dynamic> list) {
     _internalList.clear();
     _internalList.addAll(list);
+  }
+
+  void setKeys(List<String> keys) {
+    _keys.clear();
+    _keys.addAll(keys);
   }
 }

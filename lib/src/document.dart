@@ -40,13 +40,13 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The Bool value.
   bool getBoolean(String key) {
-    Object _result = getValue(key);
+    var result = getValue(key);
 
-    if (_result is num) {
-      return _result != 0;
+    if (result is num) {
+      return result != 0;
     }
 
-    return _result is bool ? _result : false;
+    return result is bool ? result : false;
   }
 
   /// Gets a property's value as a double value.
@@ -56,11 +56,11 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The Double value.
   double getDouble(String key) {
-    Object _result = getValue(key);
-    if (_result is double) {
-      return _result;
-    } else if (_result is int) {
-      return _result.toDouble();
+    var result = getValue(key);
+    if (result is double) {
+      return result;
+    } else if (result is int) {
+      return result.toDouble();
     } else {
       return 0.0;
     }
@@ -73,11 +73,11 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The Int value.
   int getInt(String key) {
-    Object _result = getValue(key);
-    if (_result is double) {
-      return _result.toInt();
-    } else if (_result is int) {
-      return _result;
+    var result = getValue(key);
+    if (result is double) {
+      return result.toInt();
+    } else if (result is int) {
+      return result;
     } else {
       return 0;
     }
@@ -92,28 +92,9 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The Blob object or null.
   Blob getBlob(String key) {
-    Map<String, dynamic> _result = getMap(key);
-    if (_result is Map && _result["@type"] == "blob") {
-      final _blob = Blob._fromMap(_result);
-      if (!_result.containsKey("data")) {
-        // Load the data if not included - this is an attempt to give more control of memory management and support larger Blobs
-        _blob._futureData = Database._methodChannel.invokeMethod(
-          'getBlobContentFromDocumentWithId', <String, dynamic>{
-          'database': _dbname,
-          'id': _id,
-          'key': key,
-          'digest': _blob.digest
-        });
-        
-        _blob._futureData.then((value) {
-          _blob._data = value;
-          _blob._futureData = null;
-        }, onError: () {
-          _blob._futureData = null;
-        });
-      }
-
-      return _blob;
+    var result = getValue(key);
+    if (result is Map && result["@type"] == "blob") {
+      return Blob._fromMap(result);
     } else {
       return null;
     }
@@ -130,8 +111,8 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The String object or null.
   String getString(String key) {
-    Object _result = getValue(key);
-    return _result is String ? _result : null;
+    var result = getValue(key);
+    return result is String ? result : null;
   }
 
   ///  Gets a property's value as a date.
@@ -164,9 +145,9 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The List Object object or null.
   List<T> getList<T>(String key) {
-    var _result = getValue(key);
-    if (_result is List) {
-      return List.from(List.castFrom<dynamic, T>(_result));
+    var result = getValue(key);
+    if (result is List) {
+      return List.from(List.castFrom<dynamic, T>(result));
     }
 
     return null;
@@ -187,9 +168,9 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The Map Object object or nil.
   Map<K, V> getMap<K, V>(String key) {
-    var _result = getValue(key);
-    if (_result is Map) {
-      return Map.from(Map.castFrom<dynamic, dynamic, K, V>(_result));
+    var result = getValue(key);
+    if (result is Map) {
+      return Map.from(Map.castFrom<dynamic, dynamic, K, V>(result));
     }
 
     return null;

@@ -23,16 +23,19 @@ public class QueryJson {
             var value = Dictionary<String,Any>()
             value["map"] = _resultToMap(result)
             value["list"] = _resultToList(result)
+            value["keys"] = result.keys
             resultArr.append(value)
         }
         
         return NSArray(array: resultArr)
     }
     
-    private static func _resultToMap(_ result: Result) -> [String: Any?] {
+    static private func _resultToMap(_ result: Result) -> [String: Any] {
         var rtnMap: [String: Any] = [:]
         for key in result.keys {
-            rtnMap[key] = CBManager._valueToJson(result[key].value, withData: true)
+            if let value = result[key].value {
+                rtnMap[key] = CBManager.convertGETValue(value)
+            }
         }
         
         return rtnMap
@@ -41,7 +44,7 @@ public class QueryJson {
     private static func _resultToList(_ result: Result) -> [Any?] {
         var rtnList: [Any?] = [];
         for idx in 0..<result.count {
-            rtnList.append(CBManager._valueToJson(result[idx].value, withData: true))
+            rtnList.append(CBManager.convertGETValue(result[idx].value))
         }
         
         return rtnList

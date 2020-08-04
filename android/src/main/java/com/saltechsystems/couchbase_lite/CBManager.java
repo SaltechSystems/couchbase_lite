@@ -1,7 +1,6 @@
 package com.saltechsystems.couchbase_lite;
 
 import android.content.res.AssetManager;
-import android.os.Debug;
 
 import com.couchbase.lite.Array;
 import com.couchbase.lite.Blob;
@@ -11,14 +10,11 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Dictionary;
 import com.couchbase.lite.Document;
-import com.couchbase.lite.IndexBuilder;
 import com.couchbase.lite.ListenerToken;
-import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.Query;
-import com.couchbase.lite.ValueIndexItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,12 +24,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.flutter.Log;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class CBManager {
     private HashMap<String, Database> mDatabase = new HashMap<>();
     private HashMap<String, Query> mQueries = new HashMap<>();
+    private final static HashMap<String, Blob> mBlobs = new HashMap<>();
     private HashMap<String, ListenerToken> mQueryListenerTokens = new HashMap<>();
     private HashMap<String, Replicator> mReplicators = new HashMap<>();
     private HashMap<String, ListenerToken[]> mReplicatorListenerTokens = new HashMap<>();
@@ -56,7 +54,7 @@ class CBManager {
     }
 
     Map<String, Object> saveDocument(Database database, Map<String, Object> _map, ConcurrencyControl concurrencyControl) throws CouchbaseLiteException {
-        MutableDocument mutableDoc = new MutableDocument(getParsedMap(_map, null));
+        MutableDocument mutableDoc = new MutableDocument(convertSETDictionary(_map));
         boolean success = database.save(mutableDoc, concurrencyControl);
         HashMap<String, Object> resultMap = new HashMap<>();
         resultMap.put("success", success);
@@ -70,7 +68,7 @@ class CBManager {
 
     Map<String, Object> saveDocumentWithId(Database database, String _id, Map<String, Object> _map, ConcurrencyControl concurrencyControl) throws CouchbaseLiteException {
         HashMap<String, Object> resultMap = new HashMap<>();
-        MutableDocument mutableDoc = new MutableDocument(_id, getParsedMap(_map, null));
+        MutableDocument mutableDoc = new MutableDocument(_id, convertSETDictionary(_map));
 
         boolean success = database.save(mutableDoc, concurrencyControl);
 
@@ -100,7 +98,7 @@ class CBManager {
             mutableDoc = document.toMutable();
         }
 
-        mutableDoc.setData(getParsedMap(_map, document.toMap()));
+        mutableDoc.setData(convertSETDictionary(_map));
 
         boolean success = database.save(mutableDoc, concurrencyControl);
 
@@ -113,44 +111,129 @@ class CBManager {
         return resultMap;
     }
 
-    private Map<String, Object> getParsedMap(Map<String, Object> _map, Map<String, Object> doc) {
+    static Blob getBlobWithDigest(String digest) {
+        synchronized (mBlobs) {
+            return mBlobs.get(digest);
+        }
+    }
+
+    static void setBlobWithDigest(String digest, Blob blob) {
+        synchronized (mBlobs) {
+            mBlobs.put(digest, blob);
+        }
+    }
+
+    static void clearBlobCache() {
+        synchronized (mBlobs) {
+            mBlobs.clear();
+        }
+    }
+
+    private Map<String, Object> _documentToMap(Document doc) {
         HashMap<String,Object> parsed = new HashMap<>();
-        for (Map.Entry<String,Object> entry: _map.entrySet()) {
-            Object value = entry.getValue();
-            if (value instanceof Map<?, ?>) {
-                Map<String, Object> parsedMap;
-                Object originValue = doc == null ? null : doc.get(entry.getKey());
-
-                if (originValue instanceof Map<?,?>) {
-                    parsedMap = getParsedMap(getMapFromGenericMap(value), getMapFromGenericMap(originValue));
-                } else {
-                    parsedMap = getParsedMap(getMapFromGenericMap(value), null);
-                }
-
-                if (parsedMap.get("@type") instanceof String && parsedMap.get("@type").equals("blob")) {
-                    if (originValue instanceof Blob && parsedMap.get("digest") instanceof String && parsedMap.get("digest").equals(((Blob) originValue).digest())) {
-                        // Prevent blob from updating when it doesn't change
-                        parsed.put(entry.getKey(), originValue);
-                    } else if (parsedMap.get("data") instanceof byte[] && parsedMap.get("content_type") instanceof String) {
-                        String contentType = (String) parsedMap.get("content_type");
-                        byte[] content = (byte[]) parsedMap.get("data");
-                        parsed.put(entry.getKey(), new Blob(contentType,content));
-                    } else {
-                        // Preserve the map value
-                        parsed.put(entry.getKey(), parsedMap);
-                    }
-                } else {
-                    parsed.put(entry.getKey(), parsedMap);
-                }
-            } else {
-                parsed.put(entry.getKey(),value);
-            }
+        for (String key: doc.getKeys()) {
+            parsed.put(key, convertGETValue(doc.getValue(key)));
         }
 
         return parsed;
     }
 
-    private Map<String, Object> getMapFromGenericMap(Object objectMap) {
+    static Object convertSETValue(Object value) {
+        if (value instanceof Map<?, ?>) {
+            Map<String, Object> result = convertSETDictionary(getMapFromGenericMap(value));
+
+            if (result.get("@type") instanceof String && result.get("@type").equals("blob")) {
+                if (result.get("digest") instanceof String) {
+                    // Prevent blob from updating when it doesn't change
+                    return getBlobWithDigest((String) result.get("digest"));
+                } else if (result.get("data") instanceof byte[] && result.get("content_type") instanceof String) {
+                    String contentType = (String) result.get("content_type");
+                    byte[] content = (byte[]) result.get("data");
+                    return new Blob(contentType,content);
+                } else {
+                    // Preserve the map value
+                    return result;
+                }
+            } else {
+                return result;
+            }
+        } else if (value instanceof List<?>) {
+            return convertSETArray(getListFromGenericList(value));
+        } else {
+            return value;
+        }
+    }
+
+    static Map<String, Object> convertSETDictionary(Map<String, Object> _map) {
+        if (_map == null) {
+            return null;
+        }
+
+        HashMap<String,Object> result = new HashMap<>();
+        for (Map.Entry<String,Object> entry: _map.entrySet()) {
+            result.put(entry.getKey(), convertSETValue(entry.getValue()));
+        }
+
+        return result;
+    }
+
+    static List<Object> convertSETArray(List<Object> array) {
+        if (array == null) {
+            return null;
+        }
+
+        List<Object> rtnList = new ArrayList<>();
+        for (Object value: array) {
+            rtnList.add(convertSETValue(value));
+        }
+
+        return rtnList;
+    }
+
+    static Map<String,Object> convertGETDictionary(Dictionary dict) {
+        HashMap<String, Object> rtnMap = new HashMap<>();
+        for (String key: dict.getKeys()) {
+            rtnMap.put(key, convertGETValue(dict.getValue(key)));
+        }
+
+        return rtnMap;
+    }
+
+    static List<Object> convertGETArray(Array array) {
+        List<Object> rtnList = new ArrayList<>();
+        for (int idx = 0; idx < array.count(); idx++) {
+            rtnList.add(convertGETValue(array.getValue(idx)));
+        }
+
+        return rtnList;
+    }
+
+    static Object convertGETValue(Object value) {
+        if (value instanceof Blob) {
+            Blob blob = (Blob) value;
+            String digest = blob.digest();
+            if (digest != null) {
+                // Store the blob for retrieving the content
+                setBlobWithDigest(digest,blob);
+            }
+
+            // Don't return the data, JSONMessageCodec doesn't support it
+            HashMap<String,Object> json = new HashMap<>();
+            json.put("content_type", blob.getContentType());
+            json.put("digest", digest);
+            json.put("length", blob.length());
+            json.put("@type","blob");
+            return json;
+        } else if (value instanceof Dictionary){
+            return convertGETDictionary((Dictionary) value);
+        } else if (value instanceof Array){
+            return convertGETArray((Array) value);
+        } else {
+            return value;
+        }
+    }
+
+    private static Map<String, Object> getMapFromGenericMap(Object objectMap) {
         Map<String, Object> resultMap = new HashMap<>();
         if (objectMap instanceof Map<?, ?>) {
             Map<?,?> genericMap = (Map<?,?>) objectMap;
@@ -159,6 +242,17 @@ class CBManager {
             }
         }
         return resultMap;
+    }
+
+    private static List<Object> getListFromGenericList(Object objectList) {
+        List<Object> resultList = new ArrayList<>();
+        if (objectList instanceof List<?>) {
+            List<?> genericList = (List<?>) objectList;
+            for (Object value: genericList) {
+                resultList.add(value);
+            }
+        }
+        return resultList;
     }
 
     Map<String, Object> getDocumentWithId(Database database, String _id) {
@@ -175,54 +269,6 @@ class CBManager {
         }
 
         return resultMap;
-    }
-
-    private static Map<String, Object> _documentToMap(Document doc) {
-        HashMap<String,Object> parsed = new HashMap<>();
-        for (String key: doc.getKeys()) {
-            parsed.put(key,_valueToJson(doc.getValue(key), false));
-        }
-
-        return parsed;
-    }
-
-    protected static Map<String,Object> _dictionaryToJson(Dictionary dict) {
-        HashMap<String, Object> rtnMap = new HashMap<>();
-        for (String key: dict.getKeys()) {
-            rtnMap.put(key, _valueToJson(dict.getValue(key), true));
-        }
-
-        return rtnMap;
-    }
-
-    protected static List<Object> _arrayToJson(Array array) {
-        List<Object> rtnList = new ArrayList<>();
-        for (int idx = 0; idx < array.count(); idx++) {
-            rtnList.add(_valueToJson(array.getValue(idx), true));
-        }
-
-        return rtnList;
-    }
-
-    protected static Object _valueToJson(Object value, boolean includeData) {
-        if (value instanceof Blob) {
-            Blob blob = (Blob) value;
-            HashMap<String,Object> json = new HashMap<>();
-            json.put("content_type", blob.getContentType());
-            json.put("digest", blob.digest());
-            json.put("length", blob.length());
-            if (includeData) {
-                json.put("data", blob.getContent());
-            }
-            json.put("@type","blob");
-            return json;
-        } else if (value instanceof Dictionary){
-            return _dictionaryToJson((Dictionary) value);
-        } else if (value instanceof Array){
-            return _arrayToJson((Array) value);
-        } else {
-            return value;
-        }
     }
 
     void deleteDocumentWithId(Database database, String _id) throws CouchbaseLiteException {

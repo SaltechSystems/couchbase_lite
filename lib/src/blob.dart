@@ -5,10 +5,27 @@ class Blob {
   Blob.data(this._contentType, this._data);
 
   Blob._fromMap(Map<String, dynamic> map) {
-    _contentType = map["content_type"];
-    _digest = map["digest"];
-    _length = map["length"];
-    _data = map["data"];
+    _contentType = map['content_type'];
+    _digest = map['digest'];
+    _length = map['length'];
+    _data = map['data'];
+
+    // Load the data when a blob is created
+    if (_data == null) {
+      // Load data here (JSONMethodCodec doesn't support data types used by Queries)
+      _futureData = Database._methodChannel.invokeMethod(
+        'getBlobContentWithDigest', <String, dynamic>{
+          'digest': _digest
+        });
+
+      _futureData.then((value) {
+        _data = value;
+        _futureData = null;
+      }).catchError((e) {
+        print(e);
+        return null;
+      });
+    }
   }
 
   String _contentType;

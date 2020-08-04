@@ -35,6 +35,7 @@ class Query {
         Result newResult = Result();
         newResult.setMap(result["map"]);
         newResult.setList(result["list"]);
+        newResult.setKeys(List.castFrom<dynamic, String>(result["keys"]));
         results.add(newResult);
       }
 
@@ -68,6 +69,7 @@ class Query {
           Result newResult = Result();
           newResult.setMap(result["map"]);
           newResult.setList(result["list"]);
+          newResult.setKeys(List.castFrom<dynamic, String>(result["keys"]));
           results.add(newResult);
         }
         result = ResultSet(results);

@@ -123,6 +123,13 @@ class Database {
     return true;
   }
 
+  /// Clears all Blobs from the database used to fetch the Blob content.
+  Future<bool> clearBlobCache() async {
+    await _methodChannel.invokeMethod('clearBlobCache');
+
+    return true;
+  }
+
   /// Creates an index [withName] which could be a value index or a full-text search index.
   /// The name can be used for deleting the index. Creating a new different index with an existing index
   /// name will replace the old index; creating the same index with the same name will be no-ops.

@@ -31,6 +31,7 @@ class CBManager {
     private var mDatabaseListenerTokens : Dictionary<String, ListenerToken> = Dictionary();
     private var mDBConfig = DatabaseConfiguration();
     private weak var mDelegate: CBManagerDelegate?
+    private static var mBlobs : Dictionary<String,Blob> = Dictionary()
     
     init(delegate: CBManagerDelegate, logLevel: LogLevel) {
         mDelegate = delegate
@@ -47,26 +48,26 @@ class CBManager {
     
     func saveDocument(database: Database, map: Dictionary<String, Any>, concurrencyControl: ConcurrencyControl) throws -> NSMutableDictionary {
         let resultMap: NSMutableDictionary = NSMutableDictionary.init()
-        let mutableDocument: MutableDocument = MutableDocument(data: DataConverter.convertSETDictionary(map));
+        let mutableDocument: MutableDocument = MutableDocument(data: CBManager.convertSETDictionary(map));
         let success = try database.saveDocument(mutableDocument, concurrencyControl: concurrencyControl)
         resultMap["success"] = success
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = CBManager._documentToMap(mutableDocument)
+            resultMap["doc"] = _documentToMap(mutableDocument)
         }
         return resultMap
     }
     
     func saveDocumentWithId(database: Database, id: String, map: Dictionary<String, Any>, concurrencyControl: ConcurrencyControl) throws -> NSMutableDictionary {
         let resultMap: NSMutableDictionary = NSMutableDictionary.init()
-        let mutableDocument: MutableDocument = MutableDocument(id: id, data: DataConverter.convertSETDictionary(map))
+        let mutableDocument: MutableDocument = MutableDocument(id: id, data: CBManager.convertSETDictionary(map))
         let success = try database.saveDocument(mutableDocument, concurrencyControl: concurrencyControl)
         resultMap["success"] = success
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = CBManager._documentToMap(mutableDocument)
+            resultMap["doc"] = _documentToMap(mutableDocument)
         }
         return resultMap
     }
@@ -81,14 +82,14 @@ class CBManager {
         }
         
         let mutableDocument: MutableDocument = document?.toMutable() ?? MutableDocument(id: id)
-        mutableDocument.setData(DataConverter.convertSETDictionary(map, origin: document?.toDictionary()))
+        mutableDocument.setData(CBManager.convertSETDictionary(map))
         
         let success = try database.saveDocument(mutableDocument, concurrencyControl: concurrencyControl)
         resultMap["success"] = success
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = CBManager._documentToMap(mutableDocument)
+            resultMap["doc"] = _documentToMap(mutableDocument)
         }
         return resultMap
     }
@@ -105,7 +106,7 @@ class CBManager {
             // It is a repetition due to implementation of Document Dart Class
             resultMap["id"] = document.id
             resultMap["sequence"] = document.sequence
-            resultMap["doc"] = NSDictionary.init(dictionary:CBManager._documentToMap(document))
+            resultMap["doc"] = NSDictionary.init(dictionary:_documentToMap(document))
         } else {
             resultMap["id"] = id
             resultMap["doc"] = nil
@@ -114,58 +115,43 @@ class CBManager {
         return NSDictionary.init(dictionary: resultMap)
     }
     
-    private static func _documentToMap(_ doc: Document) -> [String: Any] {
+    static func getBlobWithDigest(_ digest: String) -> Blob? {
+        // mBlobs needs to be thread safe because of Queries
+        objc_sync_enter(mBlobs)
+        defer {
+            objc_sync_exit(mBlobs)
+        }
+        
+        return mBlobs[digest]
+    }
+    
+    static func setBlobWithDigest(_ digest: String, blob: Blob) {
+        // mBlobs needs to be thread safe because of Queries
+        objc_sync_enter(mBlobs)
+        defer {
+            objc_sync_exit(mBlobs)
+        }
+        
+        mBlobs[digest] = blob
+    }
+    
+    static func clearBlobCache() {
+        // mBlobs needs to be thread safe because of Queries
+        objc_sync_enter(mBlobs)
+        defer {
+            objc_sync_exit(mBlobs)
+        }
+        
+        mBlobs.removeAll()
+    }
+    
+    private func _documentToMap(_ doc: Document) -> [String: Any] {
         var parsed: [String: Any] = [:]
         for key in doc.keys {
-            parsed[key] = _valueToJson(doc.value(forKey: key), withData: false)
+            parsed[key] = CBManager.convertGETValue(doc.value(forKey: key))
         }
         
         return parsed
-    }
-    
-    static func _dictionaryToJson(_ dict: DictionaryObject) -> [String: Any?] {
-        var rtnMap: [String: Any] = [:]
-        for key in dict.keys {
-            rtnMap[key] = _valueToJson(dict[key].value, withData: true)
-        }
-        
-        return rtnMap
-    }
-    
-    static func _arrayToJson(_ array: ArrayObject) -> [Any?] {
-        var rtnList: [Any?] = [];
-        for idx in 0..<array.count {
-            rtnList.append(_valueToJson(array[idx].value, withData: true))
-        }
-        return rtnList
-    }
-    
-    static func _valueToJson(_ value: Any?, withData: Bool) -> Any? {
-        switch (value) {
-        case let blob as Blob:
-            if (withData) {
-                return [
-                    "content_type": blob.contentType as Any,
-                    "digest": blob.digest as Any,
-                    "length": blob.length,
-                    "data": blob.content as Any,
-                    "@type": "blob"
-                ]
-            } else {
-                return [
-                    "content_type": blob.contentType as Any,
-                    "digest": blob.digest as Any,
-                    "length": blob.length,
-                    "@type": "blob"
-                ]
-            }
-        case let dict as DictionaryObject:
-            return _dictionaryToJson(dict)
-        case let array as ArrayObject:
-            return _arrayToJson(array)
-        default:
-            return value
-        }
     }
     
     func initDatabaseWithName(name: String) throws -> Database {

@@ -1,11 +1,6 @@
 package com.saltechsystems.couchbase_lite;
 
-import com.couchbase.lite.Array;
-import com.couchbase.lite.Blob;
 import com.couchbase.lite.DataSource;
-import com.couchbase.lite.Dictionary;
-import com.couchbase.lite.DictionaryInterface;
-import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
 import com.couchbase.lite.Function;
@@ -51,6 +46,7 @@ class QueryJson {
             HashMap<String, Object> value = new HashMap<>();
             value.put("map",_resultToMap(result));
             value.put("list",_resultToList(result));
+            value.put("keys",result.getKeys());
             rtnList.add(value);
         }
 
@@ -60,7 +56,10 @@ class QueryJson {
     private static Map<String,Object> _resultToMap(Result result) {
         HashMap<String, Object> rtnMap = new HashMap<>();
         for (String key: result.getKeys()) {
-            rtnMap.put(key, CBManager._valueToJson(result.getValue(key), true));
+            Object value = result.getValue(key);
+            if (value != null) {
+                rtnMap.put(key, CBManager.convertGETValue(value));
+            }
         }
 
         return rtnMap;
@@ -69,7 +68,7 @@ class QueryJson {
     private static List<Object> _resultToList(Result result) {
         List<Object> rtnList = new ArrayList<>();
         for (int idx = 0; idx < result.count(); idx++) {
-            rtnList.add(CBManager._valueToJson(result.getValue(idx), true));
+            rtnList.add(CBManager.convertGETValue(result.getValue(idx)));
         }
 
         return rtnList;
