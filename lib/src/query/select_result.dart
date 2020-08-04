@@ -23,7 +23,7 @@ class SelectResultProtocol {
     if (alias != null) {
       return expression.internalExpressionStack +
           [
-            {"as": alias}
+            {'as': alias}
           ];
     } else {
       return expression.internalExpressionStack;
@@ -36,7 +36,7 @@ class SelectResultAs extends SelectResultProtocol {
       : super(expression, alias: alias);
 
   SelectResultProtocol as(String _alias) {
-    return SelectResultProtocol(this.expression, alias: _alias);
+    return SelectResultProtocol(expression, alias: _alias);
   }
 }
 

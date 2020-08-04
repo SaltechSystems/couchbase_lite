@@ -13,7 +13,7 @@ abstract class ReplicatedDocument
     implements Built<ReplicatedDocument, ReplicatedDocumentBuilder> {
   ReplicatedDocument._();
 
-  factory ReplicatedDocument([updates(ReplicatedDocumentBuilder b)]) =
+  factory ReplicatedDocument([Function(ReplicatedDocumentBuilder b) updates]) =
       _$ReplicatedDocument;
 
   @BuiltValueField(wireName: 'document')

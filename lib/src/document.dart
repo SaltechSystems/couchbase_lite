@@ -93,7 +93,7 @@ class Document {
   /// - Returns: The Blob object or null.
   Blob getBlob(String key) {
     var result = getValue(key);
-    if (result is Map && result["@type"] == "blob") {
+    if (result is Map && result['@type'] == 'blob') {
       return Blob._fromMap(result);
     } else {
       return null;

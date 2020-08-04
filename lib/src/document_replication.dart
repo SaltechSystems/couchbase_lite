@@ -15,8 +15,8 @@ abstract class DocumentReplication
     implements Built<DocumentReplication, DocumentReplicationBuilder> {
   DocumentReplication._();
 
-  factory DocumentReplication([updates(DocumentReplicationBuilder b)]) =
-      _$DocumentReplication;
+  factory DocumentReplication(
+      [Function(DocumentReplicationBuilder b) updates]) = _$DocumentReplication;
 
   @nullable
   @BuiltValueField(serialize: false)

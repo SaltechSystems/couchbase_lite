@@ -12,9 +12,9 @@ class BasicAuthenticator implements Authenticator {
 
   Map<String, dynamic> toJson() {
     return {
-      "method": "basic",
-      "username": username,
-      "password": password,
+      'method': 'basic',
+      'username': username,
+      'password': password,
     };
   }
 }
@@ -28,9 +28,9 @@ class SessionAuthenticator implements Authenticator {
 
   Map<String, dynamic> toJson() {
     return {
-      "method": "session",
-      "sessionId": sessionId,
-      "cookieName": cookieName,
+      'method': 'session',
+      'sessionId': sessionId,
+      'cookieName': cookieName,
     };
   }
 }

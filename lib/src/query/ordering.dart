@@ -2,7 +2,7 @@ part of couchbase_lite;
 
 class Ordering {
   Ordering._internal(Expression _expression) {
-    this._internalExpression = _expression;
+    _internalExpression = _expression;
   }
 
   factory Ordering.property(String _property) {
@@ -16,14 +16,14 @@ class Ordering {
   Expression _internalExpression;
 
   Ordering ascending() {
-    Expression clone = _internalExpression._clone();
-    clone._internalExpressionStack.add({"orderingSortOrder": "ascending"});
+    var clone = _internalExpression._clone();
+    clone._internalExpressionStack.add({'orderingSortOrder': 'ascending'});
     return Ordering._internal(clone);
   }
 
   Ordering descending() {
-    Expression clone = _internalExpression._clone();
-    clone._internalExpressionStack.add({"orderingSortOrder": "descending"});
+    var clone = _internalExpression._clone();
+    clone._internalExpressionStack.add({'orderingSortOrder': 'descending'});
     return Ordering._internal(clone);
   }
 

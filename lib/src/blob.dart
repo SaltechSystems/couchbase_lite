@@ -14,9 +14,7 @@ class Blob {
     if (_data == null) {
       // Load data here (JSONMethodCodec doesn't support data types used by Queries)
       _futureData = Database._methodChannel.invokeMethod(
-        'getBlobContentWithDigest', <String, dynamic>{
-          'digest': _digest
-        });
+          'getBlobContentWithDigest', <String, dynamic>{'digest': _digest});
 
       _futureData.then((value) {
         _data = value;
@@ -44,6 +42,12 @@ class Blob {
   ///
   /// - Returns: The Dictionary representing the content of the current object.
   Map<String, dynamic> toMap() {
-    return {"content_type": _contentType, "digest": _digest, "length": _length, "data": _data, "@type": "blob"};
+    return {
+      'content_type': _contentType,
+      'digest': _digest,
+      'length': _length,
+      'data': _data,
+      '@type': 'blob'
+    };
   }
 }

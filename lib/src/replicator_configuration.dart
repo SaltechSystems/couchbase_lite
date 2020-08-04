@@ -35,30 +35,30 @@ class ReplicatorConfiguration {
   bool _isLocked = false;*/
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> map = {"database": database.name, "target": target};
+    var map = <String, dynamic>{'database': database.name, 'target': target};
 
     switch (replicatorType) {
       case ReplicatorType.pushAndPull:
-        map["replicatorType"] = "PUSH_AND_PULL";
+        map['replicatorType'] = 'PUSH_AND_PULL';
         break;
       case ReplicatorType.push:
-        map["replicatorType"] = "PUSH";
+        map['replicatorType'] = 'PUSH';
         break;
       case ReplicatorType.pull:
-        map["replicatorType"] = "PULL";
+        map['replicatorType'] = 'PULL';
         break;
     }
 
     if (pinnedServerCertificate != null) {
-      map["pinnedServerCertificate"] = pinnedServerCertificate;
+      map['pinnedServerCertificate'] = pinnedServerCertificate;
     }
 
     if (authenticator != null) {
-      map["authenticator"] = authenticator;
+      map['authenticator'] = authenticator;
     }
 
     if (continuous != null) {
-      map["continuous"] = continuous;
+      map['continuous'] = continuous;
     }
 
     //map["hasPushFilter"] = pushFilter != null;

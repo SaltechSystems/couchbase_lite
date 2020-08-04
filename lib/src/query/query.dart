@@ -13,14 +13,14 @@ class Query {
   static const MethodChannel _channel =
       MethodChannel('com.saltechsystems.couchbase_lite/json', _jsonMethod);
   static const EventChannel _queryEventChannel = EventChannel(
-      "com.saltechsystems.couchbase_lite/queryEventChannel", _jsonMethod);
+      'com.saltechsystems.couchbase_lite/queryEventChannel', _jsonMethod);
   static final Stream _stream = _queryEventChannel.receiveBroadcastStream();
 
   /// Executes the query.
   ///
   /// Returns the ResultSet object representing the query result.
   Future<ResultSet> execute() async {
-    this._options["queryId"] = queryId;
+    _options['queryId'] = queryId;
 
     if (!_stored && tokens.isNotEmpty) {
       _stored = await _channel.invokeMethod('storeQuery', this);
@@ -30,12 +30,12 @@ class Query {
       final List<dynamic> resultSet =
           await _channel.invokeMethod('executeQuery', this);
 
-      List<Result> results = List<Result>();
+      var results = <Result>[];
       for (dynamic result in resultSet) {
-        Result newResult = Result();
-        newResult.setMap(result["map"]);
-        newResult.setList(result["list"]);
-        newResult.setKeys(List.castFrom<dynamic, String>(result["keys"]));
+        var newResult = Result();
+        newResult.setMap(result['map']);
+        newResult.setList(result['list']);
+        newResult.setKeys(List.castFrom<dynamic, String>(result['keys']));
         results.add(newResult);
       }
 
@@ -57,25 +57,25 @@ class Query {
       Function(QueryChange) callback) async {
     var token = ListenerToken();
     tokens[token] =
-        _stream.where((data) => data["query"] == queryId).listen((data) {
+        _stream.where((data) => data['query'] == queryId).listen((data) {
       Map<String, dynamic> qcJson = data;
-      final List<dynamic> resultList = qcJson["results"];
+      final List<dynamic> resultList = qcJson['results'];
 
       ResultSet result;
 
       if (resultList != null) {
-        List<Result> results = List<Result>();
+        var results = <Result>[];
         for (dynamic result in resultList) {
-          Result newResult = Result();
-          newResult.setMap(result["map"]);
-          newResult.setList(result["list"]);
-          newResult.setKeys(List.castFrom<dynamic, String>(result["keys"]));
+          var newResult = Result();
+          newResult.setMap(result['map']);
+          newResult.setList(result['list']);
+          newResult.setKeys(List.castFrom<dynamic, String>(result['keys']));
           results.add(newResult);
         }
         result = ResultSet(results);
       }
 
-      String error = qcJson["error"];
+      String error = qcJson['error'];
 
       callback(QueryChange(query: this, results: result, error: error));
     });
@@ -117,15 +117,16 @@ class Query {
   ///
   Future<String> explain() {
     //Make sure the queryId is available when the toJson() method is called.
-    this._options["queryId"] = queryId;
+    _options['queryId'] = queryId;
     return _channel.invokeMethod('explainQuery', this);
   }
 
-  Map<String, dynamic> toJson() => this.options;
+  Map<String, dynamic> toJson() => options;
 }
 
 class QueryChange {
-  QueryChange({this.query, this.results, this.error}) : assert(query != null);
+  QueryChange({@required this.query, this.results, this.error})
+      : assert(query != null);
 
   final Query query;
   final ResultSet results;

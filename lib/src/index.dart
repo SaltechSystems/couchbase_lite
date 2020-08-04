@@ -1,11 +1,6 @@
 part of couchbase_lite;
 
 class ValueIndexItem {
-  Map<String, dynamic> _map;
-
-  /// Returns the json representation of this object
-  Map<String, dynamic> toJson() => _map;
-
   ValueIndexItem(this._map);
 
   /// Creates a ValueIndexItem for the given [property]
@@ -17,15 +12,20 @@ class ValueIndexItem {
   factory ValueIndexItem.expression(Expression expression) {
     return ValueIndexItem({'expression': expression.toJson()});
   }
+
+  Map<String, dynamic> _map;
+
+  /// Returns the json representation of this object
+  Map<String, dynamic> toJson() => _map;
 }
 
 class ValueIndex {
-  final List<ValueIndexItem> _valueIndexItems;
-
   ValueIndex(this._valueIndexItems);
 
+  final List<ValueIndexItem> _valueIndexItems;
+
   List<Map<String, dynamic>> toJson() {
-    List<Map<String, dynamic>> map = [];
+    var map = <Map<String, dynamic>>[];
     for (var item in _valueIndexItems) {
       map.add(item.toJson());
     }
