@@ -1,11 +1,13 @@
 package com.saltechsystems.couchbase_lite;
 
-import android.content.res.AssetManager;
 
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.Database;
+import com.couchbase.lite.Document;
+import com.couchbase.lite.DocumentFlag;
 import com.couchbase.lite.Endpoint;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.ReplicationFilter;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.SessionAuthenticator;
@@ -14,8 +16,10 @@ import com.couchbase.lite.URLEndpoint;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URI;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import io.flutter.plugin.common.JSONUtil;
 
@@ -88,6 +92,34 @@ class ReplicatorJson {
             }
         }
 
+        if (replicatorMap.channels != null) {
+            mReplicatorConfig.setChannels(replicatorMap.channels);
+        }
+
+        if (replicatorMap.pushAttributeKeyFilter != null &&
+            replicatorMap.pushAttributeValuesFilter != null) {
+            mReplicatorConfig.setPushFilter(new ReplicationFilter() {
+
+                @Override
+                public boolean filtered(Document document,
+                                        EnumSet<DocumentFlag> flags) {
+                    if (replicatorMap.pushAttributeKeyFilter!= null &&
+                            document.contains(replicatorMap.pushAttributeKeyFilter) &&
+                            replicatorMap.pushAttributeValuesFilter != null &&
+                            replicatorMap.pushAttributeValuesFilter.contains(
+                                    document.getString(replicatorMap.pushAttributeKeyFilter))
+                    ) {
+                        return false;
+                    }
+                    return true;
+                }
+            });
+        }
+
+        if (replicatorMap.headers != null) {
+            mReplicatorConfig.setHeaders(replicatorMap.headers);
+        }
+
         if (replicatorMap.hasAuthenticator) {
             inflateAuthenticator();
         }
@@ -133,6 +165,11 @@ class ReplicatorMap {
     String pinnedServerCertificate;
     boolean hasAuthenticator = false;
     Map<String, Object> authenticator;
+    List<String> channels;
+    String pushAttributeKeyFilter;
+    List<String> pushAttributeValuesFilter;
+    Map<String, String> headers;
+
 
     ReplicatorMap(JSONObject jsonObject) {
         Object unwrappedJson = JSONUtil.unwrap(jsonObject);
@@ -168,6 +205,22 @@ class ReplicatorMap {
                     hasAuthenticator = true;
                     authenticator = getMapFromGenericMap(mapObject);
                 }
+            }
+
+            if (config.containsKey("channels")) {
+                channels = (List<String>) config.get("channels");
+            }
+
+            if (config.containsKey("pushAttributeValuesFilter")) {
+                pushAttributeValuesFilter = (List<String>) config.get("pushAttributeValuesFilter");
+            }
+
+            if (config.containsKey("pushAttributeKeyFilter")) {
+                pushAttributeKeyFilter = (String) config.get("pushAttributeKeyFilter");
+            }
+
+            if (config.containsKey("headers")) {
+                headers = (Map<String, String>) config.get("headers");
             }
         }
     }
