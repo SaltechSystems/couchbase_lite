@@ -1,3 +1,10 @@
+## 2.7.1+6
+
+* Added channels to replicator configs
+* Added headers to replicator config
+* Added push filters to replicator config
+* Added pull filters to replicator config
+
 ## 2.7.1+5
 
 * Added deletion of indexes
