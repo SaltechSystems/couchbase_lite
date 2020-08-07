@@ -17,6 +17,10 @@ class MutableDocument extends Document {
   ///   - key: The key.
   /// - Returns: The self object.
   MutableDocument setValue(String key, Object value) {
+    if (value is Fragment) {
+      value = (value as Fragment).getValue();
+    }
+
     if (value != null) {
       super._data[key] = value;
     }
@@ -128,8 +132,7 @@ class MutableDocument extends Document {
   /// - Returns: The MutableDocument object.
   @override
   MutableDocument toMutable() {
-    return MutableDocument._init(
-        this.toMap(), this.id, this._dbname, this.sequence);
+    return MutableDocument._init(toMap(), id, _dbname, sequence);
   }
 
   /// Get a property's value as a List Object, which is a mapping object of an array value.

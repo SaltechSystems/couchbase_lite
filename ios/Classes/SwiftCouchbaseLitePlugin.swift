@@ -66,6 +66,29 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
     }
     
     public func handleDatabase(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        switch (call.method) {
+        case "clearBlobCache":
+            CBManager.clearBlobCache()
+            result(nil)
+            return
+        case "getBlobContentWithDigest":
+            guard let arguments = call.arguments as? [String:Any], let digest = arguments["digest"] as? String else {
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+
+            // Don't load the content if it isn't found
+            if let blob = CBManager.getBlobWithDigest(digest), let data = blob.content {
+                result(FlutterStandardTypedData(bytes: data))
+            } else {
+                result(nil)
+            }
+            return
+        default:
+            break
+        }
+
+        // All other methods are database dependent
         guard let arguments = call.arguments as? [String:Any], let dbname = arguments["database"] as? String else {
             result(FlutterError(code: "errArgs", message: "Error: Missing database", details: call.arguments.debugDescription))
             return
@@ -258,22 +281,14 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             } else {
                 result(nil)
             }
-        case "getBlobContentFromDocumentWithId":
-            guard let database = mCBManager.getDatabase(name: dbname) else {
-                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
-                return
-            }
-            
-            guard let id = arguments["id"] as? String, let key = arguments["key"] as? String, let digest = arguments["digest"] as? String else {
+        case "getBlobContentWithDigest":
+            guard let digest = arguments["digest"] as? String else {
                 result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
             
-            // Don't load the content if it isn't found or the digest doesn't match anymore
-            if let document = database.document(withID: id),
-                let blob = document.blob(forKey: key),
-                blob.digest == digest,
-                let data = blob.content {
+            // Don't load the content if it isn't found
+            if let blob = CBManager.getBlobWithDigest(digest), let data = blob.content {
                 result(FlutterStandardTypedData(bytes: data))
             } else {
                 result(nil)

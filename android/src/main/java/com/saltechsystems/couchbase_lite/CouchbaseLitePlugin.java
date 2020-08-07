@@ -5,9 +5,7 @@ import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
-import com.couchbase.lite.Array;
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.BuildConfig;
 import com.couchbase.lite.ConcurrencyControl;
@@ -16,7 +14,6 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseChange;
 import com.couchbase.lite.DatabaseChangeListener;
-import com.couchbase.lite.Document;
 import com.couchbase.lite.DocumentFlag;
 import com.couchbase.lite.DocumentReplication;
 import com.couchbase.lite.DocumentReplicationListener;
@@ -31,7 +28,6 @@ import com.couchbase.lite.ReplicatedDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
-import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.ValueIndex;
 import com.couchbase.lite.ValueIndexItem;
 
@@ -39,7 +35,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +141,32 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
   private class DatabaseCallHander implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, final Result result) {
+      switch (call.method) {
+        case ("getBlobContentWithDigest"):
+          if (!call.hasArgument("digest")) {
+            result.error("errArgs", "Database Error: Invalid Arguments", call.arguments.toString());
+            return;
+          }
+
+          String _digest = call.argument("digest");
+
+          // Don't load the content if it isn't found
+          Blob _blob = CBManager.getBlobWithDigest(_digest);
+          if (_blob != null) {
+            result.success(_blob.getContent());
+          } else {
+            result.success(null);
+          }
+          return;
+        case ("clearBlobCache"):
+          CBManager.clearBlobCache();
+          result.success(null);
+          return;
+        default:
+          break;
+      }
+
+      // All other methods are database dependent
       if (!call.hasArgument("database")) {
         result.error("errArgs", "Error: Missing database", call.arguments.toString());
         return;
@@ -354,33 +375,6 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
           _id = call.argument("id");
           result.success(mCBManager.getDocumentWithId(database, _id));
-          break;
-        case ("getBlobContentFromDocumentWithId"):
-          if (database == null) {
-            result.error("errDatabase", "Database with name " + dbname + "not found", null);
-            return;
-          }
-
-          if (!call.hasArgument("id") || !call.hasArgument("key") || !call.hasArgument("digest")) {
-            result.error("errArgs", "Database Error: Invalid Arguments", call.arguments.toString());
-            return;
-          }
-
-          _id = call.argument("id");
-          String _key = call.argument("key");
-          String _digest = call.argument("digest");
-          Document document = database.getDocument(_id);
-          byte[] content = null;
-
-          // Don't load the content if it isn't found or the digest doesn't match anymore
-          if (document != null) {
-            Blob _blob = document.getBlob(_key);
-            if (_blob != null && _blob.digest().equals(_digest)) {
-              content = _blob.getContent();
-            }
-          }
-
-          result.success(content);
           break;
         case ("deleteDocumentWithId"):
           if (database == null) {

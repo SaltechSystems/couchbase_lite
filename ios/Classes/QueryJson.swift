@@ -21,12 +21,33 @@ public class QueryJson {
         var resultArr: Array<Dictionary<String,Any>> = []
         for result in results.allResults() {
             var value = Dictionary<String,Any>()
-            value["map"] = result.toDictionary()
-            value["list"] = result.toArray()
+            value["map"] = _resultToMap(result)
+            value["list"] = _resultToList(result)
+            value["keys"] = result.keys
             resultArr.append(value)
         }
         
         return NSArray(array: resultArr)
+    }
+    
+    static private func _resultToMap(_ result: Result) -> [String: Any] {
+        var rtnMap: [String: Any] = [:]
+        for key in result.keys {
+            if let value = result[key].value {
+                rtnMap[key] = CBManager.convertGETValue(value)
+            }
+        }
+        
+        return rtnMap
+    }
+    
+    private static func _resultToList(_ result: Result) -> [Any?] {
+        var rtnList: [Any?] = [];
+        for idx in 0..<result.count {
+            rtnList.append(CBManager.convertGETValue(result[idx].value))
+        }
+        
+        return rtnList
     }
     
     func toCouchbaseQuery() -> Query? {

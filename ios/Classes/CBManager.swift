@@ -31,6 +31,7 @@ class CBManager {
     private var mDatabaseListenerTokens : Dictionary<String, ListenerToken> = Dictionary();
     private var mDBConfig = DatabaseConfiguration();
     private weak var mDelegate: CBManagerDelegate?
+    private static var mBlobs : Dictionary<String,Blob> = Dictionary()
     
     init(delegate: CBManagerDelegate, logLevel: LogLevel) {
         mDelegate = delegate
@@ -47,26 +48,26 @@ class CBManager {
     
     func saveDocument(database: Database, map: Dictionary<String, Any>, concurrencyControl: ConcurrencyControl) throws -> NSMutableDictionary {
         let resultMap: NSMutableDictionary = NSMutableDictionary.init()
-        let mutableDocument: MutableDocument = MutableDocument(data: DataConverter.convertSETDictionary(map));
+        let mutableDocument: MutableDocument = MutableDocument(data: CBManager.convertSETDictionary(map));
         let success = try database.saveDocument(mutableDocument, concurrencyControl: concurrencyControl)
         resultMap["success"] = success
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = getJSONMap(mutableDocument.toDictionary())
+            resultMap["doc"] = _documentToMap(mutableDocument)
         }
         return resultMap
     }
     
     func saveDocumentWithId(database: Database, id: String, map: Dictionary<String, Any>, concurrencyControl: ConcurrencyControl) throws -> NSMutableDictionary {
         let resultMap: NSMutableDictionary = NSMutableDictionary.init()
-        let mutableDocument: MutableDocument = MutableDocument(id: id, data: DataConverter.convertSETDictionary(map))
+        let mutableDocument: MutableDocument = MutableDocument(id: id, data: CBManager.convertSETDictionary(map))
         let success = try database.saveDocument(mutableDocument, concurrencyControl: concurrencyControl)
         resultMap["success"] = success
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = getJSONMap(mutableDocument.toDictionary())
+            resultMap["doc"] = _documentToMap(mutableDocument)
         }
         return resultMap
     }
@@ -81,14 +82,14 @@ class CBManager {
         }
         
         let mutableDocument: MutableDocument = document?.toMutable() ?? MutableDocument(id: id)
-        mutableDocument.setData(DataConverter.convertSETDictionary(map, origin: document?.toDictionary()))
+        mutableDocument.setData(CBManager.convertSETDictionary(map))
         
         let success = try database.saveDocument(mutableDocument, concurrencyControl: concurrencyControl)
         resultMap["success"] = success
         if (success) {
             resultMap["id"] = mutableDocument.id
             resultMap["sequence"] = mutableDocument.sequence
-            resultMap["doc"] = getJSONMap(mutableDocument.toDictionary())
+            resultMap["doc"] = _documentToMap(mutableDocument)
         }
         return resultMap
     }
@@ -105,7 +106,7 @@ class CBManager {
             // It is a repetition due to implementation of Document Dart Class
             resultMap["id"] = document.id
             resultMap["sequence"] = document.sequence
-            resultMap["doc"] = NSDictionary.init(dictionary:getJSONMap(document.toDictionary()))
+            resultMap["doc"] = NSDictionary.init(dictionary:_documentToMap(document))
         } else {
             resultMap["id"] = id
             resultMap["doc"] = nil
@@ -114,55 +115,44 @@ class CBManager {
         return NSDictionary.init(dictionary: resultMap)
     }
     
-    /*func _documentToMap(_ document: Document) -> NSDictionary {
-        return NSDictionary.init(dictionary:getJSONMap(document.toDictionary()))
-    }
-    
-    func _encodeValue(_ value: Any?) -> Any? {
-        switch value {
-        case let dict as Dictionary<String, Any>:
-            return _encodeDictionary(dict)
-        case let _ as Blob:
-            //return _encodeBlob(blob)
-            //May have memory issues if we pass the blob
-            return nil
-        default:
-            return value
-        }
-    }*/
-    
-    func getJSONMap(_ dictionary: [String: Any]) -> [String: Any] {
-        var result: [String: Any] = [:]
-        for (key, value) in dictionary {
-            switch (value) {
-            case let blob as Blob:
-                let blobJSON: [String: Any] = [
-                    "contentType": blob.contentType as Any,
-                    "digest": blob.digest as Any,
-                    "length": blob.length,
-                    "@type": "blob"
-                ]
-                result[key] = blobJSON
-                break
-            default:
-                result[key] = value
-            }
+    static func getBlobWithDigest(_ digest: String) -> Blob? {
+        // mBlobs needs to be thread safe because of Queries
+        objc_sync_enter(mBlobs)
+        defer {
+            objc_sync_exit(mBlobs)
         }
         
-        return result
+        return mBlobs[digest]
     }
     
-    /*func _encodeBlob(_ blob: Blob) -> [String: Any]? {
-        var result: [String: Any] = [:]
-        result["contentType"] = blob.contentType
-        if let data = blob.content {
-            result["data"] = FlutterStandardTypedData(bytes: data)
-        } else {
-            result["data"] = nil
+    static func setBlobWithDigest(_ digest: String, blob: Blob) {
+        // mBlobs needs to be thread safe because of Queries
+        objc_sync_enter(mBlobs)
+        defer {
+            objc_sync_exit(mBlobs)
         }
         
-        return result
-    }*/
+        mBlobs[digest] = blob
+    }
+    
+    static func clearBlobCache() {
+        // mBlobs needs to be thread safe because of Queries
+        objc_sync_enter(mBlobs)
+        defer {
+            objc_sync_exit(mBlobs)
+        }
+        
+        mBlobs.removeAll()
+    }
+    
+    private func _documentToMap(_ doc: Document) -> [String: Any] {
+        var parsed: [String: Any] = [:]
+        for key in doc.keys {
+            parsed[key] = CBManager.convertGETValue(doc.value(forKey: key))
+        }
+        
+        return parsed
+    }
     
     func initDatabaseWithName(name: String) throws -> Database {
         if let database = mDatabase[name] {

@@ -34,14 +34,14 @@ class Database {
 
   /// Gets a Document object [withId]
   Future<Document> document(String withId) async {
-    Map<dynamic, dynamic> _docResult = await _methodChannel.invokeMethod(
+    var _docResult = await _methodChannel.invokeMethod(
         'getDocumentWithId', <String, dynamic>{'database': name, 'id': withId});
 
-    if (_docResult["doc"] == null) {
+    if (_docResult['doc'] == null) {
       return null;
     } else {
       return Document._init(
-          _docResult["doc"], _docResult["id"], name, _docResult["sequence"]);
+          _docResult['doc'], _docResult['id'], name, _docResult['sequence']);
     }
   }
 
@@ -104,11 +104,11 @@ class Database {
       });
     }
 
-    if (result["success"] == true) {
+    if (result['success'] == true) {
       doc._dbname = name;
-      doc._id = result["id"];
-      doc._sequence = result["sequence"];
-      doc._data = Map<String, dynamic>.from(result["doc"]);
+      doc._id = result['id'];
+      doc._sequence = result['sequence'];
+      doc._data = Map<String, dynamic>.from(result['doc']);
       return true;
     } else {
       return false;
@@ -119,6 +119,13 @@ class Database {
   Future<bool> deleteDocument(String withId) async {
     await _methodChannel.invokeMethod('deleteDocumentWithId',
         <String, dynamic>{'database': name, 'id': withId});
+
+    return true;
+  }
+
+  /// Clears all Blobs from the database used to fetch the Blob content.
+  Future<bool> clearBlobCache() async {
+    await _methodChannel.invokeMethod('clearBlobCache');
 
     return true;
   }
@@ -152,17 +159,17 @@ class Database {
 
     tokens[token] = _stream
         .where((data) =>
-            (data["database"] == name && data["type"] == "DatabaseChange"))
+            (data['database'] == name && data['type'] == 'DatabaseChange'))
         .listen((data) => callback(DatabaseChange(
             this,
-            (data["documentIDs"] as List<dynamic>)
+            (data['documentIDs'] as List<dynamic>)
                 .map((id) => id as String)
                 .toList())));
 
     // Caveat:  Do not call addChangeListener more than once.
     if (tokens.length == 1) {
       _methodChannel.invokeMethod(
-          "addChangeListener", <String, dynamic>{'database': name});
+          'addChangeListener', <String, dynamic>{'database': name});
     }
 
     return token;
@@ -177,8 +184,8 @@ class Database {
 
     tokens[token] = _stream
         .where((data) =>
-            (data["database"] == name && data["type"] == "DatabaseChange") &&
-            (data["documentIDs"] as List<Object>).contains(withId))
+            (data['database'] == name && data['type'] == 'DatabaseChange') &&
+            (data['documentIDs'] as List<Object>).contains(withId))
         .listen((data) {
       callback(DocumentChange(this, withId));
     });
@@ -186,7 +193,7 @@ class Database {
     // Caveat:  Do not call addChangeListener more than once.
     if (tokens.length == 1) {
       _methodChannel.invokeMethod(
-          "addChangeListener", <String, dynamic>{'database': name});
+          'addChangeListener', <String, dynamic>{'database': name});
     }
 
     return token;

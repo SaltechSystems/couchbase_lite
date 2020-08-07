@@ -14,7 +14,7 @@ class Replicator {
   static const MethodChannel _jsonChannel =
       MethodChannel('com.saltechsystems.couchbase_lite/json', _jsonMethod);
   static const EventChannel _replicationEventChannel =
-      EventChannel("com.saltechsystems.couchbase_lite/replicationEventChannel");
+      EventChannel('com.saltechsystems.couchbase_lite/replicationEventChannel');
   static final Stream _replicationStream =
       _replicationEventChannel.receiveBroadcastStream();
 
@@ -60,13 +60,13 @@ class Replicator {
   ListenerToken addChangeListener(Function(ReplicatorChange) callback) {
     var token = ListenerToken();
     tokens[token] = _replicationStream
-        .where((data) => (data["replicator"] == replicatorId &&
-            data["type"] == "ReplicatorChange"))
+        .where((data) => (data['replicator'] == replicatorId &&
+            data['type'] == 'ReplicatorChange'))
         .listen((data) {
-      var activity = ReplicatorStatus.activityFromString(data["activity"]);
+      var activity = ReplicatorStatus.activityFromString(data['activity']);
       String error;
-      if (data["error"] is String) {
-        error = data["error"];
+      if (data['error'] is String) {
+        error = data['error'];
       }
 
       callback(
@@ -82,8 +82,8 @@ class Replicator {
       Function(DocumentReplication) callback) {
     var token = ListenerToken();
     tokens[token] = _replicationStream
-        .where((data) => ((data["replicator"] == replicatorId &&
-            data["type"] == "DocumentReplication")))
+        .where((data) => ((data['replicator'] == replicatorId &&
+            data['type'] == 'DocumentReplication')))
         .listen((data) {
       callback(DocumentReplication.fromMap(data)
           .rebuild((b) => b..replicator = this));
@@ -115,7 +115,7 @@ class Replicator {
   }
 
   Map<String, dynamic> toJson() {
-    return {"replicatorId": replicatorId, "config": config};
+    return {'replicatorId': replicatorId, 'config': config};
   }
 }
 
@@ -127,19 +127,19 @@ class ReplicatorStatus {
 
   static ReplicatorActivityLevel activityFromString(String _status) {
     switch (_status) {
-      case "BUSY":
+      case 'BUSY':
         return ReplicatorActivityLevel.busy;
         break;
-      case "IDLE":
+      case 'IDLE':
         return ReplicatorActivityLevel.idle;
         break;
-      case "OFFLINE":
+      case 'OFFLINE':
         return ReplicatorActivityLevel.offline;
         break;
-      case "STOPPED":
+      case 'STOPPED':
         return ReplicatorActivityLevel.stopped;
         break;
-      case "CONNECTING":
+      case 'CONNECTING':
         return ReplicatorActivityLevel.connecting;
         break;
     }
