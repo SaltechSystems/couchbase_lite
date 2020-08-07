@@ -125,8 +125,31 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                     }
                 }
             }
-            
-            
+
+        case "deleteIndex":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            guard let indexName = arguments["forName"] as? String else {
+                result(FlutterError.init(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+
+            databaseDispatchQueue.async {
+                do {
+                    try database.deleteIndex(forName: indexName);
+                    DispatchQueue.main.async {
+                        result(true)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError.init(code: "errIndex", message: "Error deleting index \(indexName)", details: error.localizedDescription))
+                    }
+                }
+            }
+
+
         case "deleteDatabaseWithName":
             do {
                 try mCBManager.deleteDatabaseWithName(name: dbname)

@@ -102,6 +102,16 @@ void main() {
                 details: arguments.toString());
           }
           break;
+        case ("deleteIndex"):
+          if (arguments.containsKey("forName")) {
+            return true;
+          } else {
+            return PlatformException(
+                code: "errArgs",
+                message: "Query Error: Invalid Arguments",
+                details: arguments.toString());
+          }
+          break;
         case ("addDocumentChangeListener"):
           return null;
           break;
@@ -220,6 +230,7 @@ void main() {
 
     expect(index.toJson(), expected);
     await database.createIndex(index, withName: "MyIndex");
+    await database.deleteIndex(forName: "MyIndex");
 
     await database.indexes;
     await database.compact();

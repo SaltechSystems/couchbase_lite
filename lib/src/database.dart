@@ -134,13 +134,15 @@ class Database {
     });
   }
 
-  /// Deletes index [withName] from the database.
-  /*Future<void> deleteIndex({@required String withName}) async {
-    await _methodChannel.invokeMethod(
-        'deleteDocumentWithId', <String, dynamic>{'database': name, 'id': id});
+  /// Deletes index [forName] from the database.
+  Future<void> deleteIndex({@required String forName}) async {
+    await _methodChannel.invokeMethod('deleteIndex', <String, dynamic>{
+      'database': name,
+      'forName': forName,
+    });
 
     return true;
-  }*/
+  }
 
   /// Adds a database change listener on which changes will be posted
   ///

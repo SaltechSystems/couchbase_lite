@@ -240,6 +240,44 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           }
 
           break;
+        case ("deleteIndex"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (call.hasArgument("forName")) {
+            final String indexName = call.argument("forName");
+
+            final Database db = database;
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+              @Override
+              public void run() {
+                try {
+                  db.deleteIndex(indexName);
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.success(true);
+                    }
+                  });
+                } catch (final CouchbaseLiteException e) {
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.error("errIndex", "Error deleting index", e.toString());
+                    }
+                  });
+                }
+              }
+            });
+
+
+          } else {
+            result.error("errArg", "invalid arguments", null);
+          }
+
+          break;
         case ("deleteDatabaseWithName"):
           try {
             mCBManager.deleteDatabaseWithName(dbname);
@@ -418,7 +456,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
               result.success(null);
           }
 
-          
+
           break;
 
         case ("removeChangeListener"):
