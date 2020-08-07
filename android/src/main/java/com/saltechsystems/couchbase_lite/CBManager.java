@@ -321,7 +321,7 @@ class CBManager {
         ListenerToken token = mDatabaseListenerTokens.remove(dbname);
         if (_db != null && token != null) {
             _db.removeChangeListener(token);
-        } 
+        }
     }
 
     void addQuery(String queryId, Query query, ListenerToken token) {

@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:couchbase_lite/couchbase_lite.dart';
 import 'package:couchbase_lite_example/beer_sample_app.dart';
 import 'package:flutter/material.dart';
-import 'package:couchbase_lite/couchbase_lite.dart';
 import 'package:flutter/services.dart';
 
 void main() => runApp(BeerSampleApp(AppMode.production));

@@ -11,6 +11,10 @@ class ReplicatorConfiguration {
   bool continuous;
   String pinnedServerCertificate;
   Authenticator authenticator;
+  List<String> channels;
+  List<String> pushAttributeValuesFilter;
+  String pushAttributeKeyFilter;
+  Map headers;
 
   /*bool Function(Document, int) _pushFilter;
   bool Function(Document, int) get pushFilter => _pushFilter;
@@ -63,6 +67,22 @@ class ReplicatorConfiguration {
 
     //map["hasPushFilter"] = pushFilter != null;
     //map["hasPullFilter"] = pullFilter != null;
+
+    if (channels != null) {
+      map['channels'] = channels;
+    }
+
+    if (pushAttributeValuesFilter != null) {
+      map['pushAttributeValuesFilter'] = pushAttributeValuesFilter;
+    }
+
+    if (pushAttributeKeyFilter != null) {
+      map['pushAttributeKeyFilter'] = pushAttributeKeyFilter;
+    }
+
+    if (headers != null) {
+      map['headers'] = headers;
+    }
 
     return map;
   }
