@@ -39,15 +39,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Bool value.
-  bool getBoolean(String key) {
-    var result = getValue(key);
-
-    if (result is num) {
-      return result != 0;
-    }
-
-    return result is bool ? result : false;
-  }
+  bool getBoolean(String key) => this[key].getBoolean();
 
   /// Gets a property's value as a double value.
   /// Integers will be converted to double. The value `true` is returned as 1.0, `false` as 0.0.
@@ -55,16 +47,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Double value.
-  double getDouble(String key) {
-    var result = getValue(key);
-    if (result is double) {
-      return result;
-    } else if (result is int) {
-      return result.toDouble();
-    } else {
-      return 0.0;
-    }
-  }
+  double getDouble(String key) => this[key].getDouble();
 
   /// Gets a property's value as an int value.
   /// Floating point values will be rounded. The value `true` is returned as 1, `false` as 0.
@@ -72,16 +55,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Int value.
-  int getInt(String key) {
-    var result = getValue(key);
-    if (result is double) {
-      return result.toInt();
-    } else if (result is int) {
-      return result;
-    } else {
-      return 0;
-    }
-  }
+  int getInt(String key) => this[key].getInt();
 
   ///  Get a property’s value as a Blob object without the data.
   ///  Returns nil if the property doesn’t exist, or its value is not a blob.
@@ -91,14 +65,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Blob object or null.
-  Blob getBlob(String key) {
-    var result = getValue(key);
-    if (result is Map && result['@type'] == 'blob') {
-      return Blob._fromMap(result);
-    } else {
-      return null;
-    }
-  }
+  Blob getBlob(String key) => this[key].getBlob();
 
   /// An array containing all keys, or an empty array if the document has no properties.
   List<String> getKeys() {
@@ -110,10 +77,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The String object or null.
-  String getString(String key) {
-    var result = getValue(key);
-    return result is String ? result : null;
-  }
+  String getString(String key) => this[key].getString();
 
   ///  Gets a property's value as a date.
   ///  Returns null if the property doesn't exist, or its value is not a date.
@@ -131,27 +95,14 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The value or null.
-  Object getValue(String key) {
-    if (contains(key)) {
-      return _data[key] as Object;
-    } else {
-      return null;
-    }
-  }
+  Object getValue(String key) => this[key].getValue();
 
   /// Get a property's value as a List Object, which is a mapping object of an array value.
   /// Returns null if the property doesn't exists, or its value is not an array.
   ///
   /// - Parameter key: The key.
   /// - Returns: The List Object object or null.
-  List<T> getList<T>(String key) {
-    var result = getValue(key);
-    if (result is List) {
-      return List.from(List.castFrom<dynamic, T>(result));
-    }
-
-    return null;
-  }
+  List<T> getList<T>(String key) => this[key].getList();
 
   /// Get a property's value as a List Object, which is a mapping object of an array value.
   /// Returns null if the property doesn't exists, or its value is not an array.
@@ -167,14 +118,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Map Object object or nil.
-  Map<K, V> getMap<K, V>(String key) {
-    var result = getValue(key);
-    if (result is Map) {
-      return Map.from(Map.castFrom<dynamic, dynamic, K, V>(result));
-    }
-
-    return null;
-  }
+  Map<K, V> getMap<K, V>(String key) => this[key].getMap();
 
   /// Gets content of the current object as a Dictionary.
   ///
@@ -189,4 +133,7 @@ class Document {
   MutableDocument toMutable() {
     return MutableDocument._init(_data, id, _dbname, sequence);
   }
+
+  /// Subscript access to a Fragment object by key.
+  Fragment operator [](String key) => Fragment._init(_data[key]);
 }

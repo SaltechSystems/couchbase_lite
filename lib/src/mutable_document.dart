@@ -17,6 +17,10 @@ class MutableDocument extends Document {
   ///   - key: The key.
   /// - Returns: The self object.
   MutableDocument setValue(String key, Object value) {
+    if (value is Fragment) {
+      value = (value as Fragment).getValue();
+    }
+
     if (value != null) {
       super._data[key] = value;
     }

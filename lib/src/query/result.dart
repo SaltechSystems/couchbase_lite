@@ -93,6 +93,18 @@ class Result {
     return _internalMap;
   }
 
+  Fragment operator [](dynamic key) {
+    if (key is int) {
+      if (key < _internalList.length) {
+        return Fragment._init(_internalList[key]);
+      }
+    } else if (key is String) {
+      return Fragment._init(_internalMap[key]);
+    }
+
+    return Fragment._init(null);
+  }
+
   void setMap(Map<String, dynamic> map) {
     _internalMap.clear();
     _internalMap.addAll(map);
