@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.BuildConfig;
 import com.couchbase.lite.ConcurrencyControl;
@@ -121,11 +123,12 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
       ValueIndexItem indexItem;
       if (item.containsKey("expression")){
 
-        Expression expression = QueryJson.inflateExpressionFromArray((List<Map<String, Object>>) item.get("expression"));
+        Expression expression = QueryJson.inflateExpressionFromArray(CBManager.getListOfMapsFromGenericList(item.get("expression")));
         indexItem = ValueIndexItem.expression(expression);
 
       } else if (item.containsKey("property")) {
         String property = (String) item.get("property");
+        assert property != null;
         indexItem = ValueIndexItem.property(property);
       } else {
         return null;
@@ -134,13 +137,13 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
       indices.add(indexItem);
     }
 
-    ValueIndexItem[] array = indices.toArray(new ValueIndexItem[indices.size()]);
+    ValueIndexItem[] array = indices.toArray(new ValueIndexItem[0]);
     return IndexBuilder.valueIndex(array);
   }
 
   private class DatabaseCallHander implements MethodCallHandler {
     @Override
-    public void onMethodCall(MethodCall call, final Result result) {
+    public void onMethodCall(MethodCall call, @NonNull final Result result) {
       switch (call.method) {
         case ("getBlobContentWithDigest"):
           if (!call.hasArgument("digest")) {
@@ -178,11 +181,13 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
       ConcurrencyControl _concurrencyControl = null;
       if (call.hasArgument("concurrencyControl")) {
         String arg = call.argument("concurrencyControl");
-        switch (arg) {
-          case "failOnConflict":
-            _concurrencyControl = ConcurrencyControl.FAIL_ON_CONFLICT;
-          default:
-            _concurrencyControl = ConcurrencyControl.LAST_WRITE_WINS;
+        if (arg != null) {
+          switch (arg) {
+            case "failOnConflict":
+              _concurrencyControl = ConcurrencyControl.FAIL_ON_CONFLICT;
+            default:
+              _concurrencyControl = ConcurrencyControl.LAST_WRITE_WINS;
+          }
         }
       }
 
@@ -236,7 +241,10 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
               @Override
               public void run() {
                 try {
+                  assert items != null;
                   ValueIndex valueIndex = inflateValueIndex(items);
+                  assert indexName != null;
+                  assert valueIndex != null;
                   db.createIndex(indexName, valueIndex);
                   new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
@@ -275,6 +283,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
               @Override
               public void run() {
                 try {
+                  assert indexName != null;
                   db.deleteIndex(indexName);
                   new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
@@ -427,9 +436,9 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             ListenerToken token = database.addChangeListener(AsyncTask.THREAD_POOL_EXECUTOR,
               new DatabaseChangeListener() {
                 @Override
-                public void changed(DatabaseChange change) {
+                public void changed(@NonNull DatabaseChange change) {
 
-                  final HashMap<String, Object> map = new HashMap<String, Object>();
+                  final HashMap<String, Object> map = new HashMap<>();
                   map.put("type", "DatabaseChange");
                   map.put("database", change.getDatabase().getName());
                   map.put("documentIDs", change.getDocumentIDs());
@@ -465,7 +474,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
   private class ReplicatorCallHander implements MethodCallHandler {
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(MethodCall call, @NonNull Result result) {
       if (!call.hasArgument("replicatorId")) {
         result.error("errArgs", "Error: Missing replicator", call.arguments.toString());
         return;
@@ -508,7 +517,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
   private class JSONCallHandler implements MethodCallHandler {
     @Override
-    public void onMethodCall(MethodCall call, final Result result) {
+    public void onMethodCall(MethodCall call, @NonNull final Result result) {
       final JSONObject json = call.arguments();
 
       final String id;
@@ -570,13 +579,10 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
             if (queryFromJson != null) {
               ListenerToken mListenerToken = queryFromJson.addChangeListener(AsyncTask.THREAD_POOL_EXECUTOR, new QueryChangeListener() {
                 @Override
-                public void changed(QueryChange change) {
-                  final HashMap<String,Object> json = new HashMap<String,Object>();
+                public void changed(@NonNull QueryChange change) {
+                  final HashMap<String,Object> json = new HashMap<>();
                   json.put("query",id);
-
-                  if (change.getResults() != null) {
-                    json.put("results",QueryJson.resultsToJson(change.getResults()));
-                  }
+                  json.put("results",QueryJson.resultsToJson(change.getResults()));
 
                   if (change.getError() != null) {
                     json.put("error",change.getError().getLocalizedMessage());
@@ -669,8 +675,8 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
           if (replicator != null) {
             ListenerToken mListenerToken = replicator.addChangeListener(new ReplicatorChangeListener() {
               @Override
-              public void changed(ReplicatorChange change) {
-                HashMap<String,Object> json = new HashMap<String,Object>();
+              public void changed(@NonNull ReplicatorChange change) {
+                HashMap<String,Object> json = new HashMap<>();
                 json.put("replicator",id);
                 json.put("type","ReplicatorChange");
 
@@ -708,7 +714,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
             ListenerToken mDocumentReplicationListenerToken = replicator.addDocumentReplicationListener(new DocumentReplicationListener() {
               @Override
-              public void replication(DocumentReplication replication) {
+              public void replication(@NonNull DocumentReplication replication) {
                 HashMap<String,Object> json = new HashMap<>();
                 json.put("replicator",id);
                 json.put("type","DocumentReplication");

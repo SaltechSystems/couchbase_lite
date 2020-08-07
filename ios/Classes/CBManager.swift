@@ -294,9 +294,53 @@ class CBManager {
             }
         }
         
+        if let channels = map["channels"] as? [Any] {
+            config.channels = channels.compactMap { $0 as? String }
+        }
+        
+        if let pushKey = map["pushAttributeKeyFilter"] as? String, let values = map["pushAttributeValuesFilter"] as? [Any?] {
+            let pushValues: [Any?] = values.compactMap { CBManager.convertSETValue($0) }
+            
+            config.pushFilter = { (document, flags) in
+                guard document.contains(key: pushKey) else {
+                    return false
+                }
+                
+                let docValue = document.value(forKey: pushKey);
+                return pushValues.contains { (value) -> Bool in
+                    return CBManager.docValueEquals(value,docValue)
+                }
+            }
+        }
+        
+        if let pullKey = map["pullAttributeKeyFilter"] as? String, let values = map["pullAttributeValuesFilter"] as? [Any?] {
+            let pullValues: [Any?] = values.compactMap { CBManager.convertSETValue($0) }
+            
+            config.pullFilter = { (document, flags) in
+                guard document.contains(key: pullKey) else {
+                    return false
+                }
+                
+                let docValue = document.value(forKey: pullKey);
+                return pullValues.contains { (value) -> Bool in
+                    return CBManager.docValueEquals(value,docValue)
+                }
+            }
+        }
+        
+        if let headers = map["headers"] as? Dictionary<String,Any> {
+            config.headers = headers.mapValues { $0 as? String ?? "" }
+        }
+        
         config.authenticator = try inflateAuthenticator(json: map["authenticator"])
         
         return config
+    }
+    
+    static func docValueEquals(_ x : Any?, _ y : Any?) -> Bool {
+        guard x is AnyHashable else { return false }
+        guard y is AnyHashable else { return false }
+        return (x as! AnyHashable) == (y as! AnyHashable)
     }
     
     func inflateAuthenticator(json: Any?) throws -> Authenticator? {

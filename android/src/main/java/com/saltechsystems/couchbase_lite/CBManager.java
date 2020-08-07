@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Objects;
 
 class CBManager {
     private HashMap<String, Database> mDatabase = new HashMap<>();
@@ -142,13 +140,15 @@ class CBManager {
         if (value instanceof Map<?, ?>) {
             Map<String, Object> result = convertSETDictionary(getMapFromGenericMap(value));
 
-            if (result.get("@type") instanceof String && result.get("@type").equals("blob")) {
+            if (Objects.equals(result.get("@type"), "blob")) {
+                Object dataObject = result.get("data");
+                Object contentTypeObject = result.get("content_type");
                 if (result.get("digest") instanceof String) {
                     // Prevent blob from updating when it doesn't change
                     return getBlobWithDigest((String) result.get("digest"));
-                } else if (result.get("data") instanceof byte[] && result.get("content_type") instanceof String) {
-                    String contentType = (String) result.get("content_type");
-                    byte[] content = (byte[]) result.get("data");
+                } else if (dataObject instanceof byte[] && contentTypeObject instanceof String) {
+                    String contentType = (String) contentTypeObject;
+                    byte[] content = (byte[]) dataObject;
                     return new Blob(contentType,content);
                 } else {
                     // Preserve the map value
@@ -248,11 +248,20 @@ class CBManager {
         List<Object> resultList = new ArrayList<>();
         if (objectList instanceof List<?>) {
             List<?> genericList = (List<?>) objectList;
-            for (Object value: genericList) {
-                resultList.add(value);
-            }
+            resultList.addAll(genericList);
         }
         return resultList;
+    }
+
+    static List<Map<String, Object>> getListOfMapsFromGenericList(Object objectList) {
+        List<Map<String, Object>> rtnList = new ArrayList<>();
+        if (objectList instanceof List<?>) {
+            List<?> genericList = (List<?>) objectList;
+            for (Object objectMap : genericList) {
+                rtnList.add(getMapFromGenericMap(objectMap));
+            }
+        }
+        return rtnList;
     }
 
     Map<String, Object> getDocumentWithId(Database database, String _id) {
@@ -272,8 +281,6 @@ class CBManager {
     }
 
     void deleteDocumentWithId(Database database, String _id) throws CouchbaseLiteException {
-        HashMap<String, Object> resultMap = new HashMap<>();
-
         Document document = database.getDocument(_id);
 
         if (document != null) {
@@ -368,8 +375,7 @@ class CBManager {
         AssetManager assetManager = mDelegate.getAssets();
         String fileKey = mDelegate.lookupKeyForAsset(assetKey);
 
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        try (InputStream is = assetManager.open(fileKey)) {
+        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream(); InputStream is = assetManager.open(fileKey)) {
             int nRead;
             byte[] data = new byte[1024];
             while ((nRead = is.read(data, 0, data.length)) != -1) {
@@ -378,8 +384,6 @@ class CBManager {
 
             buffer.flush();
             return buffer.toByteArray();
-        } finally {
-            buffer.close();
         }
     }
 }

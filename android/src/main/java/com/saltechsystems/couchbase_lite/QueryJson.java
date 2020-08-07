@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.flutter.plugin.common.JSONUtil;
 
@@ -173,6 +174,7 @@ class QueryJson {
 
             if (last.containsKey("orderingSortOrder")) {
                 String orderingSortOrder = (String) last.get("orderingSortOrder");
+                assert orderingSortOrder != null;
                 if (orderingSortOrder.equals("ascending")) {
                     resultOrdering.add(ordering.ascending());
                 } else if (orderingSortOrder.equals("descending")) {
@@ -312,14 +314,14 @@ class QueryJson {
                         }
                         break;
                     case ("meta"):
-                        if (currentExpression.get("meta").equals("id")) {
+                        if (Objects.equals(currentExpression.get("meta"), "id")) {
                             returnExpression = Meta.id;
-                        } else if (currentExpression.get("meta").equals("sequence")) {
+                        } else if (Objects.equals(currentExpression.get("meta"), "sequence")) {
                             returnExpression = Meta.sequence;
                         }
                         break;
                     case ("booleanValue"):
-                        returnExpression = Expression.booleanValue((Boolean) currentExpression.get("booleanValue"));
+                        returnExpression = Expression.booleanValue((boolean) currentExpression.get("booleanValue"));
                         break;
                     case ("date"):
                         returnExpression = Expression.date((Date) currentExpression.get("date"));
@@ -458,9 +460,15 @@ class QueryJson {
                 switch (currentExpression.keySet().iterator().next()) {
                     case ("from"):
                         if (returnExpression instanceof PropertyExpression) {
-                            returnExpression = ((PropertyExpression) returnExpression).from((String) currentExpression.get("from"));
+                            Object from = currentExpression.get("from");
+                            if (from instanceof String) {
+                                returnExpression = ((PropertyExpression) returnExpression).from((String) from);
+                            }
                         } else if (returnExpression instanceof MetaExpression) {
-                            returnExpression = ((MetaExpression) returnExpression).from((String) currentExpression.get("from"));
+                            Object from = currentExpression.get("from");
+                            if (from instanceof String) {
+                                returnExpression = ((MetaExpression) returnExpression).from((String) from);
+                            }
                         }
                         break;
                     case ("add"):
@@ -566,7 +574,7 @@ class QueryMap {
             this.queryMap = getMapFromGenericMap(unwrappedJson);
         }
         if (queryMap.containsKey("selectDistinct")) {
-            this.selectDistinct = (Boolean) queryMap.get("selectDistinct");
+            this.selectDistinct = (boolean) queryMap.get("selectDistinct");
         }
         if (queryMap.containsKey("selectResult")) {
             this.hasSelectResult = true;
@@ -626,6 +634,7 @@ class QueryMap {
     private List<Map<String, Object>> getList(String key) {
         List<?> tempList = (List<?>) queryMap.get(key);
         List<Map<String, Object>> resultList = new ArrayList<>();
+        assert tempList != null;
         for (Object listObject : tempList) {
             if (listObject instanceof Map<?, ?>) {
                 resultList.add(getMapFromGenericMap(listObject));
