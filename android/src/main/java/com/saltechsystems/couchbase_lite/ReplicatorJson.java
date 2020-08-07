@@ -38,11 +38,6 @@ class ReplicatorJson {
 
     Replicator toCouchbaseReplicator() {
         if (replicatorMap.hasConfig) {
-//            try {
-//
-//            } catch (Exception e) {
-//
-//            }
             inflateConfig();
         }
 
@@ -114,6 +109,22 @@ class ReplicatorJson {
             });
         }
 
+        if (replicatorMap.pullAttributeKeyFilter != null &&
+                replicatorMap.pullAttributeValuesFilter != null) {
+            mReplicatorConfig.setPullFilter(new ReplicationFilter() {
+                @Override
+                public boolean filtered(@NonNull Document document,
+                                        @NonNull EnumSet<DocumentFlag> flags) {
+                    if (!document.contains(replicatorMap.pullAttributeKeyFilter)) {
+                        return false;
+                    }
+
+                    Object value = document.getValue(replicatorMap.pullAttributeKeyFilter);
+                    return replicatorMap.pullAttributeValuesFilter.contains(value);
+                }
+            });
+        }
+
         if (replicatorMap.headers != null) {
             mReplicatorConfig.setHeaders(replicatorMap.headers);
         }
@@ -170,6 +181,8 @@ class ReplicatorMap {
     List<String> channels;
     String pushAttributeKeyFilter;
     List<Object> pushAttributeValuesFilter;
+    String pullAttributeKeyFilter;
+    List<Object> pullAttributeValuesFilter;
     Map<String, String> headers;
 
 
@@ -235,6 +248,25 @@ class ReplicatorMap {
                 Object pushKeyObject = config.get("pushAttributeKeyFilter");
                 if (pushKeyObject instanceof String) {
                     pushAttributeKeyFilter = (String) pushKeyObject;
+                }
+            }
+
+            if (config.containsKey("pullAttributeValuesFilter")) {
+                Object listObject = config.get("pullAttributeValuesFilter");
+                if (listObject instanceof List<?>) {
+                    List<Object> pullValues = new ArrayList<>();
+                    for (Object object : ((List<?>)listObject)) {
+                        pullValues.add(Objects.toString(object, null));
+                    }
+
+                    pullAttributeValuesFilter = CBManager.convertSETArray(pullValues);
+                }
+            }
+
+            if (config.containsKey("pullAttributeKeyFilter")) {
+                Object pullKeyObject = config.get("pullAttributeKeyFilter");
+                if (pullKeyObject instanceof String) {
+                    pullAttributeKeyFilter = (String) pullKeyObject;
                 }
             }
 
