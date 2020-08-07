@@ -142,7 +142,7 @@ class Database {
   }
 
   /// Deletes index [forName] from the database.
-  Future<void> deleteIndex({@required String forName}) async {
+  Future<bool> deleteIndex({@required String forName}) async {
     await _methodChannel.invokeMethod('deleteIndex', <String, dynamic>{
       'database': name,
       'forName': forName,
