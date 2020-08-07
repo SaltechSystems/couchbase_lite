@@ -1,3 +1,10 @@
+## 2.7.1+5
+
+* Added deletion of indexes
+* Fixed issues with blobs and queries
+* Added Fragments to expose value getters for Documents
+* Added [] operators to Result, Document, and MutableDocument classes to retrieve Fragments
+
 ## 2.7.1+4
 
 * Added Database addDocumentChangeListener 
