@@ -1,6 +1,7 @@
 library couchbase_lite;
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:collection';
 import 'dart:typed_data';
 

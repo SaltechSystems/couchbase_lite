@@ -195,7 +195,12 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
         case ("initDatabaseWithName"):
           try {
             database = mCBManager.initDatabaseWithName(dbname);
-            result.success(database.getName());
+
+            HashMap<String,Object> config = new HashMap<>();
+            config.put("name", database.getName());
+            config.put("path", database.getPath());
+
+            result.success(config);
           } catch (Exception e) {
             result.error("errInit", "error initializing database with name " + dbname, e.toString());
           }

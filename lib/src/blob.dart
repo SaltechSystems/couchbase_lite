@@ -18,6 +18,10 @@ class Blob {
   String get contentType => _contentType;
   String get digest => _digest;
   int get length => _length;
+
+  Uint8List get blobData => _data;
+  void set blobData(Uint8List data) => _data = data;
+
   Future<Uint8List> get content async {
     // Load data here if needed
     _data ??= await Database._methodChannel.invokeMethod(
