@@ -15,7 +15,6 @@ class Blob {
   String _digest;
   int _length;
   Uint8List _data;
-  Future<Uint8List> _futureData;
   String get contentType => _contentType;
   String get digest => _digest;
   int get length => _length;
