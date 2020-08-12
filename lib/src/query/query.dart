@@ -27,8 +27,7 @@ class Query {
     }
 
     try {
-      final List<dynamic> resultSet =
-          await _channel.invokeMethod('executeQuery', this);
+      final resultSet = await _channel.invokeMethod('executeQuery', this);
 
       var results = <Result>[];
       for (dynamic result in resultSet) {

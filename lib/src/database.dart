@@ -132,11 +132,11 @@ class Database {
   }
 
   Future<Uint8List> getBlobContent(Blob blob) async {
-    readContent() async {
+    Future<Uint8List> readContent() async {
       var blobPath = path +
-          "Attachments/" +
-          blob.digest.replaceFirst('sha1-', '').replaceAll("/", "_") +
-          ".blob";
+          'Attachments/' +
+          blob.digest.replaceFirst('sha1-', '').replaceAll('/', '_') +
+          '.blob';
 
       var file = File(blobPath);
       return file.existsSync() ? file.readAsBytes() : null;

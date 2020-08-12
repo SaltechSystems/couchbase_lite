@@ -143,15 +143,12 @@ class CBManager {
             if (Objects.equals(result.get("@type"), "blob")) {
                 Object dataObject = result.get("data");
                 Object contentTypeObject = result.get("content_type");
-                if (result.get("digest") instanceof String) {
-                    // Prevent blob from updating when it doesn't change
-                    return getBlobWithDigest((String) result.get("digest"));
-                } else if (dataObject instanceof byte[] && contentTypeObject instanceof String) {
+                if (!(result.get("digest") instanceof String) && dataObject instanceof byte[] && contentTypeObject instanceof String) {
                     String contentType = (String) contentTypeObject;
                     byte[] content = (byte[]) dataObject;
                     return new Blob(contentType,content);
                 } else {
-                    // Preserve the map value
+                    // Prevent blob from updating when it doesn't change
                     return result;
                 }
             } else {

@@ -18,9 +18,23 @@ class Blob {
   String get contentType => _contentType;
   String get digest => _digest;
   int get length => _length;
-
   Uint8List get blobData => _data;
-  void set blobData(Uint8List data) => _data = data;
+  set blobData(Uint8List data) => _data = data;
+
+  Future<Uint8List> contentFromDatabase(Database database) async {
+    Future<Uint8List> readContent() async {
+      var blobPath = database.path +
+          'Attachments/' +
+          _digest.replaceFirst('sha1-', '').replaceAll('/', '_') +
+          '.blob';
+
+      var file = File(blobPath);
+      return file.existsSync() ? file.readAsBytes() : null;
+    }
+
+    _data ??= await readContent();
+    return _data;
+  }
 
   Future<Uint8List> get content async {
     // Load data here if needed
