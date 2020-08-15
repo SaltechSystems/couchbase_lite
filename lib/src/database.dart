@@ -132,6 +132,10 @@ class Database {
   }
 
   Future<Uint8List> getBlobContent(Blob blob) async {
+    if (blob == null) {
+      return;
+    }
+
     Future<Uint8List> readContent() async {
       var blobPath = path +
           'Attachments/' +
