@@ -448,7 +448,10 @@ void main() {
   group("Results", () {
     var map = {
       "int": 1,
-      "bool": true,
+      "true": true,
+      "false": false,
+      "1": 1,
+      "0": 0,
       "list": [],
       "double": 1.2,
       "string": "test",
@@ -484,8 +487,20 @@ void main() {
       expect(newResult.getList(key: "list"), []);
     });
 
-    test("getBoolean()", () {
-      expect(newResult.getBoolean(key: "bool"), true);
+    test("getBoolean(true)", () {
+      expect(newResult.getBoolean(key: "true"), true);
+    });
+
+    test("getBoolean(false)", () {
+      expect(newResult.getBoolean(key: "false"), false);
+    });
+
+    test("getBoolean(1)", () {
+      expect(newResult.getBoolean(key: "1"), true);
+    });
+
+    test("getBoolean(0)", () {
+      expect(newResult.getBoolean(key: "0"), false);
     });
 
     test("getDouble()", () {
