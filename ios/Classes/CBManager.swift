@@ -298,34 +298,12 @@ class CBManager {
             config.channels = channels.compactMap { $0 as? String }
         }
         
-        if let pushKey = map["pushAttributeKeyFilter"] as? String, let values = map["pushAttributeValuesFilter"] as? [Any?] {
-            let pushValues: [Any?] = values.compactMap { CBManager.convertSETValue($0) }
-            
-            config.pushFilter = { (document, flags) in
-                guard document.contains(key: pushKey) else {
-                    return false
-                }
-                
-                let docValue = document.value(forKey: pushKey);
-                return pushValues.contains { (value) -> Bool in
-                    return CBManager.docValueEquals(value,docValue)
-                }
-            }
+        if let pushFilters = map["pushAttributeFilters"] as? [String:[Any?]] {
+            config.pushFilter = CBManager.inflateReplicationFilter(pushFilters)
         }
         
-        if let pullKey = map["pullAttributeKeyFilter"] as? String, let values = map["pullAttributeValuesFilter"] as? [Any?] {
-            let pullValues: [Any?] = values.compactMap { CBManager.convertSETValue($0) }
-            
-            config.pullFilter = { (document, flags) in
-                guard document.contains(key: pullKey) else {
-                    return false
-                }
-                
-                let docValue = document.value(forKey: pullKey);
-                return pullValues.contains { (value) -> Bool in
-                    return CBManager.docValueEquals(value,docValue)
-                }
-            }
+        if let pullFilters = map["pullAttributeFilters"] as? [String:[Any?]] {
+            config.pullFilter = CBManager.inflateReplicationFilter(pullFilters)
         }
         
         if let headers = map["headers"] as? Dictionary<String,Any> {
@@ -363,6 +341,26 @@ class CBManager {
             return SessionAuthenticator(sessionID: sessionId, cookieName: map["cookieName"] as? String)
         default:
             throw CBManagerError.IllegalArgument
+        }
+    }
+
+    static func inflateReplicationFilter(_ filterConfig: [String:[Any?]]) -> CouchbaseLiteSwift.ReplicationFilter {
+        let filterValues: [String:[Any?]] = filterConfig.compactMapValues { $0.compactMap { CBManager.convertSETValue($0) } }
+        return { (document, flags) in
+            for (key, values) in filterValues {
+                guard document.contains(key: key) else {
+                    return false
+                }
+                
+                let docValue = document.value(forKey: key);
+                let matches = values.contains { (value) -> Bool in
+                    return CBManager.docValueEquals(value,docValue)
+                }
+                if !matches {
+                    return false
+                }
+            }
+            return true
         }
     }
 }

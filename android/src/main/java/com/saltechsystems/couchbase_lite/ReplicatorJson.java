@@ -93,36 +93,12 @@ class ReplicatorJson {
             mReplicatorConfig.setChannels(replicatorMap.channels);
         }
 
-        if (replicatorMap.pushAttributeKeyFilter != null &&
-            replicatorMap.pushAttributeValuesFilter != null) {
-            mReplicatorConfig.setPushFilter(new ReplicationFilter() {
-                @Override
-                public boolean filtered(@NonNull Document document,
-                                        @NonNull EnumSet<DocumentFlag> flags) {
-                    if (!document.contains(replicatorMap.pushAttributeKeyFilter)) {
-                        return false;
-                    }
-
-                    Object value = document.getValue(replicatorMap.pushAttributeKeyFilter);
-                    return replicatorMap.pushAttributeValuesFilter.contains(value);
-                }
-            });
+        if (replicatorMap.pushAttributeFilters != null) {
+            mReplicatorConfig.setPushFilter(inflateReplicationFilter(replicatorMap.pushAttributeFilters));
         }
 
-        if (replicatorMap.pullAttributeKeyFilter != null &&
-                replicatorMap.pullAttributeValuesFilter != null) {
-            mReplicatorConfig.setPullFilter(new ReplicationFilter() {
-                @Override
-                public boolean filtered(@NonNull Document document,
-                                        @NonNull EnumSet<DocumentFlag> flags) {
-                    if (!document.contains(replicatorMap.pullAttributeKeyFilter)) {
-                        return false;
-                    }
-
-                    Object value = document.getValue(replicatorMap.pullAttributeKeyFilter);
-                    return replicatorMap.pullAttributeValuesFilter.contains(value);
-                }
-            });
+        if (replicatorMap.pullAttributeFilters != null) {
+            mReplicatorConfig.setPullFilter(inflateReplicationFilter(replicatorMap.pullAttributeFilters));
         }
 
         if (replicatorMap.headers != null) {
@@ -160,6 +136,26 @@ class ReplicatorJson {
                 throw new IllegalArgumentException("Invalid authentication method: " + method);
         }
     }
+
+    private static ReplicationFilter inflateReplicationFilter(final Map<String, List<Object>> filterMap) {
+        return new ReplicationFilter() {
+            @Override
+            public boolean filtered(@NonNull Document document,
+                                    @NonNull EnumSet<DocumentFlag> flags) {
+                for (Map.Entry<String, List<Object>> entry : filterMap.entrySet()) {
+                    if (!document.contains(entry.getKey())) {
+                        return false;
+                    }
+
+                    Object value = document.getValue(entry.getKey());
+                    if (!entry.getValue().contains(value)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        };
+    }
 }
 
 class ReplicatorMap {
@@ -179,10 +175,8 @@ class ReplicatorMap {
     boolean hasAuthenticator = false;
     Map<String, Object> authenticator;
     List<String> channels;
-    String pushAttributeKeyFilter;
-    List<Object> pushAttributeValuesFilter;
-    String pullAttributeKeyFilter;
-    List<Object> pullAttributeValuesFilter;
+    Map<String, List<Object>> pushAttributeFilters;
+    Map<String, List<Object>> pullAttributeFilters;
     Map<String, String> headers;
 
 
@@ -232,41 +226,17 @@ class ReplicatorMap {
                 }
             }
 
-            if (config.containsKey("pushAttributeValuesFilter")) {
-                Object listObject = config.get("pushAttributeValuesFilter");
-                if (listObject instanceof List<?>) {
-                    List<Object> pushValues = new ArrayList<>();
-                    for (Object object : ((List<?>)listObject)) {
-                        pushValues.add(Objects.toString(object, null));
-                    }
-
-                    pushAttributeValuesFilter = CBManager.convertSETArray(pushValues);
+            if (config.containsKey("pushAttributeFilters")) {
+                Object filterObject = config.get("pushAttributeFilters");
+                if (filterObject instanceof Map<?, ?>) {
+                    pushAttributeFilters = getFilterMapFromGenericMap(filterObject);
                 }
             }
 
-            if (config.containsKey("pushAttributeKeyFilter")) {
-                Object pushKeyObject = config.get("pushAttributeKeyFilter");
-                if (pushKeyObject instanceof String) {
-                    pushAttributeKeyFilter = (String) pushKeyObject;
-                }
-            }
-
-            if (config.containsKey("pullAttributeValuesFilter")) {
-                Object listObject = config.get("pullAttributeValuesFilter");
-                if (listObject instanceof List<?>) {
-                    List<Object> pullValues = new ArrayList<>();
-                    for (Object object : ((List<?>)listObject)) {
-                        pullValues.add(Objects.toString(object, null));
-                    }
-
-                    pullAttributeValuesFilter = CBManager.convertSETArray(pullValues);
-                }
-            }
-
-            if (config.containsKey("pullAttributeKeyFilter")) {
-                Object pullKeyObject = config.get("pullAttributeKeyFilter");
-                if (pullKeyObject instanceof String) {
-                    pullAttributeKeyFilter = (String) pullKeyObject;
+            if (config.containsKey("pullAttributeFilters")) {
+                Object filterObject = config.get("pullAttributeFilters");
+                if (filterObject instanceof Map<?, ?>) {
+                    pullAttributeFilters = getFilterMapFromGenericMap(filterObject);
                 }
             }
 
@@ -285,6 +255,23 @@ class ReplicatorMap {
             Map<?,?> genericMap = (Map<?,?>) objectMap;
             for (Map.Entry<?, ?> entry : genericMap.entrySet()) {
                 resultMap.put((String) entry.getKey(), entry.getValue());
+            }
+        }
+        return resultMap;
+    }
+
+    private Map<String, List<Object>> getFilterMapFromGenericMap(Object objectMap) {
+        Map<String, List<Object>> resultMap = new HashMap<>();
+        if (objectMap instanceof Map<?, ?>) {
+            Map<?,?> genericMap = (Map<?,?>) objectMap;
+            for (Map.Entry<?, ?> entry : genericMap.entrySet()) {
+                Object objectList = entry.getValue();
+                List<Object> resultList = new ArrayList<>();
+                if (objectList instanceof List<?>) {
+                    resultList.addAll((List<?>) objectList);
+                }
+
+                resultMap.put((String) entry.getKey(), CBManager.convertSETArray(resultList));
             }
         }
         return resultMap;
