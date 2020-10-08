@@ -4,7 +4,7 @@ part of couchbase_lite;
 class Blob {
   Blob.data(this._contentType, this._data);
 
-  Blob._fromMap(Map<String, dynamic> map) {
+  Blob._fromMap(Map<dynamic, dynamic> map) {
     _contentType = map['content_type'];
     _digest = map['digest'];
     _length = map['length'];
@@ -18,8 +18,7 @@ class Blob {
   String get contentType => _contentType;
   String get digest => _digest;
   int get length => _length;
-  Uint8List get blobData => _data;
-  set blobData(Uint8List data) => _data = data;
+  Uint8List blobData;
 
   Future<Uint8List> contentFromDatabase(Database database) async {
     Future<Uint8List> readContent() async {
@@ -32,8 +31,8 @@ class Blob {
       return file.existsSync() ? file.readAsBytes() : null;
     }
 
-    _data ??= await readContent();
-    return _data;
+    blobData ??= await readContent();
+    return blobData;
   }
 
   Future<Uint8List> get content async {
