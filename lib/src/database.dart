@@ -133,7 +133,7 @@ class Database {
 
   Future<Uint8List> getBlobContent(Blob blob) async {
     if (blob == null) {
-      return;
+      return null;
     }
 
     Future<Uint8List> readContent() async {
