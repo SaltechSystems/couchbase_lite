@@ -48,6 +48,9 @@ class QueryJson {
         for (final com.couchbase.lite.Result result:results) {
             HashMap<String, Object> value = new HashMap<>();
 
+            /*
+            null values are handled differently between swift and java
+            this was an attempt to fix this issue
             HashMap<Object, Integer> resultIndexes = new HashMap<>();
             for (int idx = 0; idx < result.count(); idx++) {
                 resultIndexes.put(result.getValue(idx),idx);
@@ -62,6 +65,8 @@ class QueryJson {
             }
 
             value.put("map",resultMap);
+            */
+            value.put("map",_resultToMap(result));
             value.put("list",_resultToList(result));
             value.put("keys",result.getKeys());
             rtnList.add(value);
