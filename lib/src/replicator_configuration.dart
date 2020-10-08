@@ -12,9 +12,21 @@ class ReplicatorConfiguration {
   String pinnedServerCertificate;
   Authenticator authenticator;
   List<String> channels;
+  /// Filters which documents should be replicated. Keys are attribute names,
+  /// and values are a list of allowed values for that attribute. A document
+  /// will only be pushed if it matches all of the filters in this map.
+  Map<String, List<dynamic>> pushAttributeFilters;
+  @Deprecated('use pushAttributeFilters instead for multiple filter support')
   List<dynamic> pushAttributeValuesFilter;
+  @Deprecated('use pushAttributeFilters instead for multiple filter support')
   String pushAttributeKeyFilter;
+  /// Filters which documents should be replicated. Keys are attribute names,
+  /// and values are a list of allowed values for that attribute. A document
+  /// will only be pulled if it matches all of the filters in this map.
+  Map<String, List<dynamic>> pullAttributeFilters;
+  @Deprecated('use pullAttributeFilters instead for multiple filter support')
   List<dynamic> pullAttributeValuesFilter;
+  @Deprecated('use pullAttributeFilters instead for multiple filter support')
   String pullAttributeKeyFilter;
   Map headers;
 
@@ -49,20 +61,22 @@ class ReplicatorConfiguration {
       map['channels'] = channels;
     }
 
-    if (pushAttributeValuesFilter != null) {
-      map['pushAttributeValuesFilter'] = pushAttributeValuesFilter;
+    if (pushAttributeKeyFilter != null && pushAttributeValuesFilter != null) {
+      pushAttributeFilters ??= {};
+      pushAttributeFilters[pushAttributeKeyFilter] = pushAttributeValuesFilter;
     }
 
-    if (pushAttributeKeyFilter != null) {
-      map['pushAttributeKeyFilter'] = pushAttributeKeyFilter;
+    if (pushAttributeFilters != null) {
+      map['pushAttributeFilters'] = pushAttributeFilters;
     }
 
-    if (pullAttributeValuesFilter != null) {
-      map['pullAttributeValuesFilter'] = pullAttributeValuesFilter;
+    if (pullAttributeKeyFilter != null && pullAttributeValuesFilter != null) {
+      pullAttributeFilters ??= {};
+      pullAttributeFilters[pullAttributeKeyFilter] = pullAttributeValuesFilter;
     }
 
-    if (pullAttributeKeyFilter != null) {
-      map['pullAttributeKeyFilter'] = pullAttributeKeyFilter;
+    if (pullAttributeFilters != null) {
+      map['pullAttributeFilters'] = pullAttributeFilters;
     }
 
     if (headers != null) {
