@@ -4,7 +4,7 @@ part of couchbase_lite;
 class Blob {
   Blob.data(this._contentType, this._data);
 
-  Blob._fromMap(Map<String, dynamic> map) {
+  Blob._fromMap(Map<dynamic, dynamic> map) {
     _contentType = map['content_type'];
     _digest = map['digest'];
     _length = map['length'];
