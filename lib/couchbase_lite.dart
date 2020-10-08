@@ -22,6 +22,7 @@ part 'src/index.dart';
 part 'src/listener_token.dart';
 part 'src/mutable_document.dart';
 part 'src/query/expression/expression.dart';
+part 'src/query/expression/full_text_expression.dart';
 part 'src/query/expression/meta.dart';
 part 'src/query/expression/meta_expression.dart';
 part 'src/query/expression/property_expression.dart';

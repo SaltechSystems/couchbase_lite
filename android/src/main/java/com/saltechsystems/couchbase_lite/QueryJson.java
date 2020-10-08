@@ -3,6 +3,8 @@ package com.saltechsystems.couchbase_lite;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
+import com.couchbase.lite.FullTextExpression;
+import com.couchbase.lite.FullTextFunction;
 import com.couchbase.lite.Function;
 import com.couchbase.lite.GroupBy;
 import com.couchbase.lite.Join;
@@ -344,6 +346,9 @@ class QueryJson {
                     case ("value"):
                         returnExpression = Expression.value(currentExpression.get("value"));
                         break;
+                    case ("rank"):
+                        returnExpression = FullTextFunction.rank((String)currentExpression.get("rank"));
+                        break;
                     case ("abs"):
                         returnExpression = Function.abs(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("abs"))));
                         break;
@@ -454,6 +459,10 @@ class QueryJson {
                     case ("upper"):
                         returnExpression = Function.upper(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("upper"))));
                         break;
+                    case ("fullTextMatch"):
+                        List<String> values = getStringList(currentExpression.get("fullTextMatch"));
+                        returnExpression = FullTextExpression.index(values.get(0)).match(values.get(1));
+                        break;
 
                 }
             } else {
@@ -547,6 +556,18 @@ class QueryJson {
             }
         }
         return returnExpression;
+    }
+
+    private static List<String> getStringList(Object valueList) {
+        List<String> result = new ArrayList<>();
+        if (valueList instanceof List<?>) {
+            for (Object value : (List<?>)valueList) {
+                if (value instanceof String) {
+                    result.add((String)value);
+                }
+            }
+        }
+        return result;
     }
 }
 

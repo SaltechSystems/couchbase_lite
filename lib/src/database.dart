@@ -133,8 +133,20 @@ class Database {
   /// Creates an index [withName] which could be a value index or a full-text search index.
   /// The name can be used for deleting the index. Creating a new different index with an existing index
   /// name will replace the old index; creating the same index with the same name will be no-ops.
-  Future<bool> createIndex(ValueIndex index, {@required String withName}) {
-    return _methodChannel.invokeMethod('createIndex', <String, dynamic>{
+  Future<bool> createIndex(Index index, {@required String withName}) {
+    var methodName;
+    if (index is ValueIndex) {
+      methodName = 'createIndex';
+    } else if (index is FullTextIndex) {
+      methodName = 'createFullTextIndex';
+    } else {
+      throw ArgumentError.value(
+        index.runtimeType,
+        'index',
+        'unknown index type',
+      );
+    }
+    return _methodChannel.invokeMethod(methodName, <String, dynamic>{
       'database': name,
       'index': index.toJson(),
       'withName': withName

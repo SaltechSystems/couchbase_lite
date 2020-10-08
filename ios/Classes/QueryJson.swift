@@ -450,6 +450,8 @@ public class QueryJson {
                     returnExpression = Expression.string(value)
                 case ("value", let value, _):
                     returnExpression = Expression.value(value)
+                case ("rank", let value as String, _):
+                    returnExpression = FullTextFunction.rank(value)
                 case ("abs", let value, _):
                     returnExpression = Function.abs(inflateExpressionFromArray(expressionParametersArray:
                         QueryMap.getListOfMapFromGenericList(objectList: value)))
@@ -561,7 +563,11 @@ public class QueryJson {
                 case ("upper", let value, _):
                     returnExpression = Function.upper(inflateExpressionFromArray(expressionParametersArray:
                         QueryMap.getListOfMapFromGenericList(objectList: value)))
-                    
+                case ("fullTextMatch", let value as [String], _):
+                    returnExpression =
+                        FullTextExpression
+                        .index(value[0])
+                        .match(value[1])
                 default:
                     break
                 }
