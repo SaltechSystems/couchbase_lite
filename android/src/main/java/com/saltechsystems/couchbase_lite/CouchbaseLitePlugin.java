@@ -20,6 +20,8 @@ import com.couchbase.lite.DocumentFlag;
 import com.couchbase.lite.DocumentReplication;
 import com.couchbase.lite.DocumentReplicationListener;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.FullTextIndex;
+import com.couchbase.lite.FullTextIndexItem;
 import com.couchbase.lite.IndexBuilder;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogLevel;
@@ -141,6 +143,33 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     return IndexBuilder.valueIndex(array);
   }
 
+  private FullTextIndex inflateFullTextIndex(List<Map<String, Object>> items) {
+    List<FullTextIndexItem> indices = new ArrayList<>();
+    Boolean ignoreAccents = null;
+    String language = null;
+    for (int i=0; i < items.size(); ++i) {
+      Map<String, Object> item = items.get(i);
+      if (item.containsKey("property")) {
+        String property = (String) item.get("property");
+        assert property != null;
+        indices.add(FullTextIndexItem.property(property));
+      } else if (item.containsKey("ignoreAccents")) {
+        ignoreAccents = (Boolean) item.get("ignoreAccents");
+      } else if (item.containsKey("language")) {
+        language = (String) item.get("language");
+      }
+    }
+
+    FullTextIndex index = IndexBuilder.fullTextIndex(indices.toArray(new FullTextIndexItem[0]));
+    if (ignoreAccents != null) {
+      index = index.ignoreAccents(ignoreAccents);
+    }
+    if (language != null) {
+      index = index.setLanguage(language);
+    }
+    return index;
+  }
+
   private class DatabaseCallHander implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, @NonNull final Result result) {
@@ -246,6 +275,49 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
                   assert indexName != null;
                   assert valueIndex != null;
                   db.createIndex(indexName, valueIndex);
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.success(true);
+                    }
+                  });
+                } catch (final CouchbaseLiteException e) {
+                  new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                      result.error("errIndex", "Error creating index", e.toString());
+                    }
+                  });
+                }
+              }
+            });
+
+
+          } else {
+            result.error("errArg", "invalid arguments", null);
+          }
+
+          break;
+        case ("createFullTextIndex"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (call.hasArgument("index") &&  call.hasArgument("withName")) {
+            final List<Map<String, Object>> items = call.argument("index");
+            final String indexName = call.argument("withName");
+
+            final Database db = database;
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+              @Override
+              public void run() {
+                try {
+                  assert items != null;
+                  FullTextIndex fullTextIndex = inflateFullTextIndex(items);
+                  assert indexName != null;
+                  assert fullTextIndex != null;
+                  db.createIndex(indexName, fullTextIndex);
                   new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
