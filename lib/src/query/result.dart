@@ -35,6 +35,8 @@ class Result {
     var result = getValue(index: index, key: key);
     if (result is bool) {
       return result;
+    } else if (result is num) {
+      return result != 0;
     } else {
       return null;
     }

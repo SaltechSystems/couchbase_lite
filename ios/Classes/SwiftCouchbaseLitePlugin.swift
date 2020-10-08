@@ -65,6 +65,36 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
         
     }
     
+    private func inflateFullTextIndex(items: [Dictionary<String, Any>] ) -> FullTextIndex? {
+        
+        var indices: Array<FullTextIndexItem> = [];
+        var ignoreAccents: Bool?
+        var language: String?
+        for item in items {
+            if let value = item["property"], let name = value as? String {
+                indices.append(FullTextIndexItem.property(name))
+            } else if let value = item["ignoreAccents"], let boolValue = value as? Bool {
+                ignoreAccents = boolValue
+            } else if let value = item["language"], let languageCode = value as? String {
+                language = languageCode
+            } else {
+                return nil //Unsupported full-text index item
+            }
+        }
+        
+        var index = IndexBuilder.fullTextIndex(items: indices)
+        if let ignoreAccents = ignoreAccents{
+            index = index.ignoreAccents(ignoreAccents)
+        }
+        if let language = language {
+            index = index.language(language)
+        }
+        
+        
+        return index
+        
+    }
+        
     public func handleDatabase(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch (call.method) {
         case "clearBlobCache":
@@ -148,6 +178,35 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                     }
                 }
             }
+            
+        case "createFullTextIndex":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            guard let indexName = arguments["withName"] as? String, let index = arguments["index"] as? [Dictionary<String, Any>] else {
+                result(FlutterError.init(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+            
+            guard let fullTextIndex = inflateFullTextIndex(items: index) else {
+                result(FlutterError.init(code: "errIndex", message: "Error creating index \(indexName)", details: "Failed to inflate fullTextIndex"))
+                return
+            }
+            
+            databaseDispatchQueue.async {
+                do {
+                    try database.createIndex(fullTextIndex, withName: indexName);
+                    DispatchQueue.main.async {
+                        result(true)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError.init(code: "errIndex", message: "Error creating index \(indexName)", details: error.localizedDescription))
+                    }
+                }
+            }
+
 
         case "deleteIndex":
             guard let database = mCBManager.getDatabase(name: dbname) else {
