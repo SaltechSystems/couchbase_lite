@@ -47,6 +47,25 @@ class QueryJson {
         List<Map<String,Object>> rtnList = new ArrayList<>();
         for (final com.couchbase.lite.Result result:results) {
             HashMap<String, Object> value = new HashMap<>();
+
+            /*
+            null values are handled differently between swift and java
+            this was an attempt to fix this issue
+            HashMap<Object, Integer> resultIndexes = new HashMap<>();
+            for (int idx = 0; idx < result.count(); idx++) {
+                resultIndexes.put(result.getValue(idx),idx);
+            }
+
+            HashMap<String, Integer> resultMap = new HashMap<>();
+            for (String key: result.getKeys()) {
+                Integer resultIndex = resultIndexes.get(result.getValue(key));
+                if (resultIndex != null) {
+                    resultMap.put(key, resultIndex);
+                }
+            }
+
+            value.put("map",resultMap);
+            */
             value.put("map",_resultToMap(result));
             value.put("list",_resultToList(result));
             value.put("keys",result.getKeys());

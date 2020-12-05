@@ -128,7 +128,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
         case "initDatabaseWithName":
             do {
                 let database = try mCBManager.initDatabaseWithName(name: dbname)
-                result(database.name)
+                result(["name": database.name, "path": database.path])
             } catch {
                 result(FlutterError.init(code: "errInit", message: "Error initializing database with name \(dbname)", details: error.localizedDescription))
             }

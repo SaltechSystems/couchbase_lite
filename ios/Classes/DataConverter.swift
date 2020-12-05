@@ -59,9 +59,9 @@ extension CBManager {
                 return result
             }
             
-            if let digest = result?["digest"] as? String {
-                // Get the blob
-                return getBlobWithDigest(digest)
+            if let _ = result?["digest"] as? String {
+                // Preserve the map value
+                return result
             }
             
             guard let contentType = result?["content_type"] as? String, let data = result?["data"] as? Data else {

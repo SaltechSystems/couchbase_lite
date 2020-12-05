@@ -297,19 +297,19 @@ class CBManager {
         if let channels = map["channels"] as? [Any] {
             config.channels = channels.compactMap { $0 as? String }
         }
-        
+
         if let pushFilters = map["pushAttributeFilters"] as? [String:[Any?]] {
             config.pushFilter = CBManager.inflateReplicationFilter(pushFilters)
         }
-        
+
         if let pullFilters = map["pullAttributeFilters"] as? [String:[Any?]] {
             config.pullFilter = CBManager.inflateReplicationFilter(pullFilters)
         }
-        
+
         if let headers = map["headers"] as? Dictionary<String,Any> {
             config.headers = headers.mapValues { $0 as? String ?? "" }
         }
-        
+
         config.authenticator = try inflateAuthenticator(json: map["authenticator"])
         
         return config
@@ -320,7 +320,7 @@ class CBManager {
         guard y is AnyHashable else { return false }
         return (x as! AnyHashable) == (y as! AnyHashable)
     }
-    
+
     func inflateAuthenticator(json: Any?) throws -> Authenticator? {
         guard let map = json as? Dictionary<String,Any> else {
             return nil
@@ -351,7 +351,7 @@ class CBManager {
                 guard document.contains(key: key) else {
                     return false
                 }
-                
+
                 let docValue = document.value(forKey: key);
                 let matches = values.contains { (value) -> Bool in
                     return CBManager.docValueEquals(value,docValue)

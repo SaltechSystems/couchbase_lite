@@ -1,3 +1,12 @@
+## 2.7.1+7
+
+* Read blob files without platform code
+* Added FullTextIndex and FullTextExpressions
+* Support filtering replication on multiple attributes
+* Fix with Result.getBoolean
+* Fixed error when loading blobs
+* Removed caching from blobs
+
 ## 2.7.1+6
 
 * Added channels to replicator configs

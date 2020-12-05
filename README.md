@@ -18,7 +18,7 @@ In your flutter project add the dependency:
 
 ```yaml
 dependencies:
-  couchbase_lite: ^2.7.0
+  couchbase_lite: ^2.7.1
   
   flutter:
       sdk: flutter
@@ -48,7 +48,7 @@ For help getting started with Flutter, view the
 
 [Swift SDK API References](https://docs.couchbase.com/mobile/2.7.0/couchbase-lite-swift/)
 
-[Java SDK API References](http://docs.couchbase.com/mobile/2.7.0/couchbase-lite-java)
+[Java SDK API References](https://docs.couchbase.com/mobile/2.7.0/couchbase-lite-java)
 
 *Note*: Syntax follows the Swift SDK but these are the SDKs used for the platform code.
 

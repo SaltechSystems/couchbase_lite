@@ -3,7 +3,7 @@ part of couchbase_lite;
 enum ConcurrencyControl { lastWriteWins, failOnConflict }
 
 class Database {
-  Database._internal(this.name);
+  Database._internal(this.name, this.path);
 
   static const MethodChannel _methodChannel =
       MethodChannel('com.saltechsystems.couchbase_lite/database');
@@ -14,12 +14,13 @@ class Database {
 
   /// Initializes a Couchbase Lite database with the given [dbName].
   static Future<Database> initWithName(String dbName) async {
-    await _methodChannel.invokeMethod(
+    var result = await _methodChannel.invokeMethod(
         'initDatabaseWithName', <String, dynamic>{'database': dbName});
-    return Database._internal(dbName);
+    return Database._internal(dbName, result is Map ? result['path'] : null);
   }
 
   final String name;
+  final String path;
 
   Map<ListenerToken, StreamSubscription> tokens = {};
 
@@ -128,6 +129,25 @@ class Database {
     await _methodChannel.invokeMethod('clearBlobCache');
 
     return true;
+  }
+
+  Future<Uint8List> getBlobContent(Blob blob) async {
+    if (blob == null) {
+      return null;
+    }
+
+    Future<Uint8List> readContent() async {
+      var blobPath = path +
+          'Attachments/' +
+          blob.digest.replaceFirst('sha1-', '').replaceAll('/', '_') +
+          '.blob';
+
+      var file = File(blobPath);
+      return file.existsSync() ? file.readAsBytes() : null;
+    }
+
+    blob.blobData ??= await readContent();
+    return blob.blobData;
   }
 
   /// Creates an index [withName] which could be a value index or a full-text search index.
