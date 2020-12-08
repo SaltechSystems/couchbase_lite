@@ -1,3 +1,8 @@
+## 2.8.1
+
+* Update libraries to version 2.8.1
+* Updated gradle to 3.5.4 and compile version to 29
+
 ## 2.7.1+7
 
 * Read blob files without platform code
