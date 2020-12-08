@@ -8,6 +8,15 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.JSONMethodCodec;
+import io.flutter.view.FlutterMain;
+
 import com.couchbase.lite.Blob;
 import com.couchbase.lite.BuildConfig;
 import com.couchbase.lite.ConcurrencyControl;
@@ -32,6 +41,7 @@ import com.couchbase.lite.ReplicatedDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorChange;
 import com.couchbase.lite.ReplicatorChangeListener;
+import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.ValueIndex;
 import com.couchbase.lite.ValueIndexItem;
 
@@ -43,78 +53,68 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugin.common.EventChannel;
-import io.flutter.plugin.common.JSONMethodCodec;
-import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /** CouchbaseLitePlugin */
-public class CouchbaseLitePlugin implements CBManagerDelegate {
-  private final Registrar mRegistrar;
+public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
+  private CBManager mCBManager;
+  private Context applicationContext;
+
+  /// The MethodChannel that will the communication between Flutter and native Android
+  ///
+  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
+  /// when the Flutter Engine is detached from the Activity
+  private MethodChannel databaseChannel;
+  private MethodChannel replicatorChannel;
+  private MethodChannel jsonChannel;
+  private EventChannel replicationEventChannel;
+  private EventChannel queryEventChannel;
+  private EventChannel databaseEventChannel;
+
+  private DatabaseCallHandler databaseCallHandler = new DatabaseCallHandler();
+  private ReplicatorCallHandler replicatorCallHandler = new ReplicatorCallHandler();
+  private JSONCallHandler jsonCallHandler = new JSONCallHandler();
   private final QueryEventListener mQueryEventListener = new QueryEventListener();
   private final ReplicationEventListener mReplicationEventListener = new ReplicationEventListener();
   private final DatabaseEventListener mDatabaseEventListener = new DatabaseEventListener();
-  private final CBManager mCBManager;
-  private DatabaseCallHander databaseCallHander = new DatabaseCallHander();
-  private ReplicatorCallHander replicatorCallHander = new ReplicatorCallHander();
-  private JSONCallHandler jsonCallHandler = new JSONCallHandler();
 
-  /**
-   * Plugin registration.
-   */
-  public static void registerWith(Registrar registrar) {
-    CouchbaseLitePlugin instance = new CouchbaseLitePlugin(registrar);
-
-    final MethodChannel databaseChannel = new MethodChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/database");
-    databaseChannel.setMethodCallHandler(instance.databaseCallHander);
-
-    final MethodChannel replicatorChannel = new MethodChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/replicator");
-    replicatorChannel.setMethodCallHandler(instance.replicatorCallHander);
-
-    final MethodChannel jsonChannel = new MethodChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/json", JSONMethodCodec.INSTANCE);
-    jsonChannel.setMethodCallHandler(instance.jsonCallHandler);
-
-    final EventChannel replicationEventChannel = new EventChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/replicationEventChannel");
-    replicationEventChannel.setStreamHandler(instance.mReplicationEventListener);
-
-    final EventChannel queryEventChannel = new EventChannel(registrar.messenger(), "com.saltechsystems.couchbase_lite/queryEventChannel", JSONMethodCodec.INSTANCE);
-    queryEventChannel.setStreamHandler(instance.mQueryEventListener);
-
-    final EventChannel databaseEventChannel = new EventChannel(registrar.messenger(),
-        "com.saltechsystems.couchbase_lite/databaseEventChannel");
-    databaseEventChannel.setStreamHandler(instance.mDatabaseEventListener);
-  }
-
-  public CouchbaseLitePlugin(Registrar registrar) {
-    super();
-
-    mRegistrar = registrar;
-
-    CouchbaseLite.init(this.getContext());
+  @Override
+  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+    applicationContext = flutterPluginBinding.getApplicationContext();
+    CouchbaseLite.init(applicationContext);
 
     if (BuildConfig.DEBUG) {
       mCBManager = new CBManager(this, LogLevel.DEBUG);
     } else {
       mCBManager = new CBManager(this, LogLevel.ERROR);
     }
+
+    databaseChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "com.saltechsystems.couchbase_lite/database");
+    databaseChannel.setMethodCallHandler(databaseCallHandler);
+
+    replicatorChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "com.saltechsystems.couchbase_lite/replicator");
+    replicatorChannel.setMethodCallHandler(replicatorCallHandler);
+
+    jsonChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "com.saltechsystems.couchbase_lite/json", JSONMethodCodec.INSTANCE);
+    jsonChannel.setMethodCallHandler(jsonCallHandler);
+
+    replicationEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "com.saltechsystems.couchbase_lite/replicationEventChannel");
+    replicationEventChannel.setStreamHandler(mReplicationEventListener);
+
+    queryEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "com.saltechsystems.couchbase_lite/queryEventChannel", JSONMethodCodec.INSTANCE);
+    queryEventChannel.setStreamHandler(mQueryEventListener);
+
+    databaseEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "com.saltechsystems.couchbase_lite/databaseEventChannel");
+    databaseEventChannel.setStreamHandler(mDatabaseEventListener);
   }
 
   @Override
-  public String lookupKeyForAsset(String asset) {
-    return mRegistrar.lookupKeyForAsset(asset);
-  }
-
-  @Override
-  public AssetManager getAssets() {
-    return mRegistrar.context().getAssets();
-  }
-
-  @Override
-  public Context getContext() {
-    return mRegistrar.context();
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    databaseChannel.setMethodCallHandler(null);
+    replicatorChannel.setMethodCallHandler(null);
+    jsonChannel.setMethodCallHandler(null);
+    replicationEventChannel.setStreamHandler(null);
+    queryEventChannel.setStreamHandler(null);
+    databaseEventChannel.setStreamHandler(null);
   }
 
   private ValueIndex inflateValueIndex(List<Map<String, Object>> items) {
@@ -162,15 +162,30 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
 
     FullTextIndex index = IndexBuilder.fullTextIndex(indices.toArray(new FullTextIndexItem[0]));
     if (ignoreAccents != null) {
-      index = index.ignoreAccents(ignoreAccents);
+      index.ignoreAccents(ignoreAccents);
     }
     if (language != null) {
-      index = index.setLanguage(language);
+      index.setLanguage(language);
     }
     return index;
   }
 
-  private class DatabaseCallHander implements MethodCallHandler {
+  @Override
+  public String lookupKeyForAsset(String asset) {
+    return FlutterMain.getLookupKeyForAsset(asset);
+  }
+
+  @Override
+  public AssetManager getAssets() {
+    return applicationContext.getAssets();
+  }
+
+  @Override
+  public Context getContext() {
+    return applicationContext;
+  }
+
+  private class DatabaseCallHandler implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, @NonNull final Result result) {
       switch (call.method) {
@@ -211,11 +226,10 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
       if (call.hasArgument("concurrencyControl")) {
         String arg = call.argument("concurrencyControl");
         if (arg != null) {
-          switch (arg) {
-            case "failOnConflict":
-              _concurrencyControl = ConcurrencyControl.FAIL_ON_CONFLICT;
-            default:
-              _concurrencyControl = ConcurrencyControl.LAST_WRITE_WINS;
+          if ("failOnConflict".equals(arg)) {
+            _concurrencyControl = ConcurrencyControl.FAIL_ON_CONFLICT;
+          } else {
+            _concurrencyControl = ConcurrencyControl.LAST_WRITE_WINS;
           }
         }
       }
@@ -321,7 +335,6 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
                   assert items != null;
                   FullTextIndex fullTextIndex = inflateFullTextIndex(items);
                   assert indexName != null;
-                  assert fullTextIndex != null;
                   db.createIndex(indexName, fullTextIndex);
                   new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
@@ -549,7 +562,7 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
     }
   }
 
-  private class ReplicatorCallHander implements MethodCallHandler {
+  private class ReplicatorCallHandler implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, @NonNull Result result) {
       if (!call.hasArgument("replicatorId")) {
@@ -659,7 +672,9 @@ public class CouchbaseLitePlugin implements CBManagerDelegate {
                 public void changed(@NonNull QueryChange change) {
                   final HashMap<String,Object> json = new HashMap<>();
                   json.put("query",id);
-                  json.put("results",QueryJson.resultsToJson(change.getResults()));
+                  final ResultSet changeResults = change.getResults();
+                  assert changeResults != null;
+                  json.put("results",QueryJson.resultsToJson(changeResults));
 
                   if (change.getError() != null) {
                     json.put("error",change.getError().getLocalizedMessage());
