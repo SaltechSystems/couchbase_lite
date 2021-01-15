@@ -418,9 +418,14 @@ public class QueryJson {
                         expressions.append(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: $0)))
                     })
-                    
                     returnExpression = existingExpression
                         .in(expressions)
+                 case ("arrayInAny",_),("satisfies",_):
+                    let arrayInAny = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["arrayInAny"] ?? [])
+                    let satisfiesArray = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["satisfies"] ?? [])
+                    returnExpression = ArrayExpression.any(existingExpression as!
+                    VariableExpressionProtocol).in(inflateExpressionFromArray(expressionParametersArray: arrayInAny))
+                    .satisfies(inflateExpressionFromArray(expressionParametersArray: satisfiesArray));
                 default:
                     break
                 }
@@ -568,6 +573,15 @@ public class QueryJson {
                         FullTextExpression
                         .index(value[0])
                         .match(value[1])
+                case ("arrayVariable",let value):
+                    returnExpression = ArrayExpression.variable(value as! String)
+                case ("arrayLength", let value):
+                    returnExpression = ArrayFunction.length(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("arrayContains", let value, let secondaryValue as Array<Any>):
+                    returnExpression = ArrayFunction.contains(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)),substring: inflateExpressionFromArray(expressionParametersArray:
+                            QueryMap.getListOfMapFromGenericList(objectList: secondaryValue)))
                 default:
                     break
                 }
