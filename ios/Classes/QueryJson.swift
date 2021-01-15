@@ -424,8 +424,8 @@ public class QueryJson {
                     let arrayInAny = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["arrayInAny"] ?? [])
                     let satisfiesArray = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["satisfies"] ?? [])
                     returnExpression = ArrayExpression.any(existingExpression as!
-                    VariableExpressionProtocol).in(inflateExpressionFromArray(expressionParametersArray: arrayInAny))
-                    .satisfies(inflateExpressionFromArray(expressionParametersArray: satisfiesArray));
+                        VariableExpressionProtocol).in(inflateExpressionFromArray(expressionParametersArray: arrayInAny))
+                            .satisfies(inflateExpressionFromArray(expressionParametersArray: satisfiesArray))
                 default:
                     break
                 }
