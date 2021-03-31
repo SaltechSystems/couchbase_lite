@@ -4,24 +4,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:couchbase_lite/couchbase_lite.dart';
 
 void main() {
-  Map initializer;
-  Document document;
-  MutableDocument mutableDocument;
+  Map? initializer;
+  late Document document;
+  late MutableDocument mutableDocument;
   setUp(() {
     initializer = Map();
-    initializer['string'] = "string";
-    initializer['double'] = 3.14;
-    initializer['int'] = 12;
-    initializer['map'] = {};
-    initializer['boolInt'] = 0;
-    initializer['bool'] = true;
-    initializer['list'] = [];
+    initializer!['string'] = "string";
+    initializer!['double'] = 3.14;
+    initializer!['int'] = 12;
+    initializer!['map'] = {};
+    initializer!['boolInt'] = 0;
+    initializer!['bool'] = true;
+    initializer!['list'] = [];
     document = MutableDocument(data: initializer, id: "123456789");
     mutableDocument = MutableDocument();
   });
 
   test("Document: getting string", () {
-    expect(document.count(), initializer.length);
+    expect(document.count(), initializer!.length);
   });
   test("Document: getting string", () {
     expect(document.getString('string'), "string");
@@ -69,7 +69,7 @@ void main() {
     expect(document.getArray("boolInt"), null);
   });
   test("Document: getting getKeys", () {
-    expect(document.getKeys(), initializer.keys);
+    expect(document.getKeys(), initializer!.keys);
   });
   test("Document: getting id", () {
     expect(document.id, "123456789");
@@ -93,10 +93,10 @@ void main() {
   });
   test("mutableDocument: setting list", () {
     // ignore: deprecated_member_use_from_same_package
-    mutableDocument.setArray('list', List<int>());
+    mutableDocument.setArray('list', <int>[]);
     // ignore: deprecated_member_use_from_same_package
     expect(mutableDocument.getArray('list'), []);
-    mutableDocument.setList('list', List<int>());
+    mutableDocument.setList('list', <int>[]);
     expect(mutableDocument.getList('list'), []);
   });
   test("mutableDocument: null map", () {
@@ -135,7 +135,7 @@ void main() {
   test("Blob", () async {
     Blob blob = Blob.data("application/octet-stream", Uint8List(0));
     mutableDocument.setBlob("blob", blob);
-    expect(await mutableDocument.getBlob("blob").content, await blob.content);
+    expect(await mutableDocument.getBlob("blob")!.content, await blob.content);
   });
   test("NullDocument", () {
     expect(MutableDocument(id: "test").toMap(), {});
