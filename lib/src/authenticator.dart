@@ -24,7 +24,7 @@ class SessionAuthenticator implements Authenticator {
   SessionAuthenticator(this.sessionId, {this.cookieName});
 
   final String sessionId;
-  final String cookieName;
+  final String? cookieName;
 
   Map<String, dynamic> toJson() {
     return {

@@ -5,7 +5,7 @@ class ResultSet extends Object with IterableMixin<Result> {
     _internalState = _list;
   }
 
-  List<Result> _internalState;
+  late List<Result> _internalState;
 
   List<Result> allResults() => List.of(_internalState);
 

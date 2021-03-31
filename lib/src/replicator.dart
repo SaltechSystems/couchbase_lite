@@ -22,7 +22,7 @@ class Replicator {
   Map<ListenerToken, StreamSubscription> tokens = {};
 
   final ReplicatorConfiguration config;
-  Future<void> _storingReplicator;
+  Future<void>? _storingReplicator;
 
   /// Starts the replicator.
   ///
@@ -64,7 +64,7 @@ class Replicator {
             data['type'] == 'ReplicatorChange'))
         .listen((data) {
       var activity = ReplicatorStatus.activityFromString(data['activity']);
-      String error;
+      String? error;
       if (data['error'] is String) {
         error = data['error'];
       }
@@ -85,7 +85,7 @@ class Replicator {
         .where((data) => ((data['replicator'] == replicatorId &&
             data['type'] == 'DocumentReplication')))
         .listen((data) {
-      callback(DocumentReplication.fromMap(data)
+      callback(DocumentReplication.fromMap(data)!
           .rebuild((b) => b..replicator = this));
     });
     return token;
@@ -122,10 +122,10 @@ class Replicator {
 class ReplicatorStatus {
   ReplicatorStatus._internal(this.activity, this.error);
 
-  final ReplicatorActivityLevel activity;
-  final String error;
+  final ReplicatorActivityLevel? activity;
+  final String? error;
 
-  static ReplicatorActivityLevel activityFromString(String _status) {
+  static ReplicatorActivityLevel? activityFromString(String? _status) {
     switch (_status) {
       case 'BUSY':
         return ReplicatorActivityLevel.busy;

@@ -13,7 +13,7 @@ class Result {
     return _internalList.length;
   }
 
-  List<dynamic> getList({int index, String key}) {
+  List<dynamic>? getList({int? index, String? key}) {
     var result = getValue(index: index, key: key);
     if (result is List<dynamic>) {
       return result;
@@ -22,7 +22,7 @@ class Result {
     }
   }
 
-  Blob getBlob({int index, String key}) {
+  Blob? getBlob({int? index, String? key}) {
     var result = getValue(index: index, key: key);
     if (result is Map && result['@type'] == 'blob') {
       return Blob._fromMap(result);
@@ -31,7 +31,7 @@ class Result {
     }
   }
 
-  bool getBoolean({int index, String key}) {
+  bool? getBoolean({int? index, String? key}) {
     var result = getValue(index: index, key: key);
     if (result is bool) {
       return result;
@@ -44,7 +44,7 @@ class Result {
 
   //TODO: implement Date object and getDate
 
-  double getDouble({int index, String key}) {
+  double? getDouble({int? index, String? key}) {
     var result = getValue(index: index, key: key);
     if (result is double) {
       return result;
@@ -53,7 +53,7 @@ class Result {
     }
   }
 
-  int getInt({int index, String key}) {
+  int? getInt({int? index, String? key}) {
     var result = getValue(index: index, key: key);
     if (result is int) {
       return result;
@@ -66,7 +66,7 @@ class Result {
     return _keys;
   }
 
-  String getString({int index, String key}) {
+  String? getString({int? index, String? key}) {
     var result = getValue(index: index, key: key);
     if (result is String) {
       return result;
@@ -75,7 +75,7 @@ class Result {
     }
   }
 
-  Object getValue({int index, String key}) {
+  Object? getValue({int? index, String? key}) {
     if (null != index && _internalList.length > index) {
       return _internalList[index];
     } else if (null != key && _internalMap.containsKey(key)) {

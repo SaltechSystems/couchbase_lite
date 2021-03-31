@@ -1,11 +1,11 @@
 part of couchbase_lite;
 
 class MutableDocument extends Document {
-  MutableDocument({String id, Map<dynamic, dynamic> data})
+  MutableDocument({String? id, Map<dynamic, dynamic>? data})
       : super._init(data, id);
 
   MutableDocument._init(
-      [Map<dynamic, dynamic> data, String id, String dbname, int sequence])
+      [Map<dynamic, dynamic>? data, String? id, String? dbname, int? sequence])
       : super._init(data, id, dbname, sequence);
 
   /// Set a value for the given key. Allowed value types are List, Map,
@@ -16,9 +16,9 @@ class MutableDocument extends Document {
   ///   - value: The value.
   ///   - key: The key.
   /// - Returns: The self object.
-  MutableDocument setValue(String key, Object value) {
+  MutableDocument setValue(String key, Object? value) {
     if (value is Fragment) {
-      value = (value as Fragment).getValue();
+      value = value.getValue();
     }
 
     if (value != null) {
@@ -121,7 +121,7 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The DateTime value.
   ///   - key: The Document object.
-  MutableDocument setData(Map<String, dynamic> data) {
+  MutableDocument setData(Map<String, dynamic>? data) {
     super._data = _stringMapFromDynamic(data ?? {});
 
     return this;
@@ -141,7 +141,7 @@ class MutableDocument extends Document {
   /// - Parameter key: The key.
   /// - Returns: The List Object object or null.
   @override
-  List<T> getList<T>(String key) {
+  List<T>? getList<T>(String key) {
     var _result = getValue(key);
     if (_result is List) {
       return List.castFrom<dynamic, T>(_result);
@@ -157,7 +157,7 @@ class MutableDocument extends Document {
   /// - Parameter key: The key.
   /// - Returns: The Map Object object or nil.
   @override
-  Map<K, V> getMap<K, V>(String key) {
+  Map<K, V>? getMap<K, V>(String key) {
     var _result = getValue(key);
     if (_result is Map) {
       return Map.castFrom<dynamic, dynamic, K, V>(_result);

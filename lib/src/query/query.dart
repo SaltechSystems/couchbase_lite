@@ -23,7 +23,7 @@ class Query {
     _options['queryId'] = queryId;
 
     if (!_stored && tokens.isNotEmpty) {
-      _stored = await _channel.invokeMethod('storeQuery', this);
+      _stored = await _channel.invokeMethod<bool>('storeQuery', this).then((bool? value) => value ?? false);
     }
 
     try {
@@ -52,15 +52,15 @@ class Query {
   /// Adds a query change listener and posts changes to [callback].
   ///
   /// Returns the listener token object for removing the listener.
-  Future<ListenerToken> addChangeListener(
+  Future<ListenerToken?> addChangeListener(
       Function(QueryChange) callback) async {
     var token = ListenerToken();
     tokens[token] =
         _stream.where((data) => data['query'] == queryId).listen((data) {
       Map<String, dynamic> qcJson = data;
-      final List<dynamic> resultList = qcJson['results'];
+      final List<dynamic>? resultList = qcJson['results'];
 
-      ResultSet result;
+      ResultSet? result;
 
       if (resultList != null) {
         var results = <Result>[];
@@ -74,7 +74,7 @@ class Query {
         result = ResultSet(results);
       }
 
-      String error = qcJson['error'];
+      String? error = qcJson['error'];
 
       callback(QueryChange(query: this, results: result, error: error));
     });
@@ -89,7 +89,7 @@ class Query {
   }
 
   /// Removes a change listener wih the given listener token.
-  Future<void> removeChangeListener(ListenerToken token) async {
+  Future<void> removeChangeListener(ListenerToken? token) async {
     final subscription = tokens.remove(token);
 
     if (subscription != null) {
@@ -98,7 +98,7 @@ class Query {
 
     if (_stored && tokens.isEmpty) {
       // We had to store this before listening to so if stored on the platform
-      _stored = !await _channel.invokeMethod('removeQuery', this);
+      _stored = !(await _channel.invokeMethod<bool>('removeQuery', this).then((bool? value) => value ?? false));
     }
   }
 
@@ -117,17 +117,16 @@ class Query {
   Future<String> explain() {
     //Make sure the queryId is available when the toJson() method is called.
     _options['queryId'] = queryId;
-    return _channel.invokeMethod('explainQuery', this);
+    return _channel.invokeMethod<String>('explainQuery', this).then((String? value) => value ?? '');
   }
 
   Map<String, dynamic> toJson() => options;
 }
 
 class QueryChange {
-  QueryChange({@required this.query, this.results, this.error})
-      : assert(query != null);
+  QueryChange({required this.query, this.results, this.error});
 
   final Query query;
-  final ResultSet results;
-  final String error;
+  final ResultSet? results;
+  final String? error;
 }

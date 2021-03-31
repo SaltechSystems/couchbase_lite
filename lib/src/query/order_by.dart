@@ -1,7 +1,7 @@
 part of couchbase_lite;
 
 class OrderBy extends Query {
-  Limit limit(Expression expression, {Expression offset}) {
+  Limit limit(Expression expression, {Expression? offset}) {
     var resultQuery = Limit();
     resultQuery._options = options;
     if (offset != null) {
