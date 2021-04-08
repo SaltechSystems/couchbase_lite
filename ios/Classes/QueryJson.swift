@@ -420,8 +420,7 @@ public class QueryJson {
                     })
                     returnExpression = existingExpression
                         .in(expressions)
-                 case ("arrayInAny", let value, _),
-                      ("satisfies", let value, _):
+                 case ("arrayInAny", let value,_),("satisfies", let value,_):
                     let arrayInAny = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["arrayInAny"] ?? [])
                     let satisfiesArray = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["satisfies"] ?? [])
                     returnExpression = ArrayExpression.any(existingExpression as!
