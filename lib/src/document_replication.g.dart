@@ -20,10 +20,10 @@ class _$DocumentReplicationSerializer
   final String wireName = 'DocumentReplication';
 
   @override
-  Iterable<Object> serialize(
+  Iterable<Object?> serialize(
       Serializers serializers, DocumentReplication object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       'documents',
       serializers.serialize(object.documents,
           specifiedType: const FullType(
@@ -40,19 +40,19 @@ class _$DocumentReplicationSerializer
 
   @override
   DocumentReplication deserialize(
-      Serializers serializers, Iterable<Object> serialized,
+      Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new DocumentReplicationBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current as String?;
       iterator.moveNext();
       final dynamic value = iterator.current;
       switch (key) {
         case 'isPush':
           result.isPush = serializers.deserialize(value,
-              specifiedType: const FullType(bool)) as bool;
+              specifiedType: const FullType(bool)) as bool?;
           break;
         case 'documents':
           result.documents.replace(serializers.deserialize(value,
@@ -69,14 +69,14 @@ class _$DocumentReplicationSerializer
 
 class _$DocumentReplication extends DocumentReplication {
   @override
-  final Replicator replicator;
+  final Replicator? replicator;
   @override
-  final bool isPush;
+  final bool? isPush;
   @override
-  final BuiltList<ReplicatedDocument> documents;
+  final BuiltList<ReplicatedDocument>? documents;
 
   factory _$DocumentReplication(
-          [void Function(DocumentReplicationBuilder) updates]) =>
+          [void Function(DocumentReplicationBuilder)? updates]) =>
       (new DocumentReplicationBuilder()..update(updates)).build();
 
   _$DocumentReplication._({this.replicator, this.isPush, this.documents})
@@ -122,17 +122,17 @@ class _$DocumentReplication extends DocumentReplication {
 
 class DocumentReplicationBuilder
     implements Builder<DocumentReplication, DocumentReplicationBuilder> {
-  _$DocumentReplication _$v;
+  _$DocumentReplication? _$v;
 
-  Replicator _replicator;
-  Replicator get replicator => _$this._replicator;
-  set replicator(Replicator replicator) => _$this._replicator = replicator;
+  Replicator? _replicator;
+  Replicator? get replicator => _$this._replicator;
+  set replicator(Replicator? replicator) => _$this._replicator = replicator;
 
-  bool _isPush;
-  bool get isPush => _$this._isPush;
-  set isPush(bool isPush) => _$this._isPush = isPush;
+  bool? _isPush;
+  bool? get isPush => _$this._isPush;
+  set isPush(bool? isPush) => _$this._isPush = isPush;
 
-  ListBuilder<ReplicatedDocument> _documents;
+  ListBuilder<ReplicatedDocument>? _documents;
   ListBuilder<ReplicatedDocument> get documents =>
       _$this._documents ??= new ListBuilder<ReplicatedDocument>();
   set documents(ListBuilder<ReplicatedDocument> documents) =>
@@ -142,9 +142,9 @@ class DocumentReplicationBuilder
 
   DocumentReplicationBuilder get _$this {
     if (_$v != null) {
-      _replicator = _$v.replicator;
-      _isPush = _$v.isPush;
-      _documents = _$v.documents?.toBuilder();
+      _replicator = _$v!.replicator;
+      _isPush = _$v!.isPush;
+      _documents = _$v!.documents?.toBuilder();
       _$v = null;
     }
     return this;
@@ -159,7 +159,7 @@ class DocumentReplicationBuilder
   }
 
   @override
-  void update(void Function(DocumentReplicationBuilder) updates) {
+  void update(void Function(DocumentReplicationBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -173,7 +173,7 @@ class DocumentReplicationBuilder
               isPush: isPush,
               documents: documents.build());
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'documents';
         documents.build();

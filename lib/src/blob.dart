@@ -11,20 +11,20 @@ class Blob {
     _data = map['data'];
   }
 
-  String _contentType;
-  String _digest;
-  int _length;
-  Uint8List _data;
-  String get contentType => _contentType;
-  String get digest => _digest;
-  int get length => _length;
-  Uint8List blobData;
+  String? _contentType;
+  String? _digest;
+  int? _length;
+  Uint8List? _data;
+  String? get contentType => _contentType;
+  String? get digest => _digest;
+  int? get length => _length;
+  Uint8List? blobData;
 
-  Future<Uint8List> contentFromDatabase(Database database) async {
-    Future<Uint8List> readContent() async {
-      var blobPath = database.path +
+  Future<Uint8List?> contentFromDatabase(Database database) async {
+    Future<Uint8List?> readContent() async {
+      var blobPath = database.path! +
           'Attachments/' +
-          _digest.replaceFirst('sha1-', '').replaceAll('/', '_') +
+          _digest!.replaceFirst('sha1-', '').replaceAll('/', '_') +
           '.blob';
 
       var file = File(blobPath);
@@ -35,7 +35,7 @@ class Blob {
     return blobData;
   }
 
-  Future<Uint8List> get content async {
+  Future<Uint8List?> get content async {
     // Load data here if needed
     _data ??= await Database._methodChannel.invokeMethod(
         'getBlobContentWithDigest', <String, dynamic>{'digest': _digest});

@@ -17,9 +17,9 @@ class _$ReplicatedDocumentSerializer
   final String wireName = 'ReplicatedDocument';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, ReplicatedDocument object,
+  Iterable<Object?> serialize(Serializers serializers, ReplicatedDocument object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       'document',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
       'flags',
@@ -36,27 +36,27 @@ class _$ReplicatedDocumentSerializer
 
   @override
   ReplicatedDocument deserialize(
-      Serializers serializers, Iterable<Object> serialized,
+      Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new ReplicatedDocumentBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
-      final key = iterator.current as String;
+      final key = iterator.current as String?;
       iterator.moveNext();
       final dynamic value = iterator.current;
       switch (key) {
         case 'document':
           result.id = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'error':
           result.error = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'flags':
           result.flags = serializers.deserialize(value,
-              specifiedType: const FullType(int)) as int;
+              specifiedType: const FullType(int)) as int?;
           break;
       }
     }
@@ -67,14 +67,14 @@ class _$ReplicatedDocumentSerializer
 
 class _$ReplicatedDocument extends ReplicatedDocument {
   @override
-  final String id;
+  final String? id;
   @override
-  final String error;
+  final String? error;
   @override
-  final int flags;
+  final int? flags;
 
   factory _$ReplicatedDocument(
-          [void Function(ReplicatedDocumentBuilder) updates]) =>
+          [void Function(ReplicatedDocumentBuilder)? updates]) =>
       (new ReplicatedDocumentBuilder()..update(updates)).build();
 
   _$ReplicatedDocument._({this.id, this.error, this.flags}) : super._() {
@@ -121,27 +121,27 @@ class _$ReplicatedDocument extends ReplicatedDocument {
 
 class ReplicatedDocumentBuilder
     implements Builder<ReplicatedDocument, ReplicatedDocumentBuilder> {
-  _$ReplicatedDocument _$v;
+  _$ReplicatedDocument? _$v;
 
-  String _id;
-  String get id => _$this._id;
-  set id(String id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  String _error;
-  String get error => _$this._error;
-  set error(String error) => _$this._error = error;
+  String? _error;
+  String? get error => _$this._error;
+  set error(String? error) => _$this._error = error;
 
-  int _flags;
-  int get flags => _$this._flags;
-  set flags(int flags) => _$this._flags = flags;
+  int? _flags;
+  int? get flags => _$this._flags;
+  set flags(int? flags) => _$this._flags = flags;
 
   ReplicatedDocumentBuilder();
 
   ReplicatedDocumentBuilder get _$this {
     if (_$v != null) {
-      _id = _$v.id;
-      _error = _$v.error;
-      _flags = _$v.flags;
+      _id = _$v!.id;
+      _error = _$v!.error;
+      _flags = _$v!.flags;
       _$v = null;
     }
     return this;
@@ -156,7 +156,7 @@ class ReplicatedDocumentBuilder
   }
 
   @override
-  void update(void Function(ReplicatedDocumentBuilder) updates) {
+  void update(void Function(ReplicatedDocumentBuilder)? updates) {
     if (updates != null) updates(this);
   }
 

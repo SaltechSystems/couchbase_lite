@@ -1,7 +1,7 @@
 part of couchbase_lite;
 
 class Select extends Query {
-  From from(String databaseName, {String as}) {
+  From from(String databaseName, {String? as}) {
     var resultQuery = From();
     resultQuery._options = options;
     if (as != null) {

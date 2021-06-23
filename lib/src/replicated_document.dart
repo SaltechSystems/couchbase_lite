@@ -13,31 +13,31 @@ abstract class ReplicatedDocument
     implements Built<ReplicatedDocument, ReplicatedDocumentBuilder> {
   ReplicatedDocument._();
 
-  factory ReplicatedDocument([Function(ReplicatedDocumentBuilder b) updates]) =
+  factory ReplicatedDocument([Function(ReplicatedDocumentBuilder b)? updates]) =
       _$ReplicatedDocument;
 
   @BuiltValueField(wireName: 'document')
-  String get id;
+  String? get id;
   @nullable
   @BuiltValueField(wireName: 'error')
-  String get error;
+  String? get error;
   @BuiltValueField(wireName: 'flags')
-  int get flags;
+  int? get flags;
 
   String toJson() {
     return json.encode(toMap());
   }
 
-  Map toMap() {
+  Map? toMap() {
     return standardSerializers.serializeWith(
-        ReplicatedDocument.serializer, this);
+        ReplicatedDocument.serializer, this) as Map<dynamic, dynamic>?;
   }
 
-  static ReplicatedDocument fromJson(String jsonString) {
+  static ReplicatedDocument? fromJson(String jsonString) {
     return fromMap(json.decode(jsonString));
   }
 
-  static ReplicatedDocument fromMap(Map jsonMap) {
+  static ReplicatedDocument? fromMap(Map? jsonMap) {
     return standardSerializers.deserializeWith(
         ReplicatedDocument.serializer, jsonMap);
   }

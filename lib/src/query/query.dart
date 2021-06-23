@@ -2,7 +2,7 @@ part of couchbase_lite;
 
 class Query {
   final queryId = Uuid().v1();
-  bool _stored = false;
+  bool? _stored = false;
   Map<String, dynamic> _options = {};
   Parameters get parameters => throw UnimplementedError();
   Map<ListenerToken, StreamSubscription> tokens = {};
@@ -22,7 +22,7 @@ class Query {
   Future<ResultSet> execute() async {
     _options['queryId'] = queryId;
 
-    if (!_stored && tokens.isNotEmpty) {
+    if (!_stored! && tokens.isNotEmpty) {
       _stored = await _channel.invokeMethod('storeQuery', this);
     }
 
@@ -52,15 +52,15 @@ class Query {
   /// Adds a query change listener and posts changes to [callback].
   ///
   /// Returns the listener token object for removing the listener.
-  Future<ListenerToken> addChangeListener(
+  Future<ListenerToken?> addChangeListener(
       Function(QueryChange) callback) async {
     var token = ListenerToken();
     tokens[token] =
         _stream.where((data) => data['query'] == queryId).listen((data) {
       Map<String, dynamic> qcJson = data;
-      final List<dynamic> resultList = qcJson['results'];
+      final List<dynamic>? resultList = qcJson['results'];
 
-      ResultSet result;
+      ResultSet? result;
 
       if (resultList != null) {
         var results = <Result>[];
@@ -74,7 +74,7 @@ class Query {
         result = ResultSet(results);
       }
 
-      String error = qcJson['error'];
+      String? error = qcJson['error'];
 
       callback(QueryChange(query: this, results: result, error: error));
     });
@@ -89,16 +89,16 @@ class Query {
   }
 
   /// Removes a change listener wih the given listener token.
-  Future<void> removeChangeListener(ListenerToken token) async {
+  Future<void> removeChangeListener(ListenerToken? token) async {
     final subscription = tokens.remove(token);
 
     if (subscription != null) {
       await subscription.cancel();
     }
 
-    if (_stored && tokens.isEmpty) {
+    if (_stored! && tokens.isEmpty) {
       // We had to store this before listening to so if stored on the platform
-      _stored = !await _channel.invokeMethod('removeQuery', this);
+      _stored = !await (_channel.invokeMethod('removeQuery', this) as FutureOr<bool>);
     }
   }
 
@@ -114,7 +114,7 @@ class Query {
   /// The most important thing to know is that if you see “SCAN TABLE”,
   /// it means that SQLite is doing a slow linear scan of the documents instead of using an index.
   ///
-  Future<String> explain() {
+  Future<String?> explain() {
     //Make sure the queryId is available when the toJson() method is called.
     _options['queryId'] = queryId;
     return _channel.invokeMethod('explainQuery', this);
@@ -124,10 +124,10 @@ class Query {
 }
 
 class QueryChange {
-  QueryChange({@required this.query, this.results, this.error})
+  QueryChange({required this.query, this.results, this.error})
       : assert(query != null);
 
   final Query query;
-  final ResultSet results;
-  final String error;
+  final ResultSet? results;
+  final String? error;
 }
