@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.4'
+        classpath 'com.android.tools.build:gradle:4.0.2'
     }
 }
 
@@ -35,6 +35,6 @@ android {
         disable 'InvalidPackage'
     }
     dependencies {
-        implementation 'com.couchbase.lite:couchbase-lite-android:2.8.1'
+        implementation 'com.couchbase.lite:couchbase-lite-android:2.8.5'
     }
 }

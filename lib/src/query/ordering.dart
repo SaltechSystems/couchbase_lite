@@ -13,7 +13,7 @@ class Ordering {
     return Ordering._internal(_expression);
   }
 
-  Expression _internalExpression;
+  late Expression _internalExpression;
 
   Ordering ascending() {
     var clone = _internalExpression._clone();

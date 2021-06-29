@@ -16,7 +16,7 @@ class Fragment {
   /// Returns true if the value exists, and is either `true` or a nonzero number.
   ///
   /// - Returns: The Bool value.
-  bool getBoolean() {
+  bool? getBoolean() {
     if (_value is num) {
       return _value != 0;
     }
@@ -29,7 +29,7 @@ class Fragment {
   /// Returns 0.0 if the property doesn't exist or does not have a numeric value.
   ///
   /// - Returns: The Double value.
-  double getDouble() {
+  double? getDouble() {
     if (_value is double) {
       return _value;
     } else if (_value is int) {
@@ -44,7 +44,7 @@ class Fragment {
   /// Returns 0 if the property doesn't exist or does not have a numeric value.
   ///
   /// - Returns: The Int value.
-  int getInt() {
+  int? getInt() {
     if (_value is double) {
       return _value.toInt();
     } else if (_value is int) {
@@ -61,7 +61,7 @@ class Fragment {
   ///  this can happen if the file updated since the last time the document was fetched.
   ///
   /// - Returns: The Blob object or null.
-  Blob getBlob() {
+  Blob? getBlob() {
     var result = getValue();
     if (result is Blob) {
       return result;
@@ -74,7 +74,7 @@ class Fragment {
   ///  Returns null if the property doesn't exist, or its value is not a string.
   ///
   /// - Returns: The String object or null.
-  String getString() {
+  String? getString() {
     return _value is String ? _value : null;
   }
 
@@ -83,7 +83,7 @@ class Fragment {
   /// if the value is null or the property doesn't exist.
   ///
   /// - Returns: The value or null.
-  Object getValue() {
+  Object? getValue() {
     if (_value is Map) {
       if (_value['@type'] == 'blob') {
         return Blob._fromMap(_value);
@@ -101,7 +101,7 @@ class Fragment {
   /// Returns null if the property doesn't exists, or its value is not an array.
   ///
   /// - Returns: The List Object object or null.
-  List<T> getList<T>() {
+  List<T>? getList<T>() {
     var result = getValue();
     if (result is List) {
       return List.castFrom<dynamic, T>(result);
@@ -115,7 +115,7 @@ class Fragment {
   /// Returns null if the property doesn't exists, or its value is not a dictionary.
   ///
   /// - Returns: The Map Object object or nil.
-  Map<K, V> getMap<K, V>() {
+  Map<K, V>? getMap<K, V>() {
     var result = getValue();
     if (result is Map) {
       return Map.castFrom<dynamic, dynamic, K, V>(result);

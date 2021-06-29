@@ -3,17 +3,17 @@ part of couchbase_lite;
 /// Couchbase Lite document. The Document is immutable.
 class Document {
   Document._init(
-      [Map<dynamic, dynamic> data, this._id, this._dbname, this._sequence]) {
+      [Map<dynamic, dynamic>? data, this._id, this._dbname, this._sequence]) {
     _data = _stringMapFromDynamic(data ?? {});
   }
 
-  Map<dynamic, dynamic> _data;
-  String _dbname;
-  String _id;
-  int _sequence;
+  late Map<dynamic, dynamic> _data;
+  String? _dbname;
+  String? _id;
+  int? _sequence;
 
-  String get id => _id;
-  int get sequence => _sequence;
+  String? get id => _id;
+  int? get sequence => _sequence;
 
   Map<String, dynamic> _stringMapFromDynamic(Map<dynamic, dynamic> _map) {
     return Map.castFrom<dynamic, dynamic, String, dynamic>(_map);
@@ -39,7 +39,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Bool value.
-  bool getBoolean(String key) => this[key].getBoolean();
+  bool? getBoolean(String key) => this[key].getBoolean();
 
   /// Gets a property's value as a double value.
   /// Integers will be converted to double. The value `true` is returned as 1.0, `false` as 0.0.
@@ -47,7 +47,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Double value.
-  double getDouble(String key) => this[key].getDouble();
+  double? getDouble(String key) => this[key].getDouble();
 
   /// Gets a property's value as an int value.
   /// Floating point values will be rounded. The value `true` is returned as 1, `false` as 0.
@@ -55,7 +55,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Int value.
-  int getInt(String key) => this[key].getInt();
+  int? getInt(String key) => this[key].getInt();
 
   ///  Get a property’s value as a Blob object without the data.
   ///  Returns nil if the property doesn’t exist, or its value is not a blob.
@@ -65,11 +65,11 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Blob object or null.
-  Blob getBlob(String key) => this[key].getBlob();
+  Blob? getBlob(String key) => this[key].getBlob();
 
   /// An array containing all keys, or an empty array if the document has no properties.
   List<String> getKeys() {
-    return _data.keys.toList();
+    return _data.keys.toList() as List<String>;
   }
 
   ///  Gets a property's value as a string.
@@ -77,7 +77,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The String object or null.
-  String getString(String key) => this[key].getString();
+  String? getString(String key) => this[key].getString();
 
   ///  Gets a property's value as a date.
   ///  Returns null if the property doesn't exist, or its value is not a date.
@@ -95,14 +95,14 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The value or null.
-  Object getValue(String key) => this[key].getValue();
+  Object? getValue(String key) => this[key].getValue();
 
   /// Get a property's value as a List Object, which is a mapping object of an array value.
   /// Returns null if the property doesn't exists, or its value is not an array.
   ///
   /// - Parameter key: The key.
   /// - Returns: The List Object object or null.
-  List<T> getList<T>(String key) => this[key].getList();
+  List<T>? getList<T>(String key) => this[key].getList();
 
   /// Get a property's value as a List Object, which is a mapping object of an array value.
   /// Returns null if the property doesn't exists, or its value is not an array.
@@ -110,7 +110,7 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: The List Object object or null.
   @Deprecated('Use `getList`.')
-  List<T> getArray<T>(String key) => getList(key);
+  List<T>? getArray<T>(String key) => getList(key);
 
   /// Get a property's value as a Map Object, which is a mapping object of
   /// a dictionary value.
@@ -118,7 +118,7 @@ class Document {
   ///
   /// - Parameter key: The key.
   /// - Returns: The Map Object object or nil.
-  Map<K, V> getMap<K, V>(String key) => this[key].getMap();
+  Map<K, V>? getMap<K, V>(String key) => this[key].getMap();
 
   /// Gets content of the current object as a Dictionary.
   ///

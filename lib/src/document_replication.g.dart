@@ -20,27 +20,29 @@ class _$DocumentReplicationSerializer
   final String wireName = 'DocumentReplication';
 
   @override
-  Iterable<Object> serialize(
+  Iterable<Object?> serialize(
       Serializers serializers, DocumentReplication object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
+    final result = <Object?>[
       'documents',
       serializers.serialize(object.documents,
           specifiedType: const FullType(
               BuiltList, const [const FullType(ReplicatedDocument)])),
     ];
-    if (object.isPush != null) {
+    Object? value;
+    value = object.isPush;
+    if (value != null) {
       result
         ..add('isPush')
-        ..add(serializers.serialize(object.isPush,
-            specifiedType: const FullType(bool)));
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
     }
     return result;
   }
 
   @override
   DocumentReplication deserialize(
-      Serializers serializers, Iterable<Object> serialized,
+      Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new DocumentReplicationBuilder();
 
@@ -48,7 +50,7 @@ class _$DocumentReplicationSerializer
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'isPush':
           result.isPush = serializers.deserialize(value,
@@ -57,7 +59,7 @@ class _$DocumentReplicationSerializer
         case 'documents':
           result.documents.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
-                      BuiltList, const [const FullType(ReplicatedDocument)]))
+                      BuiltList, const [const FullType(ReplicatedDocument)]))!
               as BuiltList<Object>);
           break;
       }
@@ -69,21 +71,21 @@ class _$DocumentReplicationSerializer
 
 class _$DocumentReplication extends DocumentReplication {
   @override
-  final Replicator replicator;
+  final Replicator? replicator;
   @override
-  final bool isPush;
+  final bool? isPush;
   @override
   final BuiltList<ReplicatedDocument> documents;
 
   factory _$DocumentReplication(
-          [void Function(DocumentReplicationBuilder) updates]) =>
+          [void Function(DocumentReplicationBuilder)? updates]) =>
       (new DocumentReplicationBuilder()..update(updates)).build();
 
-  _$DocumentReplication._({this.replicator, this.isPush, this.documents})
+  _$DocumentReplication._(
+      {this.replicator, this.isPush, required this.documents})
       : super._() {
-    if (documents == null) {
-      throw new BuiltValueNullFieldError('DocumentReplication', 'documents');
-    }
+    BuiltValueNullFieldError.checkNotNull(
+        documents, 'DocumentReplication', 'documents');
   }
 
   @override
@@ -122,29 +124,30 @@ class _$DocumentReplication extends DocumentReplication {
 
 class DocumentReplicationBuilder
     implements Builder<DocumentReplication, DocumentReplicationBuilder> {
-  _$DocumentReplication _$v;
+  _$DocumentReplication? _$v;
 
-  Replicator _replicator;
-  Replicator get replicator => _$this._replicator;
-  set replicator(Replicator replicator) => _$this._replicator = replicator;
+  Replicator? _replicator;
+  Replicator? get replicator => _$this._replicator;
+  set replicator(Replicator? replicator) => _$this._replicator = replicator;
 
-  bool _isPush;
-  bool get isPush => _$this._isPush;
-  set isPush(bool isPush) => _$this._isPush = isPush;
+  bool? _isPush;
+  bool? get isPush => _$this._isPush;
+  set isPush(bool? isPush) => _$this._isPush = isPush;
 
-  ListBuilder<ReplicatedDocument> _documents;
+  ListBuilder<ReplicatedDocument>? _documents;
   ListBuilder<ReplicatedDocument> get documents =>
       _$this._documents ??= new ListBuilder<ReplicatedDocument>();
-  set documents(ListBuilder<ReplicatedDocument> documents) =>
+  set documents(ListBuilder<ReplicatedDocument>? documents) =>
       _$this._documents = documents;
 
   DocumentReplicationBuilder();
 
   DocumentReplicationBuilder get _$this {
-    if (_$v != null) {
-      _replicator = _$v.replicator;
-      _isPush = _$v.isPush;
-      _documents = _$v.documents?.toBuilder();
+    final $v = _$v;
+    if ($v != null) {
+      _replicator = $v.replicator;
+      _isPush = $v.isPush;
+      _documents = $v.documents.toBuilder();
       _$v = null;
     }
     return this;
@@ -152,14 +155,12 @@ class DocumentReplicationBuilder
 
   @override
   void replace(DocumentReplication other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$DocumentReplication;
   }
 
   @override
-  void update(void Function(DocumentReplicationBuilder) updates) {
+  void update(void Function(DocumentReplicationBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -173,7 +174,7 @@ class DocumentReplicationBuilder
               isPush: isPush,
               documents: documents.build());
     } catch (_) {
-      String _$failedField;
+      late String _$failedField;
       try {
         _$failedField = 'documents';
         documents.build();

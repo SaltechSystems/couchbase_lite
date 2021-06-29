@@ -197,7 +197,8 @@ void main() {
     await database.saveDocument(doc);
     expect(doc.id, "documentid");
     var testDoc = await database.document("myid");
-    expect(testDoc.id, "myid");
+    expect(testDoc, isNotNull);
+    expect(testDoc!.id, "myid");
     expect(await database.deleteDocument("myid"), true);
     // Code Coverage for deprecate functions
     // ignore: deprecated_member_use_from_same_package

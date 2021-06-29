@@ -1,3 +1,9 @@
+## 3.0.0-nullsafety.0
+
+* Migrate to NNDB
+* Update libraries to version 2.8.4 (iOS) & 2.8.5 (Android)
+* Updated gradle to 4.0.2
+
 ## 2.8.1
 
 * Update libraries to version 2.8.1

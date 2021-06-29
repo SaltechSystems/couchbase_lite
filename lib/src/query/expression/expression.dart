@@ -142,7 +142,7 @@ abstract class Expression {
   }
 
   Expression _addExpression(String selector, Expression expression,
-      {String secondSelector, Expression secondExpression}) {
+      {String? secondSelector, Expression? secondExpression}) {
     var clone = _clone();
     if (secondSelector != null && secondExpression != null) {
       clone._internalExpressionStack.add({

@@ -20,13 +20,13 @@ class Database {
   }
 
   final String name;
-  final String path;
+  final String? path;
 
   Map<ListenerToken, StreamSubscription> tokens = {};
 
   /// The number of documents in the database
-  Future<int> get count => _methodChannel
-      .invokeMethod('getDocumentCount', <String, dynamic>{'database': name});
+  Future<int> get count => _methodChannel.invokeMethod<int>('getDocumentCount',
+      <String, dynamic>{'database': name}).then((int? value) => value ?? 0);
 
   /// Deletes a database of the given [dbName].
   static Future<void> deleteWithName(String dbName) =>
@@ -34,7 +34,7 @@ class Database {
           'deleteDatabaseWithName', <String, dynamic>{'database': dbName});
 
   /// Gets a Document object [withId]
-  Future<Document> document(String withId) async {
+  Future<Document?> document(String withId) async {
     var _docResult = await _methodChannel.invokeMethod(
         'getDocumentWithId', <String, dynamic>{'database': name, 'id': withId});
 
@@ -48,7 +48,7 @@ class Database {
 
   /// Gets a Document object with the given [id]
   @Deprecated('Replaced by `document`.')
-  Future<Document> documentWithId(String id) => document(id);
+  Future<Document?> documentWithId(String id) => document(id);
 
   /// All index names.
   Future<List<String>> get indexes async {
@@ -69,10 +69,10 @@ class Database {
   Future<bool> saveDocument(MutableDocument doc,
       {ConcurrencyControl concurrencyControl =
           ConcurrencyControl.lastWriteWins}) async {
-    Map<dynamic, dynamic> result;
+    Map<dynamic, dynamic>? result;
     if (doc.id == null) {
-      result =
-          await _methodChannel.invokeMethod('saveDocument', <String, dynamic>{
+      result = await _methodChannel.invokeMethod<Map<dynamic, dynamic>>(
+          'saveDocument', <String, dynamic>{
         'database': name,
         'map': doc.toMap(),
         'concurrencyControl':
@@ -81,8 +81,8 @@ class Database {
                 : 'lastWriteWins'
       });
     } else if (doc.sequence != null) {
-      result = await _methodChannel
-          .invokeMethod('saveDocumentWithId', <String, dynamic>{
+      result = await _methodChannel.invokeMethod<Map<dynamic, dynamic>>(
+          'saveDocumentWithId', <String, dynamic>{
         'database': name,
         'id': doc.id,
         'sequence': doc.sequence,
@@ -93,8 +93,8 @@ class Database {
                 : 'lastWriteWins'
       });
     } else {
-      result = await _methodChannel
-          .invokeMethod('saveDocumentWithId', <String, dynamic>{
+      result = await _methodChannel.invokeMethod<Map<dynamic, dynamic>>(
+          'saveDocumentWithId', <String, dynamic>{
         'database': name,
         'id': doc.id,
         'map': doc.toMap(),
@@ -105,7 +105,7 @@ class Database {
       });
     }
 
-    if (result['success'] == true) {
+    if (result != null && result['success'] == true) {
       doc._dbname = name;
       doc._id = result['id'];
       doc._sequence = result['sequence'];
@@ -131,15 +131,15 @@ class Database {
     return true;
   }
 
-  Future<Uint8List> getBlobContent(Blob blob) async {
+  Future<Uint8List?> getBlobContent(Blob? blob) async {
     if (blob == null) {
       return null;
     }
 
-    Future<Uint8List> readContent() async {
-      var blobPath = path +
+    Future<Uint8List?> readContent() async {
+      var blobPath = path! +
           'Attachments/' +
-          blob.digest.replaceFirst('sha1-', '').replaceAll('/', '_') +
+          blob.digest!.replaceFirst('sha1-', '').replaceAll('/', '_') +
           '.blob';
 
       var file = File(blobPath);
@@ -153,7 +153,7 @@ class Database {
   /// Creates an index [withName] which could be a value index or a full-text search index.
   /// The name can be used for deleting the index. Creating a new different index with an existing index
   /// name will replace the old index; creating the same index with the same name will be no-ops.
-  Future<bool> createIndex(Index index, {@required String withName}) {
+  Future<bool> createIndex(Index index, {required String withName}) {
     var methodName;
     if (index is ValueIndex) {
       methodName = 'createIndex';
@@ -166,15 +166,15 @@ class Database {
         'unknown index type',
       );
     }
-    return _methodChannel.invokeMethod(methodName, <String, dynamic>{
+    return _methodChannel.invokeMethod<bool>(methodName, <String, dynamic>{
       'database': name,
       'index': index.toJson(),
       'withName': withName
-    });
+    }).then((bool? value) => value ?? false);
   }
 
   /// Deletes index [forName] from the database.
-  Future<bool> deleteIndex({@required String forName}) async {
+  Future<bool> deleteIndex({required String forName}) async {
     await _methodChannel.invokeMethod('deleteIndex', <String, dynamic>{
       'database': name,
       'forName': forName,

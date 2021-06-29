@@ -56,8 +56,8 @@ class FullTextIndex extends Index {
   FullTextIndex(this._fullTextIndexItems);
 
   final List<FullTextIndexItem> _fullTextIndexItems;
-  bool _ignoreAccents;
-  String _language;
+  bool? _ignoreAccents;
+  String? _language;
 
   FullTextIndex ignoreAccents(bool ignoreAccents) {
     _ignoreAccents = ignoreAccents;
@@ -87,12 +87,12 @@ class FullTextIndex extends Index {
 
 class IndexBuilder {
   /// Creates a value index with the given index items. The index items are a list of the properties or expressions to be indexed.
-  static ValueIndex valueIndex({@required List<ValueIndexItem> items}) {
+  static ValueIndex valueIndex({required List<ValueIndexItem> items}) {
     return ValueIndex(items);
   }
 
   /// Creates a full-text index with the given index items. The index items are a list of the properties to be indexed.
-  static FullTextIndex fullTextIndex({@required List<FullTextIndexItem> items}) {
+  static FullTextIndex fullTextIndex({required List<FullTextIndexItem> items}) {
     return FullTextIndex(items);
   }
 }
