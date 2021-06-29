@@ -1,8 +1,11 @@
 package com.saltechsystems.couchbase_lite;
 
+import com.couchbase.lite.ArrayExpression;
+import com.couchbase.lite.ArrayFunction;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.From;
+import com.couchbase.lite.Function;
 import com.couchbase.lite.FullTextExpression;
 import com.couchbase.lite.FullTextFunction;
 import com.couchbase.lite.Function;
@@ -20,6 +23,7 @@ import com.couchbase.lite.Result;
 import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.Select;
 import com.couchbase.lite.SelectResult;
+import com.couchbase.lite.VariableExpression;
 import com.couchbase.lite.Where;
 
 import org.json.JSONObject;
@@ -292,11 +296,11 @@ class QueryJson {
     }
 
     private SelectResult[] inflateSelectResultArray() {
-            List<List<Map<String, Object>>> selectResultArray = queryMap.selectResult;
-            List<SelectResult> result = new ArrayList<>();
-            for (List<Map<String, Object>> SelectResultParametersArray : selectResultArray) {
-                result.add(inflateSelectResult(SelectResultParametersArray));
-            }
+        List<List<Map<String, Object>>> selectResultArray = queryMap.selectResult;
+        List<SelectResult> result = new ArrayList<>();
+        for (List<Map<String, Object>> SelectResultParametersArray : selectResultArray) {
+            result.add(inflateSelectResult(SelectResultParametersArray));
+        }
         return result.toArray(new SelectResult[0]);
     }
 
@@ -364,6 +368,15 @@ class QueryJson {
                         break;
                     case ("value"):
                         returnExpression = Expression.value(currentExpression.get("value"));
+                        break;
+                    case ("arrayVariable"):
+                        returnExpression = ArrayExpression.variable(String.valueOf(currentExpression.get("arrayVariable")));
+                        break;
+                    case ("arrayLength"):
+                        returnExpression = ArrayFunction.length(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("arrayLength"))));
+                        break;
+                    case ("arrayContains"):
+                        returnExpression = ArrayFunction.contains(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("arrayContains"))), inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("value"))));
                         break;
                     case ("rank"):
                         returnExpression = FullTextFunction.rank((String)currentExpression.get("rank"));
@@ -570,6 +583,14 @@ class QueryJson {
                         }
 
                         returnExpression = returnExpression.in(inExpressions.toArray(new Expression[]{}));
+                        break;
+                    case ("arrayInAny"):
+                    case ("satisfies"):
+                        List arrayInAnyList = QueryMap.getListOfMapFromGenericList(currentExpression.get("arrayInAny"));
+                        List satisfiesList = QueryMap.getListOfMapFromGenericList(currentExpression.get("satisfies"));
+                        returnExpression = ArrayExpression.any((VariableExpression) returnExpression)
+                                .in(inflateExpressionFromArray(arrayInAnyList))
+                                .satisfies(inflateExpressionFromArray(satisfiesList));
                         break;
                 }
             }
