@@ -418,9 +418,14 @@ public class QueryJson {
                         expressions.append(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: $0)))
                     })
-                    
                     returnExpression = existingExpression
                         .in(expressions)
+                 case ("arrayInAny", let value,_),("satisfies", let value,_):
+                    let arrayInAny = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["arrayInAny"] ?? [])
+                    let satisfiesArray = QueryMap.getListOfMapFromGenericList(objectList: currentExpression["satisfies"] ?? [])
+                    returnExpression = ArrayExpression.any(existingExpression as!
+                        VariableExpressionProtocol).in(inflateExpressionFromArray(expressionParametersArray: arrayInAny))
+                            .satisfies(inflateExpressionFromArray(expressionParametersArray: satisfiesArray))
                 default:
                     break
                 }
@@ -568,6 +573,15 @@ public class QueryJson {
                         FullTextExpression
                         .index(value[0])
                         .match(value[1])
+                case ("arrayVariable", let value, _):
+                    returnExpression = ArrayExpression.variable(value as! String)
+                case ("arrayLength", let value, _):
+                    returnExpression = ArrayFunction.length(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)))
+                case ("arrayContains", let value, let secondaryValue as Array<Any>):
+                    returnExpression = ArrayFunction.contains(inflateExpressionFromArray(expressionParametersArray:
+                        QueryMap.getListOfMapFromGenericList(objectList: value)),value: inflateExpressionFromArray(expressionParametersArray:
+                            QueryMap.getListOfMapFromGenericList(objectList: secondaryValue)))
                 default:
                     break
                 }
