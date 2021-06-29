@@ -19,14 +19,17 @@ jobs:
         with:
           channel: 'stable'
       - name: Setup credentials
-        shell: bash
-        env:
-          PUB_DEV_PUBLISH_ACCESS_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
-          PUB_DEV_PUBLISH_REFRESH_TOKEN: ${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}
-          PUB_DEV_PUBLISH_TOKEN_ENDPOINT: ${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}
-          PUB_DEV_PUBLISH_EXPIRATION: ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
         run: |
-          sh ./pub_login.sh
+          mkdir -p ~/.pub-cache
+          cat <<EOF > ~/.pub-cache/credentials.json
+          {
+            "accessToken":"${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}",
+            "refreshToken":"${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}",
+            "tokenEndpoint":"${{ secrets.PUB_DEV_PUBLISH_TOKEN_ENDPOINT }}",
+            "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
+            "expiration": ${{ secrets.PUB_DEV_PUBLISH_EXPIRATION }}
+          }
+          EOF
       - name: Install dependencies
         run: flutter pub get
       - name: Document plugin
