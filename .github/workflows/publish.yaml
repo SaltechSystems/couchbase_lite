@@ -10,8 +10,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
-#    container:
-#      image:  google/dart:latest
+    #    container:
+    #      image:  google/dart:latest
 
     steps:
       - uses: actions/checkout@v2
@@ -20,8 +20,8 @@ jobs:
           channel: 'stable'
       - name: Setup credentials
         run: |
-          mkdir -p $FLUTTER_HOME/.pub-cache
-          cat <<EOF > $FLUTTER_HOME/.pub-cache/credentials.json
+          mkdir -p $PUB_CACHE
+          cat <<EOF > $PUB_CACHE/credentials.json
           {
             "accessToken":"${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}",
             "refreshToken":"${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}",
@@ -34,7 +34,6 @@ jobs:
         run: flutter pub get
       - name: Document plugin
         run: |
-          export FLUTTER_ROOT="$FLUTTER_HOME"
           pub global activate dartdoc
           pub global run dartdoc
       - name: Publish plugin
