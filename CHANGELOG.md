@@ -1,3 +1,8 @@
+## 2.8.5
+
+* Updated libraries to version 2.8.4 (iOS) & 2.8.5 (Android)
+* Updated gradle to 4.0.2
+
 ## 2.8.1
 
 * Update libraries to version 2.8.1
