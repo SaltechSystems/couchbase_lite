@@ -94,9 +94,35 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
         return index
         
     }
-        
+    
     public func handleDatabase(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch (call.method) {
+        case "setConsoleLogLevel":
+            guard let arguments = call.arguments as? [String:Any], let level = arguments["level"] as? String else {
+                result(FlutterError(code: "errArgs", message: "Error: Missing database", details: call.arguments.debugDescription))
+                return
+            }
+            let logLevel: LogLevel
+            switch (level) {
+            case "none":
+                logLevel = .none
+            case "debug":
+                logLevel = .debug
+            case "info":
+                logLevel = .info
+            case "warning":
+                logLevel = .warning
+            case "error":
+                logLevel = .error
+            case "verbose":
+                logLevel = .verbose
+            default:
+                logLevel = .none
+            }
+    
+            mCBManager.setConsoleLogLevel(logLevel: logLevel)
+            result(nil)
+            return
         case "clearBlobCache":
             CBManager.clearBlobCache()
             result(nil)
@@ -106,7 +132,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                 result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
-
+            
             // Don't load the content if it isn't found
             if let blob = CBManager.getBlobWithDigest(digest), let data = blob.content {
                 result(FlutterStandardTypedData(bytes: data))
@@ -117,7 +143,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
         default:
             break
         }
-
+        
         // All other methods are database dependent
         guard let arguments = call.arguments as? [String:Any], let dbname = arguments["database"] as? String else {
             result(FlutterError(code: "errArgs", message: "Error: Missing database", details: call.arguments.debugDescription))
@@ -206,8 +232,8 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                     }
                 }
             }
-
-
+            
+            
         case "deleteIndex":
             guard let database = mCBManager.getDatabase(name: dbname) else {
                 result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
@@ -217,7 +243,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                 result(FlutterError.init(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
-
+            
             databaseDispatchQueue.async {
                 do {
                     try database.deleteIndex(forName: indexName);
@@ -230,8 +256,8 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                     }
                 }
             }
-
-
+            
+            
         case "deleteDatabaseWithName":
             do {
                 try mCBManager.deleteDatabaseWithName(name: dbname)
@@ -372,7 +398,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                 result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
                 return
             }
-           
+            
             guard let _ = mCBManager.getDatabaseListenerToken(dbname: dbname) else {
                 let token = database.addChangeListener(withQueue: databaseDispatchQueue, listener: { [weak self] change in
                     var map = Dictionary<String,Any?>()
@@ -400,10 +426,10 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                 try mCBManager.removeDatabaseListenerToken(dbname: dbname)
                 result(nil)
             } catch {
-                 result(FlutterError(code: "errDatabase", message: "Error removing database listener token", details: nil))
+                result(FlutterError(code: "errDatabase", message: "Error removing database listener token", details: nil))
             }
             
-           
+            
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -510,7 +536,7 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             
             let _ = mCBManager.removeQuery(queryId: queryId)
             result(true)
-        
+            
         case "explainQuery":
             guard let options = call.arguments as? [String:Any], let queryId = options["queryId"] as? String else {
                 result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))

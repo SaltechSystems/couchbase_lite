@@ -6,10 +6,10 @@ class Database {
   Database._internal(this.name, this.path);
 
   static const MethodChannel _methodChannel =
-      MethodChannel('com.saltechsystems.couchbase_lite/database');
+  MethodChannel('com.saltechsystems.couchbase_lite/database');
 
   static const EventChannel _eventChannel =
-      EventChannel('com.saltechsystems.couchbase_lite/databaseEventChannel');
+  EventChannel('com.saltechsystems.couchbase_lite/databaseEventChannel');
   static final Stream _stream = _eventChannel.receiveBroadcastStream();
 
   /// Initializes a Couchbase Lite database with the given [dbName].
@@ -19,14 +19,16 @@ class Database {
     return Database._internal(dbName, result is Map ? result['path'] : null);
   }
 
+  static final Log log = Log();
   final String name;
   final String? path;
 
   Map<ListenerToken, StreamSubscription> tokens = {};
 
   /// The number of documents in the database
-  Future<int> get count => _methodChannel.invokeMethod<int>('getDocumentCount',
-      <String, dynamic>{'database': name}).then((int? value) => value ?? 0);
+  Future<int> get count =>
+      _methodChannel.invokeMethod<int>('getDocumentCount',
+          <String, dynamic>{'database': name}).then((int? value) => value ?? 0);
 
   /// Deletes a database of the given [dbName].
   static Future<void> deleteWithName(String dbName) =>
@@ -61,8 +63,8 @@ class Database {
   /// Saves [doc] to the database with the document id set by the database. When write operations are executed concurrently, the last write wins by default.
   @Deprecated('Replaced by `saveDocument`.')
   Future<bool> save(MutableDocument doc,
-          {ConcurrencyControl concurrencyControl =
-              ConcurrencyControl.lastWriteWins}) =>
+      {ConcurrencyControl concurrencyControl =
+          ConcurrencyControl.lastWriteWins}) =>
       saveDocument(doc, concurrencyControl: concurrencyControl);
 
   /// Saves [doc] to the database with the document id set by the database. When write operations are executed concurrently, the last write wins by default.
@@ -76,9 +78,9 @@ class Database {
         'database': name,
         'map': doc.toMap(),
         'concurrencyControl':
-            concurrencyControl == ConcurrencyControl.failOnConflict
-                ? 'failOnConflict'
-                : 'lastWriteWins'
+        concurrencyControl == ConcurrencyControl.failOnConflict
+            ? 'failOnConflict'
+            : 'lastWriteWins'
       });
     } else if (doc.sequence != null) {
       result = await _methodChannel.invokeMethod<Map<dynamic, dynamic>>(
@@ -88,9 +90,9 @@ class Database {
         'sequence': doc.sequence,
         'map': doc.toMap(),
         'concurrencyControl':
-            concurrencyControl == ConcurrencyControl.failOnConflict
-                ? 'failOnConflict'
-                : 'lastWriteWins'
+        concurrencyControl == ConcurrencyControl.failOnConflict
+            ? 'failOnConflict'
+            : 'lastWriteWins'
       });
     } else {
       result = await _methodChannel.invokeMethod<Map<dynamic, dynamic>>(
@@ -99,9 +101,9 @@ class Database {
         'id': doc.id,
         'map': doc.toMap(),
         'concurrencyControl':
-            concurrencyControl == ConcurrencyControl.failOnConflict
-                ? 'failOnConflict'
-                : 'lastWriteWins'
+        concurrencyControl == ConcurrencyControl.failOnConflict
+            ? 'failOnConflict'
+            : 'lastWriteWins'
       });
     }
 
@@ -191,8 +193,9 @@ class Database {
 
     tokens[token] = _stream
         .where((data) =>
-            (data['database'] == name && data['type'] == 'DatabaseChange'))
-        .listen((data) => callback(DatabaseChange(
+    (data['database'] == name && data['type'] == 'DatabaseChange'))
+        .listen((data) =>
+        callback(DatabaseChange(
             this,
             (data['documentIDs'] as List<dynamic>)
                 .map((id) => id as String)
@@ -210,14 +213,14 @@ class Database {
   /// Adds a document change listener.
   ///
   /// Returns the listener token object for removing the listener.
-  ListenerToken addDocumentChangeListener(
-      String withId, Function(DocumentChange) callback) {
+  ListenerToken addDocumentChangeListener(String withId,
+      Function(DocumentChange) callback) {
     var token = ListenerToken();
 
     tokens[token] = _stream
         .where((data) =>
-            (data['database'] == name && data['type'] == 'DatabaseChange') &&
-            (data['documentIDs'] as List<Object>).contains(withId))
+    (data['database'] == name && data['type'] == 'DatabaseChange') &&
+        (data['documentIDs'] as List<Object>).contains(withId))
         .listen((data) {
       callback(DocumentChange(this, withId));
     });
@@ -258,14 +261,16 @@ class Database {
   }
 
   //Not including this way of deleting for now because I remove the reference when we close the database
-  Future<void> delete() => _methodChannel.invokeMethod(
-      'deleteDatabaseWithName', <String, dynamic>{'database': name});
+  Future<void> delete() =>
+      _methodChannel.invokeMethod(
+          'deleteDatabaseWithName', <String, dynamic>{'database': name});
 
   //Not including this way of disposing for now because I remove the reference when we close the database
   //Future<void> dispose() => _methodChannel.invokeMethod('dispose', <String, dynamic>{'database': name});
 
-  Future<void> compact() => _methodChannel.invokeMethod(
-      'compactDatabaseWithName', <String, dynamic>{'database': name});
+  Future<void> compact() =>
+      _methodChannel.invokeMethod(
+          'compactDatabaseWithName', <String, dynamic>{'database': name});
 }
 
 class DocumentChange {

@@ -38,6 +38,10 @@ class CBManager {
         Database.log.console.level = logLevel
     }
     
+    func setConsoleLogLevel(logLevel: LogLevel) {
+        Database.log.console.level = logLevel
+    }
+    
     func getDatabase(name : String) -> Database? {
         if let result = mDatabase[name] {
             return result;
