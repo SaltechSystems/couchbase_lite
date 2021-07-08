@@ -203,6 +203,15 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
     @Override
     public void onMethodCall(MethodCall call, @NonNull final Result result) {
       switch (call.method) {
+        case ("setConsoleLogLevel"):
+          String level = call.argument("level");
+          if (!call.hasArgument("level")) {
+            result.error("errArgs", "Error: Missing log level", call.arguments.toString());
+            return;
+          }
+          CBManager.setConsoleLogLevel(LogLevel.valueOf(level.toUpperCase()));
+          result.success(null);
+          return;
         case ("getBlobContentWithDigest"):
           if (!call.hasArgument("digest")) {
             result.error("errArgs", "Database Error: Invalid Arguments", call.arguments.toString());

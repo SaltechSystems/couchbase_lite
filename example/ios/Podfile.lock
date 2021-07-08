@@ -1,18 +1,12 @@
 PODS:
   - couchbase_lite (0.0.1):
-    - CouchbaseLite-Swift (~> 2.7.1)
+    - CouchbaseLite-Swift (~> 2.8.4)
     - Flutter
-  - CouchbaseLite-Swift (2.7.1)
+  - CouchbaseLite-Swift (2.8.4)
   - Flutter (1.0.0)
   - package_info (0.0.1):
     - Flutter
   - url_launcher (0.0.1):
-    - Flutter
-  - url_launcher_linux (0.0.1):
-    - Flutter
-  - url_launcher_macos (0.0.1):
-    - Flutter
-  - url_launcher_web (0.0.1):
     - Flutter
 
 DEPENDENCIES:
@@ -20,9 +14,6 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
-  - url_launcher_linux (from `.symlinks/plugins/url_launcher_linux/ios`)
-  - url_launcher_macos (from `.symlinks/plugins/url_launcher_macos/ios`)
-  - url_launcher_web (from `.symlinks/plugins/url_launcher_web/ios`)
 
 SPEC REPOS:
   trunk:
@@ -37,23 +28,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info/ios"
   url_launcher:
     :path: ".symlinks/plugins/url_launcher/ios"
-  url_launcher_linux:
-    :path: ".symlinks/plugins/url_launcher_linux/ios"
-  url_launcher_macos:
-    :path: ".symlinks/plugins/url_launcher_macos/ios"
-  url_launcher_web:
-    :path: ".symlinks/plugins/url_launcher_web/ios"
 
 SPEC CHECKSUMS:
-  couchbase_lite: bb50e514b1dc8ef3a1eccd3c8e7d4d4920b7dddc
-  CouchbaseLite-Swift: 02012c1d5715106b349fb16fbcf88266d8f457c4
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  couchbase_lite: 295aee7b523fcba6700bfcec5ec22ca6d71c99e2
+  CouchbaseLite-Swift: a25971eb557d646359581371e559333a386a5701
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
-  url_launcher_linux: ac237cb7a8058736e4aae38bdbcc748a4b394cc0
-  url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313
-  url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c
 
-PODFILE CHECKSUM: 1b66dae606f75376c5f2135a8290850eeb09ae83
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.10.1

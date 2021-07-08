@@ -44,6 +44,10 @@ class CBManager {
         Database.log.getConsole().setLevel(logLevel);
     }
 
+    static void setConsoleLogLevel(LogLevel logLevel) {
+        Database.log.getConsole().setLevel(logLevel);
+    }
+
     Database getDatabase(String name) {
         if (mDatabase.containsKey(name)) {
             return mDatabase.get(name);

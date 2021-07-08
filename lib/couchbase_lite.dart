@@ -16,6 +16,7 @@ export 'src/replicated_document.dart';
 part 'src/authenticator.dart';
 part 'src/blob.dart';
 part 'src/database.dart';
+part 'src/log.dart';
 part 'src/document.dart';
 part 'src/fragment.dart';
 part 'src/index.dart';

@@ -1,3 +1,7 @@
+## 3.0.0-nullsafety.1
+
+* Added setting logging level feature 
+
 ## 3.0.0-nullsafety.0
 
 * Migrate to NNDB
