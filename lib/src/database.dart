@@ -220,7 +220,7 @@ class Database {
     tokens[token] = _stream
         .where((data) =>
     (data['database'] == name && data['type'] == 'DatabaseChange') &&
-        (data['documentIDs'] as List<Object>).contains(withId))
+        (data['documentIDs'] as List<dynamic>).contains(withId))
         .listen((data) {
       callback(DocumentChange(this, withId));
     });
