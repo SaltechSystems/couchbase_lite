@@ -15,18 +15,22 @@ class _$BrewerySerializer implements StructuredSerializer<Brewery> {
   final String wireName = 'Brewery';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, Brewery object,
+  Iterable<Object?> serialize(Serializers serializers, Brewery object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
   @override
-  Brewery deserialize(Serializers serializers, Iterable<Object> serialized,
+  Brewery deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new BreweryBuilder();
 
@@ -34,11 +38,11 @@ class _$BrewerySerializer implements StructuredSerializer<Brewery> {
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -49,18 +53,14 @@ class _$BrewerySerializer implements StructuredSerializer<Brewery> {
 
 class _$Brewery extends Brewery {
   @override
-  final String id;
+  final String? id;
   @override
-  final String name;
+  final String? name;
 
-  factory _$Brewery([void Function(BreweryBuilder) updates]) =>
+  factory _$Brewery([void Function(BreweryBuilder)? updates]) =>
       (new BreweryBuilder()..update(updates)).build();
 
-  _$Brewery._({this.id, this.name}) : super._() {
-    if (name == null) {
-      throw new BuiltValueNullFieldError('Brewery', 'name');
-    }
-  }
+  _$Brewery._({this.id, this.name}) : super._();
 
   @override
   Brewery rebuild(void Function(BreweryBuilder) updates) =>
@@ -90,22 +90,23 @@ class _$Brewery extends Brewery {
 }
 
 class BreweryBuilder implements Builder<Brewery, BreweryBuilder> {
-  _$Brewery _$v;
+  _$Brewery? _$v;
 
-  String _id;
-  String get id => _$this._id;
-  set id(String id) => _$this._id = id;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  String _name;
-  String get name => _$this._name;
-  set name(String name) => _$this._name = name;
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
   BreweryBuilder();
 
   BreweryBuilder get _$this {
-    if (_$v != null) {
-      _id = _$v.id;
-      _name = _$v.name;
+    final $v = _$v;
+    if ($v != null) {
+      _id = $v.id;
+      _name = $v.name;
       _$v = null;
     }
     return this;
@@ -113,14 +114,12 @@ class BreweryBuilder implements Builder<Brewery, BreweryBuilder> {
 
   @override
   void replace(Brewery other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$Brewery;
   }
 
   @override
-  void update(void Function(BreweryBuilder) updates) {
+  void update(void Function(BreweryBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -132,4 +131,4 @@ class BreweryBuilder implements Builder<Brewery, BreweryBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new

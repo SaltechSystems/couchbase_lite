@@ -28,7 +28,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  HomePageBloc _pageBloc;
+  late HomePageBloc _pageBloc;
   final _textFieldController = TextEditingController();
 
   @override
@@ -58,11 +58,11 @@ class _HomePageState extends State<HomePage> {
                       case LoadingState:
                         return _buildLoading();
                       case BeerDataState:
-                        BeerDataState state = snapshot.data;
+                        BeerDataState state = snapshot.data as BeerDataState;
                         return _buildBeerContent(state.beerMap,
                             state.lastIndex + 1, state.hasReachedEnd);
                       case BreweryDataState:
-                        BreweryDataState state = snapshot.data;
+                        BreweryDataState state = snapshot.data as BreweryDataState;
                         return _buildBreweryContent(state.breweryMap,
                             state.lastIndex + 1, state.hasReachedEnd);
                     }
@@ -216,7 +216,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (context, snapshot) {
                   return IconButton(
                     color: Theme.of(context).primaryColor,
-                    icon: Icon(snapshot.data
+                    icon: Icon(snapshot.data!
                         ? Icons.arrow_drop_down
                         : Icons.arrow_drop_up),
                     tooltip: 'Reorder Results',
@@ -235,7 +235,7 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
-  Widget _buildCategoryIcon(PageCategory selectedCategory) {
+  Widget? _buildCategoryIcon(PageCategory selectedCategory) {
     switch (selectedCategory) {
       case PageCategory.beer:
         return Icon(Icons.add_shopping_cart,
@@ -264,7 +264,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _openCreateDialog() async {
     _textFieldController.clear();
-    String beerName = await showDialog<String>(
+    String? beerName = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -295,7 +295,7 @@ class _HomePageState extends State<HomePage> {
         });
 
     if (beerName != null) {
-      await _pageBloc.createBeer(beerName);
+      _pageBloc.createBeer(beerName);
     }
   }
 

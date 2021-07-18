@@ -15,21 +15,29 @@ class _$BeerSerializer implements StructuredSerializer<Beer> {
   final String wireName = 'Beer';
 
   @override
-  Iterable<Object> serialize(Serializers serializers, Beer object,
+  Iterable<Object?> serialize(Serializers serializers, Beer object,
       {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object>[
-      'beerID',
-      serializers.serialize(object.beerID,
-          specifiedType: const FullType(String)),
-      'name',
-      serializers.serialize(object.name, specifiedType: const FullType(String)),
-    ];
-
+    final result = <Object?>[];
+    Object? value;
+    value = object.beerID;
+    if (value != null) {
+      result
+        ..add('beerID')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.name;
+    if (value != null) {
+      result
+        ..add('name')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
     return result;
   }
 
   @override
-  Beer deserialize(Serializers serializers, Iterable<Object> serialized,
+  Beer deserialize(Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = new BeerBuilder();
 
@@ -37,15 +45,15 @@ class _$BeerSerializer implements StructuredSerializer<Beer> {
     while (iterator.moveNext()) {
       final key = iterator.current as String;
       iterator.moveNext();
-      final dynamic value = iterator.current;
+      final Object? value = iterator.current;
       switch (key) {
         case 'beerID':
           result.beerID = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
         case 'name':
           result.name = serializers.deserialize(value,
-              specifiedType: const FullType(String)) as String;
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -56,21 +64,14 @@ class _$BeerSerializer implements StructuredSerializer<Beer> {
 
 class _$Beer extends Beer {
   @override
-  final String beerID;
+  final String? beerID;
   @override
-  final String name;
+  final String? name;
 
-  factory _$Beer([void Function(BeerBuilder) updates]) =>
+  factory _$Beer([void Function(BeerBuilder)? updates]) =>
       (new BeerBuilder()..update(updates)).build();
 
-  _$Beer._({this.beerID, this.name}) : super._() {
-    if (beerID == null) {
-      throw new BuiltValueNullFieldError('Beer', 'beerID');
-    }
-    if (name == null) {
-      throw new BuiltValueNullFieldError('Beer', 'name');
-    }
-  }
+  _$Beer._({this.beerID, this.name}) : super._();
 
   @override
   Beer rebuild(void Function(BeerBuilder) updates) =>
@@ -100,22 +101,23 @@ class _$Beer extends Beer {
 }
 
 class BeerBuilder implements Builder<Beer, BeerBuilder> {
-  _$Beer _$v;
+  _$Beer? _$v;
 
-  String _beerID;
-  String get beerID => _$this._beerID;
-  set beerID(String beerID) => _$this._beerID = beerID;
+  String? _beerID;
+  String? get beerID => _$this._beerID;
+  set beerID(String? beerID) => _$this._beerID = beerID;
 
-  String _name;
-  String get name => _$this._name;
-  set name(String name) => _$this._name = name;
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
   BeerBuilder();
 
   BeerBuilder get _$this {
-    if (_$v != null) {
-      _beerID = _$v.beerID;
-      _name = _$v.name;
+    final $v = _$v;
+    if ($v != null) {
+      _beerID = $v.beerID;
+      _name = $v.name;
       _$v = null;
     }
     return this;
@@ -123,14 +125,12 @@ class BeerBuilder implements Builder<Beer, BeerBuilder> {
 
   @override
   void replace(Beer other) {
-    if (other == null) {
-      throw new ArgumentError.notNull('other');
-    }
+    ArgumentError.checkNotNull(other, 'other');
     _$v = other as _$Beer;
   }
 
   @override
-  void update(void Function(BeerBuilder) updates) {
+  void update(void Function(BeerBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -142,4 +142,4 @@ class BeerBuilder implements Builder<Beer, BeerBuilder> {
   }
 }
 
-// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new
+// ignore_for_file: always_put_control_body_on_new_line,always_specify_types,annotate_overrides,avoid_annotating_with_dynamic,avoid_as,avoid_catches_without_on_clauses,avoid_returning_this,deprecated_member_use_from_same_package,lines_longer_than_80_chars,omit_local_variable_types,prefer_expression_function_bodies,sort_constructors_first,test_types_in_equals,unnecessary_const,unnecessary_new

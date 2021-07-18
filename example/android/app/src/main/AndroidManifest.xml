@@ -35,5 +35,7 @@
         </activity>
     </application>
 
-    <meta-data android:name="flutterEmbedding" android:value="2"/>
+    <!-- If you're using V2 embedding, you don't need to override onCreate -->
+    <!-- For more information, please check https://github.com/flutter/flutter/issues/61292 -->
+    <!-- <meta-data android:name="flutterEmbedding" android:value="2"/> -->
 </manifest>

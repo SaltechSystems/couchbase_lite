@@ -21,7 +21,7 @@ import 'package:built_collection/built_collection.dart';
 
 import 'package:couchbase_lite_example/data/observable_response.dart';
 
-typedef ResultSetCallback = void Function(ResultSet results);
+typedef ResultSetCallback = void Function(ResultSet? results);
 
 class AppDatabase {
   AppDatabase._internal();
@@ -29,12 +29,12 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._internal();
 
   String dbName = "myDatabase";
-  List<Future> pendingListeners = List();
-  ListenerToken _replicatorListenerToken;
-  Database database;
-  Replicator replicator;
-  ListenerToken _docListenerToken;
-  ListenerToken _dbListenerToken;
+  List<Future> pendingListeners = [];
+  ListenerToken? _replicatorListenerToken;
+  late Database database;
+  late Replicator replicator;
+  ListenerToken? _docListenerToken;
+  ListenerToken? _dbListenerToken;
 
   Future<bool> login(String username, String password) async {
     try {
@@ -52,7 +52,7 @@ class AppDatabase {
 
       replicator.addChangeListener((ReplicatorChange event) {
         if (event.status.error != null) {
-          print("Error: " + event.status.error);
+          print("Error: " + event.status.error!);
         }
 
         print(event.status.activity.toString());
@@ -75,8 +75,9 @@ class AppDatabase {
       }
 
       var pref =
-          await createDocumentIfNotExists("MyPreference", {"theme": "dark"});
-      _docListenerToken = database.addDocumentChangeListener(pref.id, (change) {
+          await (createDocumentIfNotExists("MyPreference", {"theme": "dark"}));
+      _docListenerToken =
+          database.addDocumentChangeListener(pref!.id!, (change) {
         print("Document change ${change.documentID}");
       });
 
@@ -95,17 +96,18 @@ class AppDatabase {
   Future<void> logout() async {
     await Future.wait(pendingListeners);
 
-    await database.removeChangeListener(_docListenerToken);
-    await database.removeChangeListener(_dbListenerToken);
+    await database.removeChangeListener(_docListenerToken!);
+    await database.removeChangeListener(_dbListenerToken!);
     _docListenerToken = null;
     _dbListenerToken = null;
-
-    await replicator.removeChangeListener(_replicatorListenerToken);
+    if (_replicatorListenerToken != null) {
+      await replicator.removeChangeListener(_replicatorListenerToken!);
+    }
     _replicatorListenerToken =
         replicator.addChangeListener((ReplicatorChange event) async {
       if (event.status.activity == ReplicatorActivityLevel.stopped) {
         await database.close();
-        await replicator.removeChangeListener(_replicatorListenerToken);
+        await replicator.removeChangeListener(_replicatorListenerToken!);
         await replicator.dispose();
         _replicatorListenerToken = null;
       }
@@ -113,7 +115,7 @@ class AppDatabase {
     await replicator.stop();
   }
 
-  Future<Document> createDocumentIfNotExists(
+  Future<Document?> createDocumentIfNotExists(
       String id, Map<String, dynamic> map) async {
     try {
       var oldDoc = await database.document(id);
@@ -130,8 +132,8 @@ class AppDatabase {
     }
   }
 
-  ObservableResponse<ResultSet> getMyDocument(String documentId) {
-    final stream = BehaviorSubject<ResultSet>();
+  ObservableResponse<ResultSet?> getMyDocument(String documentId) {
+    final stream = BehaviorSubject<ResultSet?>();
     // Execute a query and then post results and all changes to the stream
 
     final Query query = QueryBuilder.select([
@@ -142,7 +144,7 @@ class AppDatabase {
         .from(dbName, as: "mydocs")
         .where(Meta.id.from("mydocs").equalTo(Expression.string(documentId)));
 
-    final processResults = (ResultSet results) {
+    final processResults = (ResultSet? results) {
       if (!stream.isClosed) {
         stream.add(results);
       }
@@ -159,8 +161,8 @@ class AppDatabase {
 
     final query = _buildBeerQuery(limit, offset, isDescending);
 
-    final processResults = (ResultSet results) {
-      final model = results.map((result) {
+    final processResults = (ResultSet? results) {
+      final model = results!.map((result) {
         return Beer.fromMap(result.toMap());
       }).toList();
 

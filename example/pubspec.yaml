@@ -3,25 +3,25 @@ description: Demonstrates how to use the couchbase_lite plugin.
 publish_to: 'none'
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   # rxdart is used for the database and observable response classes
-  rxdart: ^0.23.1
-  http: ^0.12.0+2
-  package_info: ^0.4.0+6
-  url_launcher: ^5.1.2
+  rxdart: ^0.27.1
+  http: ^0.13.3
+  package_info: ^2.0.2
+  url_launcher: ^6.0.9
 
   flutter:
     sdk: flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
+  cupertino_icons: ^1.0.3
 
 dev_dependencies:
-  build_runner: ^1.0.0
-  built_value_generator: ^7.0.9
+  build_runner: ^2.0.6
+  built_value_generator: ^8.1.1
 
   flutter_test:
     sdk: flutter

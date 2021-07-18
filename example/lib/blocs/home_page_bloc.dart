@@ -49,7 +49,7 @@ class HomePageBloc {
   ///
   /// Keep the currently displayed response so it can be properly disposed of
   ///
-  ObservableResponse<BuiltList<Beer>> _beerResponse;
+  ObservableResponse<BuiltList<Beer>>? _beerResponse;
   bool _isDescending = true;
 
   final perPage = 20;
@@ -109,7 +109,7 @@ class HomePageBloc {
 
         // If the results change this will propagate the changes to the UI and will
         // also initialize it with the first result set
-        _beerResponse.stream.listen((data) {
+        _beerResponse!.stream.listen((data) {
           Map<int, Beer> cards = {};
           for (var i = 0; i < data.length; i++) {
             cards[i + offset] = data[i];
