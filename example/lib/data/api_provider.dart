@@ -26,10 +26,10 @@ class ApiProvider {
   final String devUrl = "https://dev.example.com";
   final prodUrl = "https://www.example.com";
 
-  String get authEndpoint {
-    return environment == Environment.development
+  Uri get authEndpoint {
+    return Uri.parse(environment == Environment.development
         ? '$devUrl/oauth/v2/token'
-        : '$prodUrl/oauth/v2/token';
+        : '$prodUrl/oauth/v2/token');
   }
 
   @visibleForTesting
@@ -54,19 +54,19 @@ class ApiProvider {
   }
 
   // If refreshing the access token fails we will use this function to logout
-  LogoutCallback _onLogout;
+  LogoutCallback? _onLogout;
   @visibleForTesting
-  String refreshToken = "";
+  String? refreshToken = "";
   @visibleForTesting
-  String accessToken = "";
+  String? accessToken = "";
   @visibleForTesting
-  String tokenType = "";
+  String? tokenType = "";
   DateTime expiresAt = DateTime(0);
   @visibleForTesting
   Environment environment = Environment.production;
 
   Future<http.Response> login(String username, String password,
-      {LogoutCallback onLogout}) async {
+      {LogoutCallback? onLogout}) async {
     _onLogout = onLogout;
 
     /*final response = await client.post(authEndpoint, body: {
@@ -87,12 +87,12 @@ class ApiProvider {
     final response = http.Response(tokenPreResponse.toJson(), 200);
 
     if (response.statusCode == 200) {
-      var tokenResponse = TokenResponse.fromJson(response.body);
+      var tokenResponse = TokenResponse.fromJson(response.body)!;
       accessToken = tokenResponse.accessToken;
       tokenType = tokenResponse.tokenType;
       refreshToken = tokenResponse.refreshToken;
       expiresAt =
-          DateTime.now().add(Duration(seconds: tokenResponse.expiresIn));
+          DateTime.now().add(Duration(seconds: tokenResponse.expiresIn!));
     }
 
     return response;
@@ -108,13 +108,13 @@ class ApiProvider {
       });
 
       if (response.statusCode == 200) {
-        var tokenResponse = TokenResponse.fromJson(response.body);
+        var tokenResponse = TokenResponse.fromJson(response.body)!;
         accessToken = tokenResponse.accessToken;
         tokenType = tokenResponse.tokenType;
         expiresAt =
-            DateTime.now().add(Duration(seconds: tokenResponse.expiresIn));
+            DateTime.now().add(Duration(seconds: tokenResponse.expiresIn!));
       } else if (response.statusCode == 401 && _onLogout != null) {
-        _onLogout(LogoutMethod.apiCredentialsError);
+        _onLogout!(LogoutMethod.apiCredentialsError);
       }
     }
   }

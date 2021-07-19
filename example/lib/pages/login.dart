@@ -30,25 +30,25 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String usernameErrorMessage;
-  String passwordErrorMessage;
+  String? usernameErrorMessage;
+  String? passwordErrorMessage;
   Environment databaseEnvironment = Environment.production;
   var environmentNames = {
     Environment.production: "Production",
     Environment.development: "Development"
   };
 
-  StreamSubscription<bool> _loggedInSubscription;
-  StreamSubscription<LogoutMethod> _logoutSubscription;
+  StreamSubscription<bool>? _loggedInSubscription;
+  StreamSubscription<LogoutMethod>? _logoutSubscription;
 
   String appName = "";
   String version = "";
 
   bool _isAuthenticating = false;
 
-  TextEditingController _usernameController;
-  TextEditingController _passwordController;
-  FocusNode _passwordFocus;
+  late TextEditingController _usernameController;
+  late TextEditingController _passwordController;
+  late FocusNode _passwordFocus;
 
   @override
   void initState() {
@@ -317,9 +317,9 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _logoutSubscription?.cancel();
     _loggedInSubscription?.cancel();
-    _passwordController?.dispose();
-    _usernameController?.dispose();
-    _passwordFocus?.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
+    _passwordFocus.dispose();
 
     super.dispose();
   }

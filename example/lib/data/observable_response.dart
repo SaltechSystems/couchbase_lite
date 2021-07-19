@@ -23,10 +23,10 @@ class ObservableResponse<T> implements StreamController<T> {
   ObservableResponse(this._result, [this._onDispose]);
 
   final Subject<T> _result;
-  final VoidCallback _onDispose;
+  final VoidCallback? _onDispose;
 
   @override
-  void add(data) => _result?.add(data);
+  void add(data) => _result.add(data);
 
   @override
   ControllerCallback get onCancel => throw UnsupportedError(
@@ -45,56 +45,56 @@ class ObservableResponse<T> implements StreamController<T> {
       'ObservableResponses do not support resume callbacks');
 
   @override
-  void addError(Object error, [StackTrace stackTrace]) =>
+  void addError(Object error, [StackTrace? stackTrace]) =>
       throw UnsupportedError(
           'ObservableResponses do not support adding errors');
 
   @override
-  Future addStream(Stream<T> source, {bool cancelOnError}) =>
+  Future addStream(Stream<T> source, {bool? cancelOnError}) =>
       throw UnsupportedError(
           'ObservableResponses do not support adding streams');
 
   @override
-  Future get done => _result?.done ?? true;
+  Future<bool> get done => _result.done.then((value) => value as bool);
 
   @override
-  bool get hasListener => _result?.hasListener ?? false;
+  bool get hasListener => _result.hasListener;
 
   @override
-  bool get isClosed => _result?.isClosed ?? true;
+  bool get isClosed => _result.isClosed;
 
   @override
-  bool get isPaused => _result?.isPaused ?? false;
+  bool get isPaused => _result.isPaused;
 
   @override
-  StreamSink<T> get sink => _result?.sink;
+  StreamSink<T> get sink => _result.sink;
 
   @override
-  Stream<T> get stream => _result?.stream;
+  Stream<T> get stream => _result.stream;
 
   @override
   Future<dynamic> close() {
     if (_onDispose != null) {
       // Do operations here like closing streams and removing listeners
-      _onDispose();
+      _onDispose!();
     }
 
-    return _result?.close();
+    return _result.close();
   }
 
   @override
-  set onCancel(Function() onCancelHandler) => throw UnsupportedError(
+  set onCancel(Function()? onCancelHandler) => throw UnsupportedError(
       'ObservableResponses do not support cancel callbacks');
 
   @override
-  set onListen(void Function() onListenHandler) => throw UnsupportedError(
+  set onListen(void Function()? onListenHandler) => throw UnsupportedError(
       'ObservableResponses do not support listen callbacks');
 
   @override
-  set onPause(void Function() onPauseHandler) => throw UnsupportedError(
+  set onPause(void Function()? onPauseHandler) => throw UnsupportedError(
       'ObservableResponses do not support pause callbacks');
 
   @override
-  set onResume(void Function() onResumeHandler) => throw UnsupportedError(
+  set onResume(void Function()? onResumeHandler) => throw UnsupportedError(
       'ObservableResponses do not support resume callbacks');
 }

@@ -18,8 +18,8 @@ import 'package:flutter/material.dart';
 class BreweryListItem extends StatelessWidget {
   BreweryListItem(this.brewery, {this.onTap});
 
-  final Brewery brewery;
-  final VoidCallback onTap;
+  final Brewery? brewery;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class BreweryListItem extends StatelessWidget {
         : ListTile(
             key: ObjectKey(brewery),
             title: Text(
-              brewery.name,
+              brewery!.name!,
               overflow: TextOverflow.ellipsis,
             ),
             onTap: onTap,

@@ -27,33 +27,33 @@ abstract class TokenResponse
     implements Built<TokenResponse, TokenResponseBuilder> {
   TokenResponse._();
 
-  factory TokenResponse([updates(TokenResponseBuilder b)]) = _$TokenResponse;
+  factory TokenResponse([updates(TokenResponseBuilder b)?]) = _$TokenResponse;
 
   @BuiltValueField(wireName: 'access_token')
-  String get accessToken;
-  @nullable
+  String? get accessToken;
+  
   @BuiltValueField(wireName: 'refresh_token')
-  String get refreshToken;
+  String? get refreshToken;
   @BuiltValueField(wireName: 'token_type')
-  String get tokenType;
+  String? get tokenType;
   @BuiltValueField(wireName: 'expires_in')
-  int get expiresIn;
+  int? get expiresIn;
   @BuiltValueField(wireName: 'scope')
-  String get scope;
+  String? get scope;
 
   String toJson() {
     return json.encode(toMap());
   }
 
-  Map toMap() {
-    return standardSerializers.serializeWith(TokenResponse.serializer, this);
+  Map? toMap() {
+    return standardSerializers.serializeWith(TokenResponse.serializer, this) as Map<dynamic, dynamic>?;
   }
 
-  static TokenResponse fromJson(String jsonString) {
+  static TokenResponse? fromJson(String jsonString) {
     return fromMap(json.decode(jsonString));
   }
 
-  static TokenResponse fromMap(Map jsonMap) {
+  static TokenResponse? fromMap(Map? jsonMap) {
     return standardSerializers.deserializeWith(
         TokenResponse.serializer, jsonMap);
   }

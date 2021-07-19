@@ -46,10 +46,10 @@ enum ResponseCode {
 typedef LogoutCallback = void Function(LogoutMethod method);
 
 class RepoResponse<T> {
-  RepoResponse({this.code, this.result}) : assert(code != null);
+  RepoResponse({required this.code, this.result});
 
   final ResponseCode code;
-  final T result;
+  final T? result;
 
   @override
   bool operator ==(Object other) {
@@ -62,10 +62,10 @@ class RepoResponse<T> {
 
 class ReceivedNotification {
   ReceivedNotification(
-      {@required this.id,
-      @required this.title,
-      @required this.body,
-      @required this.payload});
+      {required this.id,
+      required this.title,
+      required this.body,
+      required this.payload});
 
   final int id;
   final String title;
@@ -78,7 +78,7 @@ class Repository {
     _database = AppDatabase.instance;
   }
 
-  AppDatabase _database;
+  late AppDatabase _database;
 
   static final Repository instance = Repository._internal();
   final _isLoggedInSubject = BehaviorSubject<bool>.seeded(false);
@@ -108,7 +108,7 @@ class Repository {
         callback(LoginResult.error);
       }
     } catch (e) {
-      debugPrint(e);
+      debugPrint(e.toString());
       callback(LoginResult.disconnected);
     }
   }
