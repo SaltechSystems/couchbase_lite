@@ -35,6 +35,6 @@ android {
         disable 'InvalidPackage'
     }
     dependencies {
-        implementation 'com.couchbase.lite:couchbase-lite-android:2.8.5'
+        implementation 'com.couchbase.lite:couchbase-lite-android:2.8.6'
     }
 }
