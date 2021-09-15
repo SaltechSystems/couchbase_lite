@@ -245,6 +245,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
       String dbname = call.argument("database");
       Database database = mCBManager.getDatabase(dbname);
       String _id;
+      List<String> _ids;
       ConcurrencyControl _concurrencyControl = null;
       if (call.hasArgument("concurrencyControl")) {
         String arg = call.argument("concurrencyControl");
@@ -447,6 +448,24 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
             result.error("errArg", "invalid arguments", null);
           }
           break;
+
+        case ("saveDocuments"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (_concurrencyControl != null && call.hasArgument("docs")) {
+            List<Map<String, Object>> _documents = call.argument("docs");
+
+            List<Map<String, Object>> saveResults = mCBManager.saveDocuments(database, _documents, _concurrencyControl);
+            result.success(saveResults);
+
+          } else {
+            result.error("errArg", "invalid arguments", null);
+          }
+          break;
+
         case ("saveDocumentWithId"):
           if (database == null) {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);
@@ -518,6 +537,27 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           }
 
           break;
+
+        case ("deleteDocumentsWithIds"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (!call.hasArgument("ids")) {
+            result.error("errArgs", "Database Error: Invalid Arguments", call.arguments.toString());
+            return;
+          }
+
+          _ids = call.argument("ids");
+          try {
+            List<Boolean> results = mCBManager.deleteDocumentsWithIds(database, _ids);
+            result.success(results);
+          } catch (CouchbaseLiteException e) {
+            result.error("errDelete", "error deleting document", e.toString());
+          }
+          break;
+        
         case ("getDocumentCount"):
           if (database == null) {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);

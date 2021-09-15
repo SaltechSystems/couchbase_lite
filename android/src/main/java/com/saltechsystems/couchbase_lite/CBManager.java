@@ -68,6 +68,51 @@ class CBManager {
         return resultMap;
     }
 
+    List<Map<String, Object>> saveDocuments(Database database, List<Map<String, Object>> documents,
+            ConcurrencyControl concurrencyControl) {
+        final Database db = database;
+        final List<Map<String, Object>> docs = documents;
+        final ConcurrencyControl concurrency = concurrencyControl;
+        final List<Map<String, Object>> results = new ArrayList<>();
+        
+        try {
+            database.inBatch(new Runnable() {
+                @Override
+                public void run() {
+                    for (Map<String, Object> doc : docs) {
+                        Map<String, Object> result;
+
+                        try {
+                            if (doc.containsKey("_id")) {
+                                String _id = (String) doc.get("_id");
+                                int _sequence = doc.containsKey("_sequence") ? (int) doc.get("_sequence") : 0;
+                                doc.remove("_id");
+                                doc.remove("_sequence");
+                                if (_sequence == 0) {
+                                    result = saveDocumentWithId(db, _id, doc, concurrency);
+                                } else {
+                                    result = saveDocumentWithId(db, _id, _sequence, doc, concurrency);
+                                }
+
+                            } else {
+                                result = saveDocument(db, doc, concurrency);
+                            }
+                        } catch (CouchbaseLiteException e) {
+                            result = new HashMap<>();
+                            result.put("success", false);
+                        }
+
+                        results.add(result);
+                    }
+                }
+            });
+        } catch (CouchbaseLiteException e) {
+            return results;
+        }
+
+        return results;
+    }
+
     Map<String, Object> saveDocumentWithId(Database database, String _id, Map<String, Object> _map, ConcurrencyControl concurrencyControl) throws CouchbaseLiteException {
         HashMap<String, Object> resultMap = new HashMap<>();
         MutableDocument mutableDoc = new MutableDocument(_id, convertSETDictionary(_map));
@@ -287,6 +332,29 @@ class CBManager {
         if (document != null) {
             database.delete(document);
         }
+    }
+
+    List<Boolean> deleteDocumentsWithIds(Database database, List<String> ids) throws CouchbaseLiteException {
+        final Database db = database;
+        final List<String> _ids = ids;
+        final List<Boolean> results = new ArrayList<>();
+        
+        database.inBatch(new Runnable() {
+            @Override
+            public void run() {
+                for (String id : _ids) {
+                    boolean success = true;
+                    try {
+                        deleteDocumentWithId(db, id);
+                    } catch (Exception e) {
+                        System.out.println("Failed to delete document: " + e.getMessage());
+                        success = false;
+                    }
+                    results.add(success);
+                }
+            }
+        });
+        return results;
     }
 
     Database initDatabaseWithName(String _name) throws CouchbaseLiteException {
