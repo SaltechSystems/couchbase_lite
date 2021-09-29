@@ -334,26 +334,31 @@ class CBManager {
         }
     }
 
-    List<Boolean> deleteDocumentsWithIds(Database database, List<String> ids) throws CouchbaseLiteException {
+    List<Boolean> deleteDocumentsWithIds(Database database, List<String> ids) {
         final Database db = database;
         final List<String> _ids = ids;
         final List<Boolean> results = new ArrayList<>();
-        
-        database.inBatch(new Runnable() {
-            @Override
-            public void run() {
-                for (String id : _ids) {
-                    boolean success = true;
-                    try {
-                        deleteDocumentWithId(db, id);
-                    } catch (Exception e) {
-                        System.out.println("Failed to delete document: " + e.getMessage());
-                        success = false;
+
+        try {
+            database.inBatch(new Runnable() {
+                @Override
+                public void run() {
+                    for (String id : _ids) {
+                        boolean success = true;
+                        try {
+                            deleteDocumentWithId(db, id);
+                        } catch (CouchbaseLiteException e) {
+                            System.out.println("Failed to delete document: " + e.getMessage());
+                            success = false;
+                        }
+                        results.add(success);
                     }
-                    results.add(success);
                 }
-            }
-        });
+            });
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+            return results;
+        }
         return results;
     }
 

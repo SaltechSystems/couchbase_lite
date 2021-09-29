@@ -245,7 +245,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
       String dbname = call.argument("database");
       Database database = mCBManager.getDatabase(dbname);
       String _id;
-      List<String> _ids;
+      final List<String> _ids;
       ConcurrencyControl _concurrencyControl = null;
       if (call.hasArgument("concurrencyControl")) {
         String arg = call.argument("concurrencyControl");
@@ -456,10 +456,21 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           }
 
           if (_concurrencyControl != null && call.hasArgument("docs")) {
-            List<Map<String, Object>> _documents = call.argument("docs");
-
-            List<Map<String, Object>> saveResults = mCBManager.saveDocuments(database, _documents, _concurrencyControl);
-            result.success(saveResults);
+            final List<Map<String, Object>> docs = call.argument("docs");
+            final Database db = database;
+            final ConcurrencyControl control = _concurrencyControl;
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+              @Override
+              public void run() {
+                final List<Map<String, Object>> saveResults = mCBManager.saveDocuments(db, docs, control);
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    result.success(saveResults);
+                  }
+                });
+              }
+            });
 
           } else {
             result.error("errArg", "invalid arguments", null);
@@ -550,12 +561,20 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           }
 
           _ids = call.argument("ids");
-          try {
-            List<Boolean> results = mCBManager.deleteDocumentsWithIds(database, _ids);
-            result.success(results);
-          } catch (CouchbaseLiteException e) {
-            result.error("errDelete", "error deleting document", e.toString());
-          }
+          final Database db = database;
+          AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+              final List<Boolean> results = mCBManager.deleteDocumentsWithIds(db, _ids);
+
+              new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                  result.success(results);
+                }
+              });
+            }
+          });
           break;
         
         case ("getDocumentCount"):

@@ -304,18 +304,26 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             
             let concurrencyControl: ConcurrencyControl
             switch(concurrencyControlArg) {
-            case "failOnConflict":
-                concurrencyControl = ConcurrencyControl.failOnConflict
-            default:
-                concurrencyControl = ConcurrencyControl.lastWriteWins
+                case "failOnConflict":
+                    concurrencyControl = ConcurrencyControl.failOnConflict
+                default:
+                    concurrencyControl = ConcurrencyControl.lastWriteWins
             }
             
-            do {
-                let saveResult = try mCBManager.saveDocuments(database: database, docs: documents, concurrencyControl: concurrencyControl)
-                result(saveResult)
-            } catch {
-                result(FlutterError.init(code: "errSave", message: "Error saving documents", details: error.localizedDescription))
+            databaseDispatchQueue.async { [weak self] in
+                do {
+                    let saveResult = try self?.mCBManager.saveDocuments(database: database, docs: documents, concurrencyControl: concurrencyControl)
+                    DispatchQueue.main.async {
+                        result(saveResult)
+                    }
+                    
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError.init(code: "errSave", message: "Error saving documents", details: error.localizedDescription))
+                    }
+                }
             }
+            
         case "saveDocumentWithId":
             guard let database = mCBManager.getDatabase(name: dbname) else {
                 result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
@@ -387,12 +395,19 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
                 return
             }
             
-            do {
-                let results = try mCBManager.deleteDocumentsWithIds(database: database, ids: ids)
-                result(results)
-            } catch {
-                result(FlutterError.init(code: "errSave", message: "Error deleting documents with the given ids", details: error.localizedDescription))
+            databaseDispatchQueue.async { [weak self] in
+                do {
+                    let results = try self?.mCBManager.deleteDocumentsWithIds(database: database, ids: ids)
+                    DispatchQueue.main.async {
+                        result(results)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError.init(code: "errSave", message: "Error deleting documents with the given ids", details: error.localizedDescription))
+                    }
+                }
             }
+            
         case "getDocumentWithId":
             guard let database = mCBManager.getDatabase(name: dbname) else {
                 result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
