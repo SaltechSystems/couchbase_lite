@@ -245,6 +245,7 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
       String dbname = call.argument("database");
       Database database = mCBManager.getDatabase(dbname);
       String _id;
+      final List<String> _ids;
       ConcurrencyControl _concurrencyControl = null;
       if (call.hasArgument("concurrencyControl")) {
         String arg = call.argument("concurrencyControl");
@@ -447,6 +448,35 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
             result.error("errArg", "invalid arguments", null);
           }
           break;
+
+        case ("saveDocuments"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (_concurrencyControl != null && call.hasArgument("docs")) {
+            final List<Map<String, Object>> docs = call.argument("docs");
+            final Database db = database;
+            final ConcurrencyControl control = _concurrencyControl;
+            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+              @Override
+              public void run() {
+                final List<Map<String, Object>> saveResults = mCBManager.saveDocuments(db, docs, control);
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                  @Override
+                  public void run() {
+                    result.success(saveResults);
+                  }
+                });
+              }
+            });
+
+          } else {
+            result.error("errArg", "invalid arguments", null);
+          }
+          break;
+
         case ("saveDocumentWithId"):
           if (database == null) {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);
@@ -518,6 +548,35 @@ public class CouchbaseLitePlugin implements FlutterPlugin, CBManagerDelegate {
           }
 
           break;
+
+        case ("deleteDocumentsWithIds"):
+          if (database == null) {
+            result.error("errDatabase", "Database with name " + dbname + "not found", null);
+            return;
+          }
+
+          if (!call.hasArgument("ids")) {
+            result.error("errArgs", "Database Error: Invalid Arguments", call.arguments.toString());
+            return;
+          }
+
+          _ids = call.argument("ids");
+          final Database db = database;
+          AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+              final List<Boolean> results = mCBManager.deleteDocumentsWithIds(db, _ids);
+
+              new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                  result.success(results);
+                }
+              });
+            }
+          });
+          break;
+        
         case ("getDocumentCount"):
           if (database == null) {
             result.error("errDatabase", "Database with name " + dbname + "not found", null);

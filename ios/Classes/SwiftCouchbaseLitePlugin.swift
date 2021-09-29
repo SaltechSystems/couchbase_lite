@@ -290,6 +290,40 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             } catch {
                 result(FlutterError.init(code: "errSave", message: "Error saving document", details: error.localizedDescription))
             }
+        case "saveDocuments":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            
+            guard let concurrencyControlArg = arguments["concurrencyControl"] as? String,
+                  let documents = arguments["docs"] as? Array<[String:Any]> else {
+                result(FlutterError.init(code: "errSave", message: "Invalid arguments", details: nil))
+                return
+            }
+            
+            let concurrencyControl: ConcurrencyControl
+            switch(concurrencyControlArg) {
+                case "failOnConflict":
+                    concurrencyControl = ConcurrencyControl.failOnConflict
+                default:
+                    concurrencyControl = ConcurrencyControl.lastWriteWins
+            }
+            
+            databaseDispatchQueue.async { [weak self] in
+                do {
+                    let saveResult = try self?.mCBManager.saveDocuments(database: database, docs: documents, concurrencyControl: concurrencyControl)
+                    DispatchQueue.main.async {
+                        result(saveResult)
+                    }
+                    
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError.init(code: "errSave", message: "Error saving documents", details: error.localizedDescription))
+                    }
+                }
+            }
+            
         case "saveDocumentWithId":
             guard let database = mCBManager.getDatabase(name: dbname) else {
                 result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
@@ -350,6 +384,30 @@ public class SwiftCouchbaseLitePlugin: NSObject, FlutterPlugin, CBManagerDelegat
             } catch {
                 result(FlutterError.init(code: "errSave", message: "Error saving document with id \(id)", details: error.localizedDescription))
             }
+        case "deleteDocumentsWithIds":
+            guard let database = mCBManager.getDatabase(name: dbname) else {
+                result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))
+                return
+            }
+            
+            guard let ids = arguments["ids"] as? Array<String> else {
+                result(FlutterError(code: "errArgs", message: "Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+            
+            databaseDispatchQueue.async { [weak self] in
+                do {
+                    let results = try self?.mCBManager.deleteDocumentsWithIds(database: database, ids: ids)
+                    DispatchQueue.main.async {
+                        result(results)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError.init(code: "errSave", message: "Error deleting documents with the given ids", details: error.localizedDescription))
+                    }
+                }
+            }
+            
         case "getDocumentWithId":
             guard let database = mCBManager.getDatabase(name: dbname) else {
                 result(FlutterError.init(code: "errDatabase", message: "Database with name \(dbname) not found", details: nil))

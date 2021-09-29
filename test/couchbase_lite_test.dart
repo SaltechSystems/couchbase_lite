@@ -48,6 +48,20 @@ void main() {
                 code: "errArgs", message: "invalid arguments", details: null);
           }
           break;
+        case ("saveDocuments"):
+          if (arguments.containsKey("docs")) {
+            final docs = arguments["docs"];
+            return docs.map((doc) => {
+              "id": "docid",
+              "sequence": 1,
+              "success": true,
+              "doc": doc
+            }).toList();
+          } else {
+            return PlatformException(
+                code: "errArgs", message: "invalid arguments", details: null);
+          }
+          break;
         case ("saveDocumentWithId"):
           if (arguments.containsKey("map") && arguments.containsKey("id")) {
             return {
@@ -78,6 +92,16 @@ void main() {
         case ("deleteDocumentWithId"):
           if (arguments.containsKey("id")) {
             return true;
+          } else {
+            return PlatformException(
+                code: "errArgs",
+                message: "Query Error: Invalid Arguments",
+                details: arguments.toString());
+          }
+          break;
+        case ("deleteDocumentsWithIds"):
+          if (arguments.containsKey("ids")) {
+            return arguments["ids"].map((_) => true).toList();
           } else {
             return PlatformException(
                 code: "errArgs",
@@ -191,6 +215,10 @@ void main() {
     expect(await database.count, 1);
     expect(await database.saveDocument(MutableDocument()), true);
     expect(await database.saveDocument(MutableDocument(id: "docid")), true);
+
+    final mdocs = [MutableDocument(id: "id:1", data: {"value": 1.00}), MutableDocument(id: "id:2", data: {"value": 2.0})];
+    expect(await database.saveDocuments(mdocs), 2);
+    expect(await database.deleteDocuments(mdocs.map((doc) => doc.id!).toList()), 2);
     MutableDocument doc = MutableDocument();
     await database.saveDocument(doc);
     expect(doc.id, "documentid");

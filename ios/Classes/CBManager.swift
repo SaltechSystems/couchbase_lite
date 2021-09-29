@@ -98,10 +98,57 @@ class CBManager {
         return resultMap
     }
     
+    func saveDocuments(database: Database, docs: Array<Dictionary<String, Any>>, concurrencyControl: ConcurrencyControl) throws -> Array<NSMutableDictionary> {
+        
+        var  results = Array<NSMutableDictionary>.init();
+        try database.inBatch {
+            for doc in docs {
+                let result: NSMutableDictionary;
+                if let id = doc["_id"] as? String {
+                    let mdoc = NSMutableDictionary.init(dictionary: doc)
+                    mdoc.removeObject(forKey: "_id")
+                    mdoc.removeObject(forKey: "_sequence")
+                    
+                    if let sequence = doc["_sequence"]  as? UInt64 {
+                        result = try saveDocumentWithId(database: database, id: id, sequence: sequence, map: mdoc as! Dictionary<String, Any>, concurrencyControl: concurrencyControl)
+                    } else {
+                        result = try saveDocumentWithId(database: database, id: id, map: mdoc as! Dictionary<String, Any>, concurrencyControl: concurrencyControl)
+                    
+                    }
+                    
+                } else {
+                    result = try saveDocument(database: database, map: doc, concurrencyControl: concurrencyControl)
+                }
+               
+                results.append(result)
+            }
+        }
+            
+        return results
+        
+    }
+
     func deleteDocumentWithId(database: Database, id: String) throws {
         if let document = database.document(withID: id) {
             try database.deleteDocument(document)
         }
+    }
+    
+    func deleteDocumentsWithIds(database: Database, ids: Array<String>) throws -> Array<Bool> {
+        var  results = Array<Bool>.init();
+        try database.inBatch {
+            for id in ids {
+                var result = true
+                 do {
+                    try deleteDocumentWithId(database: database, id: id)
+                } catch {
+                    result = false;
+                }
+                results.append(result)
+            }
+        }
+            
+        return results
     }
     
     func getDocumentWithId(database: Database, id: String) -> NSDictionary? {
