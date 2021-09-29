@@ -1,3 +1,7 @@
+## 3.0.0-nullsafety.3
+
+* Added saveDocuments and deleteDocuments
+
 ## 3.0.0-nullsafety.2
 
 * Update Android library to version 2.8.6
