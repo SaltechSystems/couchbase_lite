@@ -63,6 +63,7 @@ unlinked_spec.ds
 **/ios/**/.vagrant/
 **/ios/**/DerivedData/
 **/ios/**/Icon?
+**/ios/**/Podfile.lock
 **/ios/**/Pods/
 **/ios/**/.symlinks/
 **/ios/**/profile
