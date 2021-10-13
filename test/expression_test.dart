@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:couchbase_lite/couchbase_lite.dart';
@@ -23,6 +24,14 @@ void main() {
         {"intValue": 1452}
       ]);
     });
+    final longVal = pow(2, 50).toInt();
+    Expression longExpr = Expression.intValue(longVal);
+    test("longValue()", () {
+      expect(longExpr.toJson(), [
+        {"longValue": longVal}
+      ]);
+    });
+
     Expression negatedExpr = Expression.negated(boolExpr);
     test("negated()", () {
       expect(negatedExpr.toJson(), [
