@@ -1,3 +1,7 @@
+## 3.0.0-nullsafety.4
+
+* Fixed issue with long value in query
+
 ## 3.0.0-nullsafety.3
 
 * Added saveDocuments and deleteDocuments
