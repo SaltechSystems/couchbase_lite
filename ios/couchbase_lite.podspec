@@ -17,7 +17,9 @@ Community edition of Couchbase Lite.  Couchbase Lite is an embedded lightweight,
   s.dependency 'Flutter'
   s.dependency 'CouchbaseLite-Swift', '~> 2.8.4'
 
-  s.ios.deployment_target = '9.0'
+  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'}
+  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64'}
+  s.ios.deployment_target = '11.0'
   s.osx.deployment_target  = '10.11'
 end
 
