@@ -17,7 +17,7 @@ abstract class Expression {
   // static Expression date(DateTime value);
 
   factory Expression.intValue(int value) {
-    return VariableExpression({'intValue': value});
+    return VariableExpression({value.bitLength > 32 ? 'longValue' : 'intValue': value});
   }
 
   factory Expression.value(Object value) {

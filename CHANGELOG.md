@@ -1,3 +1,8 @@
+## 3.0.0-nullsafety.4
+
+* Fixed issue with long value in query
+* Fixed building issue with Swift 5.5.1 compiler
+
 ## 3.0.0-nullsafety.3
 
 * Added saveDocuments and deleteDocuments

@@ -451,6 +451,8 @@ public class QueryJson {
                     returnExpression = Expression.float(value)
                 case ("intValue", let value as Int, _):
                     returnExpression = Expression.int(value)
+                case ("longValue", let value as Int64, _):
+                    returnExpression = Expression.int64(value)
                 case ("string", let value as String, _):
                     returnExpression = Expression.string(value)
                 case ("value", let value, _):
